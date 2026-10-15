@@ -1,0 +1,572 @@
+/* global require, __dirname */
+require('dotenv').config();
+const express = require('express');
+const http = require('http');
+const multer = require('multer');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+const { Server } = require('socket.io');
+const jwt = require('jsonwebtoken');
+const db = require('./db');
+const { JWT_SECRET, authenticateToken } = require('./middlewares/auth');
+const { upload } = require('./middlewares/upload');
+const CommentController = require('./controllers/CommentController');
+
+const authRoutes = require('./routes/authRoutes');
+const categoriesRoutes = require('./routes/categoriesRoutes');
+const contentsRoutes = require('./routes/contentsRoutes');
+const bookmarkRoutes = require('./routes/bookmarkRoutes');
+const readlistRoutes = require('./routes/readlistRoutes');
+const commentRoutes = require('./routes/commentRoutes');
+const voteRoutes = require('./routes/voteRoutes');
+const chapterReactionRoutes = require('./routes/chapterReactionRoutes');
+const chapterRoutes = require('./routes/chapterRoutes');
+const mangaRoutes = require('./routes/mangaRoutes');
+const comicRoutes = require('./routes/comicRoutes');
+const adsRoutes = require('./routes/adsRoutes');
+const featuredItemsRoutes = require('./routes/featuredItemsRoutes');
+const sitemapRoutes = require('./routes/sitemapRoutes');
+const ikiruRoutes = require('./routes/ikiruRoutes');
+const ikiruSyncRoutes = require('./routes/ikiruSyncRoutes');
+const apkomikSyncRoutes = require('./routes/apkomikSyncRoutes');
+const apkomikRoutes = require('./routes/apkomikRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
+const contactInfoRoutes = require('./routes/contactInfoRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const adminUserRoutes = require('./routes/adminUserRoutes');
+const leaderboardRoutes = require('./routes/leaderboardRoutes');
+const premiumOrderRoutes = require('./routes/premiumOrderRoutes');
+const stickerRoutes = require('./routes/stickerRoutes');
+const liveChatRoutes = require('./routes/liveChatRoutes');
+const imageProxyRoutes = require('./routes/imageProxyRoutes');
+const migrationRoutes = require('./routes/migrationRoutes');
+const scrapperSyncRoutes = require('./routes/scrapperSyncRoutes');
+const announcementRoutes = require('./routes/announcementRoutes');
+const { toProxiedImagePathIfNeeded } = require('./utils/ikiruCdnImage');
+const { CHAPTER_RELEASED_WHERE, isScheduledReleaseInFuture } = require('./utils/chapterRelease');
+const { validateApiOrigin } = require('./middlewares/validateApiOrigin');
+const { globalApiLimiter } = require('./middlewares/rateLimiter');
+const { encryptResponseMiddleware } = require('./utils/responseEncryptor');
+
+const app = express();
+app.set('trust proxy', 1);
+const server = http.createServer(app);
+const PORT = 3001;
+
+// Middleware
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://komiknesia.vercel.app',
+  'https://komiknesia.net',
+  'https://www.komiknesia.asia',
+  'https://02.komiknesia.asia',
+  'https://www.02.komiknesia.asia',
+  'https://03.komiknesia.asia',
+  'https://www.03.komiknesia.asia',
+  'https://id.komiknesia.net',
+  'https://komiknesia.site',
+  'https://www.komiknesia.site',
+  'https://v1.komiknesiaku.com',
+  'https://v2.komiknesia.site',
+  'https://v3.komiknesia.site',
+  'https://v4.komiknesia.site',
+  'https://v5.komiknesia.site',
+  'https://v6.komiknesia.site',
+  'https://v7.komiknesia.site',
+  'https://v8.komiknesia.site',
+  'https://v9.komiknesia.site'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Jika request tidak ada origin (misal Postman), izinkan juga
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
+app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads-komiknesia')));
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads-komiknesia');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+  },
+});
+
+app.set('io', io);
+
+// Anti-spam cooldown map for live chat
+const liveChatCooldowns = new Map(); // userId -> { lastTime, lastMessage }
+
+// Periodic cleanup of expired cooldown entries
+setInterval(() => {
+  const now = Date.now();
+  for (const [uid, rec] of liveChatCooldowns.entries()) {
+    if (now - rec.lastTime > 60000) liveChatCooldowns.delete(uid);
+  }
+}, 60000).unref();
+
+io.on('connection', (socket) => {
+  socket.on('live-chat:send', async (payload, ack) => {
+    try {
+      const message = String(payload?.message || '').trim();
+      const token = typeof payload?.token === 'string' ? payload.token : '';
+
+      if (!token) {
+        if (typeof ack === 'function') ack({ status: false, error: 'Access token required' });
+        return;
+      }
+
+      if (!message) {
+        if (typeof ack === 'function') ack({ status: false, error: 'Pesan tidak boleh kosong' });
+        return;
+      }
+
+      if (message.length > 300) {
+        if (typeof ack === 'function') {
+          ack({ status: false, error: 'Pesan terlalu panjang (maksimal 300 karakter)' });
+        }
+        return;
+      }
+
+      const decoded = jwt.verify(token, JWT_SECRET);
+
+      // Anti-Spam: Check cooldown (min 3 seconds between messages per user)
+      const now = Date.now();
+      const userLast = liveChatCooldowns.get(decoded.userId);
+      if (userLast && now - userLast.lastTime < 3000) {
+        const waitSec = Math.ceil((3000 - (now - userLast.lastTime)) / 1000);
+        if (typeof ack === 'function') {
+          ack({ status: false, error: `Tolong tunggu ${waitSec} detik sebelum mengirim pesan lagi.` });
+        }
+        return;
+      }
+
+      // Anti-Spam: Check duplicate message within 30 seconds
+      if (userLast && userLast.lastMessage?.toLowerCase() === message.toLowerCase() && now - userLast.lastTime < 30000) {
+        if (typeof ack === 'function') {
+          ack({ status: false, error: 'Pesan yang sama baru saja dikirim. Harap jangan spam pesan berulang.' });
+        }
+        return;
+      }
+
+      const [users] = await db.execute(
+        `SELECT id, username, name, profile_image
+         FROM users
+         WHERE id = ?`,
+        [decoded.userId]
+      );
+
+      if (users.length === 0) {
+        if (typeof ack === 'function') ack({ status: false, error: 'User not found' });
+        return;
+      }
+
+      const sender = users[0];
+      const [result] = await db.execute(
+        'INSERT INTO live_chat_messages (user_id, message) VALUES (?, ?)',
+        [sender.id, message]
+      );
+
+      // Update cooldown record
+      liveChatCooldowns.set(decoded.userId, { lastTime: now, lastMessage: message });
+
+      const [rows] = await db.execute(
+        `SELECT
+          c.id,
+          c.user_id,
+          c.message,
+          c.created_at,
+          u.username,
+          u.name,
+          u.profile_image,
+          u.is_membership,
+          u.membership_expires_at,
+          CASE
+            WHEN u.is_membership = 1 AND (u.membership_expires_at IS NULL OR u.membership_expires_at >= NOW())
+            THEN 1
+            ELSE 0
+          END AS membership_active,
+          u.role
+        FROM live_chat_messages c
+        JOIN users u ON u.id = c.user_id
+        WHERE c.id = ?`,
+        [result.insertId]
+      );
+
+      io.emit('live-chat:new-message', rows[0]);
+      if (typeof ack === 'function') ack({ status: true });
+    } catch {
+      if (typeof ack === 'function') ack({ status: false, error: 'Gagal mengirim pesan' });
+    }
+  });
+});
+
+// Middleware to dynamically rewrite S3/R2 image keys to use the current dynamic CDN domain
+const { tryParseS3KeyFromUrl, getDynamicCdnDomainSync } = require('./utils/s3Upload');
+
+function transformUrls(obj, cdnUrl) {
+  if (obj === null || obj === undefined) return obj;
+
+  if (obj instanceof Date) {
+    return obj;
+  }
+
+  if (typeof obj === 'string') {
+    if (obj.startsWith('/uploads/')) {
+      return obj;
+    }
+    const key = tryParseS3KeyFromUrl(obj);
+    if (key) {
+      const cleanCdn = cdnUrl.replace(/\/$/, '');
+      return `${cleanCdn}/${key}`;
+    }
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => transformUrls(item, cdnUrl));
+  }
+
+  if (typeof obj === 'object') {
+    const newObj = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        newObj[key] = transformUrls(obj[key], cdnUrl);
+      }
+    }
+    return newObj;
+  }
+
+  return obj;
+}
+
+app.use((req, res, next) => {
+  const originalJson = res.json;
+  res.json = function (body) {
+    if (body) {
+      const cdnUrl = getDynamicCdnDomainSync();
+      body = transformUrls(body, cdnUrl);
+    }
+    return originalJson.call(this, body);
+  };
+  next();
+});
+
+// Apply global API rate limiter
+app.use('/api', globalApiLimiter);
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/categories', encryptResponseMiddleware, categoriesRoutes);
+app.use('/api/contents', validateApiOrigin(), encryptResponseMiddleware, contentsRoutes);
+app.use('/api/bookmarks', bookmarkRoutes);
+app.use('/api/readlists', readlistRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/votes', voteRoutes);
+app.use('/api/chapter-reactions', chapterReactionRoutes);
+app.use('/api/manga', validateApiOrigin(), encryptResponseMiddleware, mangaRoutes);
+app.use('/api/chapters', validateApiOrigin(), encryptResponseMiddleware, chapterRoutes);
+app.use('/api/comic', validateApiOrigin(), encryptResponseMiddleware, comicRoutes);
+app.use('/api/ads', encryptResponseMiddleware, adsRoutes);
+app.use('/api/featured-items', validateApiOrigin(), encryptResponseMiddleware, featuredItemsRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/contact-info', encryptResponseMiddleware, contactInfoRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/admin/users', adminUserRoutes);
+app.use('/api/leaderboard', encryptResponseMiddleware, leaderboardRoutes);
+app.use('/api/premium-orders', premiumOrderRoutes);
+app.use('/api/announcements', announcementRoutes);
+app.use('/api/stickers', encryptResponseMiddleware, stickerRoutes);
+app.use('/api/live-chat', liveChatRoutes);
+app.use('/api', imageProxyRoutes);
+app.use('/api/ikiru', ikiruRoutes);
+app.use('/api/apkomik', apkomikRoutes);
+app.use('/api/admin/ikiru-sync', ikiruSyncRoutes);
+app.use('/api/admin/apkomik-sync', apkomikSyncRoutes);
+app.use('/api/admin/migration', migrationRoutes);
+app.use('/api/admin/scrapper-sync', scrapperSyncRoutes);
+app.post('/api/upload-image', authenticateToken, upload.single('image'), CommentController.uploadImage);
+app.use('/', sitemapRoutes);
+
+
+
+// (in-memory cache helpers were removed; caching is handled in dedicated modules/controllers)
+
+
+// Get chapter images by slug (format lokal dan kompatibel dengan frontend)
+app.get('/api/v/:chapterSlug', encryptResponseMiddleware, async (req, res) => {
+  try {
+    const { chapterSlug } = req.params;
+
+    // First, check if chapter exists in our database
+    const [chapters] = await db.execute(`
+      SELECT 
+        c.id,
+        c.chapter_number as number,
+        c.title,
+        c.slug,
+        c.manga_id,
+        c.scheduled_release_at,
+        m.is_input_manual,
+        m.slug as manga_slug,
+        m.title as manga_title,
+        m.thumbnail as manga_cover,
+        m.synopsis as manga_sinopsis,
+        m.author as manga_author,
+        m.content_type,
+        m.country_id,
+        m.color,
+        m.hot,
+        m.is_project,
+        m.is_safe,
+        m.rating,
+        m.bookmark_count,
+        m.views as total_views,
+        m.release,
+        m.status
+      FROM chapters c
+      JOIN manga m ON c.manga_id = m.id
+      WHERE c.slug = ?
+    `, [chapterSlug]);
+
+    if (chapters.length > 0) {
+      const chapter = chapters[0];
+
+      if (isScheduledReleaseInFuture(chapter.scheduled_release_at)) {
+        return res.status(404).json({ status: false, error: 'Chapter belum dirilis' });
+      }
+
+      // Hanya dukung manga input manual
+      if (chapter.is_input_manual) {
+        // Get all images for this chapter
+        const [images] = await db.execute(`
+          SELECT image_path
+          FROM chapter_images
+          WHERE chapter_id = ?
+          ORDER BY page_number
+        `, [chapter.id]);
+
+        // Get all chapters for this manga (for navigation)
+        const [allChapters] = await db.execute(`
+          SELECT 
+            c.id,
+            c.westmanga_chapter_id as content_id,
+            c.chapter_number as number,
+            c.title,
+            c.slug,
+            c.created_at,
+            UNIX_TIMESTAMP(COALESCE(c.scheduled_release_at, c.created_at)) as release_at_timestamp,
+            UNIX_TIMESTAMP(c.created_at) as created_at_timestamp
+          FROM chapters c
+          WHERE c.manga_id = ?
+            AND ${CHAPTER_RELEASED_WHERE}
+          ORDER BY CAST(c.chapter_number AS UNSIGNED) DESC, c.chapter_number DESC
+        `, [chapter.manga_id]);
+
+        // Get genres for this manga
+        const [genres] = await db.execute(`
+          SELECT c.id, c.name, c.slug
+          FROM manga_genres mg
+          JOIN categories c ON mg.category_id = c.id
+          WHERE mg.manga_id = ?
+        `, [chapter.manga_id]);
+
+        // Format response to match WestManga API format
+        const responseData = {
+          images: images.map(img => {
+            // Convert relative paths to full URLs if needed
+            if (img.image_path && !img.image_path.startsWith('http')) {
+              const localUrl = img.image_path.startsWith('/uploads/')
+                ? `${req.protocol}://${req.get('host')}${img.image_path}`
+                : img.image_path;
+              return toProxiedImagePathIfNeeded(localUrl, req);
+            }
+            return toProxiedImagePathIfNeeded(img.image_path, req);
+          }),
+          content: {
+            id: chapter.manga_id,
+            title: chapter.manga_title,
+            slug: chapter.manga_slug,
+            alternative_name: null,
+            author: chapter.manga_author || 'Unknown',
+            sinopsis: chapter.manga_sinopsis || null,
+            cover: toProxiedImagePathIfNeeded(chapter.manga_cover || null, req),
+            content_type: chapter.content_type || 'comic',
+            country_id: chapter.country_id || null,
+            color: chapter.color ? true : false,
+            hot: chapter.hot ? true : false,
+            is_project: chapter.is_project ? true : false,
+            is_safe: chapter.is_safe ? true : false,
+            rating: parseFloat(chapter.rating) || 0,
+            bookmark_count: chapter.bookmark_count || 0,
+            total_views: chapter.total_views || 0,
+            release: chapter.release || null,
+            status: chapter.status || 'ongoing',
+            genres: genres
+          },
+          chapters: allChapters.map(ch => ({
+            id: ch.id,
+            content_id: ch.content_id || ch.id,
+            number: ch.number,
+            title: ch.title || `Chapter ${ch.number}`,
+            slug: ch.slug,
+            created_at: {
+              time: parseInt(ch.release_at_timestamp || ch.created_at_timestamp, 10),
+              formatted: new Date(ch.created_at).toLocaleString('id-ID')
+            }
+          })),
+          number: chapter.number
+        };
+
+        return res.json({
+          status: true,
+          data: responseData
+        });
+      }
+      // Jika bukan manual, tidak didukung
+    }
+
+    return res.status(404).json({
+      status: false,
+      error: 'Chapter tidak ditemukan'
+    });
+  } catch (error) {
+    console.error('Error fetching chapter images:', error);
+    res.status(500).json({
+      status: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'File too large. Maximum size is 500KB' });
+    }
+  }
+  res.status(500).json({ error: error.message });
+  next();
+});
+
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
+});
+
+const runSqlMigration = async () => {
+  const statements = [
+    'ALTER TABLE users ADD COLUMN name VARCHAR(100) NULL AFTER id',
+    'ALTER TABLE users ADD COLUMN points INT NOT NULL DEFAULT 0',
+    'ALTER TABLE users ADD COLUMN is_membership TINYINT(1) NOT NULL DEFAULT 0',
+    'ALTER TABLE users ADD COLUMN membership_expires_at DATETIME NULL',
+    'ALTER TABLE users ADD COLUMN membership_type VARCHAR(20) NOT NULL DEFAULT \'web\'',
+    'ALTER TABLE users ADD COLUMN bio TEXT NULL AFTER email',
+    `CREATE TABLE IF NOT EXISTS user_chapter_reads (
+      id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+      user_id INT NOT NULL,
+      chapter_id INT NOT NULL,
+      exp_awarded INT NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      UNIQUE KEY uniq_user_chapter_read (user_id, chapter_id),
+      KEY idx_user_chapter_reads_user (user_id),
+      KEY idx_user_chapter_reads_chapter (chapter_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+    `CREATE TABLE IF NOT EXISTS premium_orders (
+      id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+      username VARCHAR(100) NOT NULL,
+      package_id VARCHAR(50) NOT NULL,
+      package_name VARCHAR(120) NOT NULL,
+      package_price VARCHAR(40) NULL,
+      proof_image VARCHAR(255) NOT NULL,
+      payment_status ENUM('pending', 'sukses') NOT NULL DEFAULT 'pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      KEY idx_premium_orders_status (payment_status),
+      KEY idx_premium_orders_created (created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+    `CREATE TABLE IF NOT EXISTS stickers (
+      id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+      name VARCHAR(120) NOT NULL,
+      image_path VARCHAR(255) NOT NULL,
+      is_gif TINYINT(1) NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      KEY idx_stickers_created (created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+    `CREATE TABLE IF NOT EXISTS live_chat_messages (
+      id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+      user_id INT NOT NULL,
+      message VARCHAR(300) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      KEY idx_live_chat_created (created_at),
+      KEY idx_live_chat_user (user_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+    `INSERT INTO settings (\`key\`, \`value\`)
+     VALUES
+       ('popup_ads_interval_minutes', '20'),
+       ('home_popup_interval_minutes', '30'),
+       ('redirect_script_urls', '["https://mbuh.my.id/siap/1770790072377-komiknesia.js"]')
+     ON DUPLICATE KEY UPDATE \`value\` = \`value\``,
+    'ALTER TABLE ads ADD COLUMN expired_at DATETIME NULL',
+    'ALTER TABLE chapters ADD COLUMN scheduled_release_at DATETIME NULL AFTER updated_at',
+    'ALTER TABLE chapters ADD INDEX idx_chapters_scheduled_release (scheduled_release_at)',
+    'ALTER TABLE settings MODIFY COLUMN `value` TEXT NULL',
+    'ALTER TABLE contact_info ADD COLUMN telegram VARCHAR(255) NULL AFTER whatsapp',
+    `CREATE TABLE IF NOT EXISTS email_otps (
+      id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+      email VARCHAR(191) NOT NULL,
+      otp_code VARCHAR(10) NOT NULL,
+      purpose ENUM('register', 'reset_password') NOT NULL,
+      payload TEXT NULL,
+      expires_at DATETIME NOT NULL,
+      is_used TINYINT(1) NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      KEY idx_email_otps_lookup (email, purpose, is_used, expires_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+  ];
+
+  for (const statement of statements) {
+    try {
+      await db.execute(statement);
+    } catch (error) {
+      // Ignore duplicate column when migration already applied.
+      if (
+        error &&
+        (error.code === 'ER_DUP_FIELDNAME' ||
+          error.errno === 1060 ||
+          error.code === 'ER_DUP_KEYNAME' ||
+          error.errno === 1061)
+      ) {
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  console.log('[migration] 20260423 migration checked/applied');
+};
+
+runSqlMigration().catch((error) => {
+  console.error('[migration] Failed running SQL migration:', error);
+});

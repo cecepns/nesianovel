@@ -1,0 +1,21 @@
+/* eslint-disable no-undef */
+/* eslint-env node */
+const router = require('express').Router();
+
+const { authenticateToken } = require('../middlewares/auth');
+const requireAdmin = require('../middlewares/requireAdmin');
+const { upload } = require('../middlewares/upload');
+const PremiumOrderController = require('../controllers/PremiumOrderController');
+
+// Public
+router.get('/packages', PremiumOrderController.getStorePackages);
+router.post('/', upload.single('proof_image'), PremiumOrderController.createOrder);
+
+// Admin
+router.get('/admin', authenticateToken, requireAdmin, PremiumOrderController.listOrders);
+router.patch('/admin/:id/status', authenticateToken, requireAdmin, PremiumOrderController.updateOrderStatus);
+router.delete('/admin/:id', authenticateToken, requireAdmin, PremiumOrderController.deleteOrder);
+router.put('/admin/packages', authenticateToken, requireAdmin, PremiumOrderController.updateStorePackages);
+router.get('/admin/recap/monthly', authenticateToken, requireAdmin, PremiumOrderController.getCoinPurchasesRecap);
+
+module.exports = router;

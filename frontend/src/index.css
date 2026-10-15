@@ -1,0 +1,214 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+}
+
+body {
+  background-color: #0c0717;
+  color: #f3f4f6;
+}
+
+@layer components {
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* React Quill Dark Purple Theme */
+.dark .ql-toolbar,
+.ql-toolbar {
+  border-color: #2e1e54 !important;
+  background-color: #170f2e !important;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+
+.dark .ql-container,
+.ql-container {
+  border-color: #2e1e54 !important;
+  background-color: #100a20 !important;
+  color: #f3f4f6 !important;
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+  font-size: 1rem;
+}
+
+.dark .ql-editor,
+.ql-editor {
+  color: #f3f4f6 !important;
+  min-height: 250px;
+}
+
+.dark .ql-stroke,
+.ql-stroke {
+  stroke: #c084fc !important;
+}
+
+.dark .ql-fill,
+.ql-fill {
+  fill: #c084fc !important;
+}
+
+.dark .ql-picker-label,
+.ql-picker-label {
+  color: #c084fc !important;
+}
+
+.dark .ql-picker-options,
+.ql-picker-options {
+  background-color: #170f2e !important;
+  border-color: #2e1e54 !important;
+}
+
+.dark .ql-picker-item:hover,
+.ql-picker-item:hover {
+  background-color: #2e1e54 !important;
+  color: #f3f4f6 !important;
+}
+
+/* Novel Admin Quill Editor custom overrides */
+.novel-admin-quill .ql-toolbar {
+  border-color: #3b286d !important;
+  background-color: #1a1236 !important;
+  padding: 10px 12px !important;
+}
+
+.novel-admin-quill .ql-container {
+  border-color: #3b286d !important;
+  background-color: #0d081a !important;
+  font-size: 0.95rem;
+}
+
+.novel-admin-quill .ql-editor {
+  min-height: 320px !important;
+  line-height: 1.75;
+  color: #f3f4f6 !important;
+  padding: 16px 20px !important;
+}
+
+.novel-admin-quill .ql-editor.ql-blank::before {
+  color: rgba(192, 132, 252, 0.45) !important;
+  font-style: italic;
+  left: 20px;
+  right: 20px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f0a1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2e1e54;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7e22ce;
+}
+
+/* Novel Reader content typography */
+.novel-content {
+  font-family: inherit;
+  word-break: break-word;
+}
+
+.novel-content p {
+  margin-bottom: 1.25em;
+  line-height: 1.85;
+}
+
+.novel-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  margin: 1.5rem auto;
+  display: block;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.novel-content a {
+  color: #c084fc;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
+}
+
+.novel-content a:hover {
+  color: #e9d5ff;
+}
+
+/* ── Chapter Card Clean Dark Purple Gradient Border ── */
+/* Replaces heavy animations with sleek dark purple gradient border */
+.chapter-border-item {
+  position: relative;
+  border-radius: 0.75rem;
+  background: #140d28;
+  border: 1px solid rgba(147, 51, 234, 0.22);
+  transition: all 0.2s ease-in-out;
+}
+
+.chapter-border-item:hover {
+  border-color: rgba(168, 85, 247, 0.6);
+  background: #1a1135;
+  box-shadow: 0 4px 14px rgba(126, 34, 206, 0.2);
+}
+
+.chapter-border-locked {
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  background: #17112a;
+}
+
+.chapter-border-locked:hover {
+  border-color: rgba(234, 179, 8, 0.6);
+  box-shadow: 0 4px 14px rgba(234, 179, 8, 0.15);
+}
+
+/* Backward compatibility for previous classes */
+.chapter-border-anim,
+.chapter-border-static {
+  position: relative;
+  border-radius: 0.75rem;
+  background: #140d28;
+  border: 1px solid rgba(147, 51, 234, 0.25);
+  transition: all 0.2s ease-in-out;
+}
+
+.chapter-border-anim:hover,
+.chapter-border-static:hover {
+  border-color: rgba(168, 85, 247, 0.65);
+  background: #1a1135;
+  box-shadow: 0 4px 14px rgba(126, 34, 206, 0.2);
+}
+
+.chapter-border-unlocked {
+  border-color: rgba(147, 51, 234, 0.3);
+}

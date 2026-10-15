@@ -1,0 +1,1060 @@
+const db = require('../db');
+const { recordMangaViewEvent } = require('../utils/recordMangaViewEvent');
+const { upload } = require('../middlewares/upload'); // used in routes, not here
+const { deleteFile, resolveLocalUploadPath } = require('../utils/files');
+const { uploadFileToS3 } = require('../utils/s3Upload');
+const { deleteUrlFromS3 } = require('../utils/s3Upload');
+const {
+  isIkiruCdnUrl,
+  isYuuCdnUrl,
+  isCdnapUrl,
+  getIkiruCdnFetchHeaders,
+  isPromoIkiruResponse,
+  isYuuCdnPromoResponse,
+  toProxiedImagePathIfNeeded,
+  IKIRU_CDN_PROXY,
+  YUUCDN_PROXY,
+} = require('../utils/ikiruCdnImage');
+const {
+  CHAPTER_RELEASED_WHERE,
+  parseScheduledReleaseAt,
+  isScheduledReleaseInFuture,
+  refreshMangaChapterActivity,
+} = require('../utils/chapterRelease');
+const { invalidateContentsCaches } = require('./ContentsController');
+const fs = require('fs');
+const path = require('path');
+const axios = require('axios');
+const AdmZip = require('adm-zip');
+const guessImageExtension = (imagePath, contentType) => {
+  if (contentType) {
+    if (contentType.includes('png')) return '.png';
+    if (contentType.includes('webp')) return '.webp';
+    if (contentType.includes('gif')) return '.gif';
+    if (contentType.includes('jpeg') || contentType.includes('jpg')) return '.jpg';
+  }
+  if (!imagePath) return '.jpg';
+  const lower = String(imagePath).toLowerCase();
+  if (lower.includes('.png')) return '.png';
+  if (lower.includes('.webp')) return '.webp';
+  if (lower.includes('.gif')) return '.gif';
+  return '.jpg';
+};
+
+const loadImageZipEntry = async (imagePath, index) => {
+  const pageName = `page-${String(index + 1).padStart(3, '0')}`;
+
+  if (!imagePath) return null;
+
+  if (imagePath.startsWith('/uploads/')) {
+    const localPath = resolveLocalUploadPath(imagePath);
+    if (localPath && fs.existsSync(localPath)) {
+      const ext = path.extname(localPath) || guessImageExtension(imagePath);
+      return {
+        name: `${pageName}${ext}`,
+        buffer: fs.readFileSync(localPath),
+      };
+    }
+    return null;
+  }
+
+  let absoluteUrl = null;
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    absoluteUrl = imagePath;
+  } else if (imagePath.startsWith('/')) {
+    // Relative path but not local uploads folder, assume S3 CDN / public origin
+    const cdnBase = process.env.S3_ENDPOINT || 'https://data.cdnesia.my.id';
+    absoluteUrl = `${cdnBase.replace(/\/+$/, '')}${imagePath}`;
+  }
+
+  if (!absoluteUrl) return null;
+
+  const isIkiru = isIkiruCdnUrl(absoluteUrl);
+  const isYuu = isIkiru && isYuuCdnUrl(absoluteUrl);
+  const isCdnap = isCdnapUrl(absoluteUrl);
+
+  let response;
+  let directFailedOrPromo = false;
+
+  // For YuuCDN: route request through the Cloudflare Worker to bypass VPS IP block / referrer check
+  if (isYuu) {
+    const yuuWorkerUrl = process.env.YUUCDN_WORKER_URL || 'https://proxy.cdnesia.my.id';
+    let yuuFetchUrl = absoluteUrl;
+    if (yuuWorkerUrl) {
+      try {
+        const u = new URL(absoluteUrl);
+        const workerBase = yuuWorkerUrl.replace(/\/+$/, '');
+        yuuFetchUrl = `${workerBase}${u.pathname}${u.search}`;
+        console.log(`[loadImageZipEntry] Routing Yuu fetch through Worker: ${yuuFetchUrl}`);
+      } catch (e) {
+        console.warn(`[loadImageZipEntry] Failed to parse target URL:`, e.message);
+      }
+    }
+
+    try {
+      response = await axios.get(yuuFetchUrl, {
+        responseType: 'arraybuffer',
+        timeout: 20000,
+        maxRedirects: 5,
+        validateStatus: (status) => status >= 200 && status < 300,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        },
+      });
+
+      const finalUrl = response.request?.res?.responseUrl || absoluteUrl;
+      if (isYuu && isYuuCdnPromoResponse(finalUrl, absoluteUrl)) {
+        directFailedOrPromo = true;
+        response = null;
+      }
+    } catch (err) {
+      directFailedOrPromo = true;
+    }
+  } else if (isCdnap) {
+    // For cdnap.site: fetch directly using the residential proxy (YUUCDN_PROXY) to bypass Cloudflare challenge/bot mode
+    try {
+      const yuuProxyUrl = YUUCDN_PROXY || IKIRU_CDN_PROXY || process.env.OUTBOUND_PROXY || '';
+      let yuuAgent = null;
+      if (yuuProxyUrl) {
+        try {
+          const { HttpsProxyAgent } = require('https-proxy-agent');
+          yuuAgent = new HttpsProxyAgent(yuuProxyUrl);
+        } catch (e) { }
+      }
+      response = await axios.get(absoluteUrl, {
+        responseType: 'arraybuffer',
+        timeout: 20000,
+        maxRedirects: 5,
+        validateStatus: (status) => status >= 200 && status < 300,
+        headers: getIkiruCdnFetchHeaders('https://01.apkomik.com/', absoluteUrl),
+        ...(yuuAgent ? { httpsAgent: yuuAgent } : {}),
+      });
+    } catch (err) {
+      console.warn(`[loadImageZipEntry] Failed to fetch cdnap URL via proxy:`, err.message);
+      directFailedOrPromo = true;
+    }
+  } else {
+    // Normal S3 CDN / direct URLs
+    try {
+      response = await axios.get(absoluteUrl, {
+        responseType: 'arraybuffer',
+        timeout: 20000,
+        maxRedirects: 5,
+        validateStatus: (status) => status >= 200 && status < 300,
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        },
+      });
+    } catch (err) {
+      console.warn(`[loadImageZipEntry] Direct fetch failed for ${absoluteUrl}:`, err.message);
+      directFailedOrPromo = true;
+    }
+  }
+
+  // Fallback to proxy or generic fetch if direct failed/redirected
+  if (!response || directFailedOrPromo) {
+    const useProxyNow = isIkiru && !isYuu;
+    let httpsAgent = null;
+    const proxyUrl = IKIRU_CDN_PROXY || process.env.OUTBOUND_PROXY || process.env.HTTPS_PROXY || process.env.HTTP_PROXY || '';
+    if (proxyUrl && useProxyNow) {
+      try {
+        const { HttpsProxyAgent } = require('https-proxy-agent');
+        httpsAgent = new HttpsProxyAgent(proxyUrl);
+      } catch { }
+    }
+
+    try {
+      let refererHeader = 'https://komiknesia.com/';
+      try {
+        const u = new URL(absoluteUrl);
+        refererHeader = `${u.origin}/`;
+      } catch {}
+
+      response = await axios.get(absoluteUrl, {
+        responseType: 'arraybuffer',
+        timeout: 45000,
+        maxRedirects: 5,
+        validateStatus: (status) => status >= 200 && status < 300,
+        headers: useProxyNow
+          ? getIkiruCdnFetchHeaders('https://v6.kiryuu.to/', absoluteUrl)
+          : {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            'Referer': refererHeader,
+          },
+        ...(httpsAgent ? { httpsAgent } : {})
+      });
+    } catch (err) {
+      console.warn(`Failed fetching image for zip (${absoluteUrl}):`, err.message);
+      return null;
+    }
+  }
+
+
+  const finalUrl = response.request?.res?.responseUrl || absoluteUrl;
+  const isPromo = isYuu
+    ? isYuuCdnPromoResponse(finalUrl, absoluteUrl)
+    : isPromoIkiruResponse(finalUrl, absoluteUrl);
+  if (isPromo) {
+    console.warn(`Skipped promo image for zip (${absoluteUrl})`);
+    return null;
+  }
+
+  const ext = guessImageExtension(absoluteUrl, response.headers['content-type']);
+  return {
+    name: `${pageName}${ext}`,
+    buffer: Buffer.from(response.data),
+  };
+};
+
+const showBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    const [chapters] = await db.execute(
+      `
+      SELECT 
+        c.id,
+        c.chapter_number as number,
+        c.title,
+        c.slug,
+        c.manga_id,
+        c.content,
+        c.coin_price,
+        c.is_locked,
+        c.scheduled_release_at,
+        m.is_input_manual,
+        m.slug as manga_slug,
+        m.title as manga_title,
+        m.thumbnail as manga_cover,
+        m.synopsis as manga_sinopsis,
+        m.author as manga_author,
+        m.content_type,
+        m.country_id,
+        m.color,
+        m.hot,
+        m.is_project,
+        m.is_safe,
+        m.rating,
+        m.bookmark_count,
+        m.views as total_views,
+        m.release,
+        m.status
+      FROM chapters c
+      JOIN manga m ON c.manga_id = m.id
+      WHERE c.slug = ?
+    `,
+      [slug]
+    );
+
+    if (chapters.length > 0) {
+      const chapter = chapters[0];
+
+      if (isScheduledReleaseInFuture(chapter.scheduled_release_at)) {
+        return res.status(404).json({
+          status: false,
+          error: 'Chapter belum dirilis',
+        });
+      }
+
+      try {
+        await db.execute(
+          'UPDATE chapters SET views = COALESCE(views, 0) + 1, updated_at = updated_at WHERE id = ?',
+          [chapter.id]
+        );
+      } catch (viewErr) {
+        console.warn('Chapter view increment failed:', viewErr.message);
+      }
+
+      await recordMangaViewEvent(chapter.manga_id);
+
+      const [images] = await db.execute(
+        `
+        SELECT image_path
+        FROM chapter_images
+        WHERE chapter_id = ?
+        ORDER BY page_number
+      `,
+        [chapter.id]
+      );
+
+      const [allChapters] = await db.execute(
+        `
+        SELECT 
+          c.id,
+          c.westmanga_chapter_id as content_id,
+          c.chapter_number as number,
+          c.title,
+          c.slug,
+          c.coin_price,
+          c.is_locked,
+          c.created_at,
+          c.scheduled_release_at,
+          UNIX_TIMESTAMP(COALESCE(c.scheduled_release_at, c.created_at)) as release_at_timestamp,
+          UNIX_TIMESTAMP(c.created_at) as created_at_timestamp,
+          COALESCE(c.views, 0) AS views,
+          (
+            SELECT COUNT(*) FROM chapter_reactions cr WHERE cr.chapter_id = c.id
+          ) AS reaction_count
+        FROM chapters c
+        WHERE c.manga_id = ?
+          AND ${CHAPTER_RELEASED_WHERE}
+        ORDER BY CAST(c.chapter_number AS UNSIGNED) DESC, c.chapter_number DESC
+      `,
+        [chapter.manga_id]
+      );
+
+      const [genres] = await db.execute(
+        `
+        SELECT c.id, c.name, c.slug
+        FROM manga_genres mg
+        JOIN categories c ON mg.category_id = c.id
+        WHERE mg.manga_id = ?
+      `,
+        [chapter.manga_id]
+      );
+
+      let isVip = false;
+      let userCoins = 0;
+      const unlockedChapterIds = new Set();
+
+      if (req.user?.id) {
+        const [userRows] = await db.execute(
+          `SELECT
+            points,
+            is_membership,
+            membership_expires_at,
+            CASE
+              WHEN is_membership = 1 AND (membership_expires_at IS NULL OR membership_expires_at >= NOW())
+              THEN 1
+              ELSE 0
+            END AS membership_active
+           FROM users
+           WHERE id = ?`,
+          [req.user.id]
+        );
+
+        if (userRows.length > 0) {
+          userCoins = Number(userRows[0].points || 0);
+          isVip = !!userRows[0].membership_active;
+        }
+
+        const [unlockedRows] = await db.execute(
+          'SELECT chapter_id FROM user_unlocked_chapters WHERE user_id = ?',
+          [req.user.id]
+        );
+        for (const ur of unlockedRows) {
+          unlockedChapterIds.add(ur.chapter_id);
+        }
+      }
+
+      const isChapterLocked = !!chapter.is_locked;
+      const isUnlocked = isVip || !isChapterLocked || unlockedChapterIds.has(chapter.id);
+
+      const responseData = {
+        id: chapter.id,
+        novel_content: isUnlocked ? (chapter.content || '') : null,
+        is_locked: isChapterLocked,
+        is_unlocked: isUnlocked,
+        coin_price: chapter.coin_price || 25,
+        user_coins: userCoins,
+        user_is_vip: isVip,
+        images: images.map((img) => toProxiedImagePathIfNeeded(img.image_path, req)),
+        content: {
+          id: chapter.manga_id,
+          title: chapter.manga_title,
+          slug: chapter.manga_slug,
+          alternative_name: null,
+          author: chapter.manga_author || 'Unknown',
+          sinopsis: chapter.manga_sinopsis || null,
+          cover: toProxiedImagePathIfNeeded(chapter.manga_cover || null, req),
+          content_type: chapter.content_type || 'novel',
+          country_id: chapter.country_id || null,
+          color: !!chapter.color,
+          hot: !!chapter.hot,
+          is_project: !!chapter.is_project,
+          is_safe: !!chapter.is_safe,
+          rating: parseFloat(chapter.rating) || 0,
+          bookmark_count: chapter.bookmark_count || 0,
+          total_views: chapter.total_views || 0,
+          release: chapter.release || null,
+          status: chapter.status || 'ongoing',
+          genres,
+        },
+        chapters: allChapters.map((ch) => ({
+          id: ch.id,
+          content_id: ch.content_id || ch.id,
+          number: ch.number,
+          title: ch.title || `Chapter ${ch.number}`,
+          slug: ch.slug,
+          coin_price: ch.coin_price || 25,
+          is_locked: !!ch.is_locked,
+          is_unlocked: isVip || !ch.is_locked || unlockedChapterIds.has(ch.id),
+          views: Number(ch.views) || 0,
+          reaction_count: Number(ch.reaction_count) || 0,
+          created_at: {
+            time: parseInt(ch.release_at_timestamp || ch.created_at_timestamp, 10),
+            formatted: new Date(ch.created_at).toLocaleString('id-ID'),
+          },
+        })),
+        number: chapter.number,
+        title: chapter.title,
+        slug: chapter.slug,
+      };
+
+      // Award EXP once per user per chapter.
+      if (req.user?.id) {
+        const expGain = isVip ? 24 : 20;
+        let gainedExp = 0;
+
+        try {
+          const [insertRead] = await db.execute(
+            `INSERT IGNORE INTO user_chapter_reads (user_id, chapter_id, exp_awarded)
+             VALUES (?, ?, ?)`,
+            [req.user.id, chapter.id, expGain]
+          );
+
+          if (insertRead.affectedRows > 0) {
+            await db.execute(
+              'UPDATE users SET points = points + ? WHERE id = ?',
+              [expGain, req.user.id]
+            );
+            gainedExp = expGain;
+            userCoins += expGain;
+          }
+
+          responseData.reader = {
+            points: userCoins,
+            gained_exp: gainedExp,
+            is_membership: isVip,
+            membership_active: isVip,
+          };
+        } catch (awardError) {
+          console.warn('Failed awarding chapter exp:', awardError.message);
+        }
+      }
+
+      return res.json({
+        status: true,
+        data: responseData,
+      });
+    }
+
+    res.status(404).json({ error: 'Chapter not found' });
+  } catch (error) {
+    console.error('Error fetching chapter:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const showByNovelAndChapter = async (req, res) => {
+  try {
+    const { novelSlug, chapterSlug } = req.params;
+    const numPart = String(chapterSlug || '').replace(/^[^\d]*-?/, '');
+    const [rows] = await db.execute(
+      `SELECT c.slug FROM chapters c 
+       JOIN manga m ON c.manga_id = m.id 
+       WHERE m.slug = ? AND (c.slug = ? OR c.slug = ? OR c.chapter_number = ?)
+       LIMIT 1`,
+      [novelSlug, chapterSlug, `${novelSlug}-${chapterSlug}`, numPart]
+    );
+
+    if (rows.length > 0) {
+      req.params.slug = rows[0].slug;
+      return showBySlug(req, res);
+    }
+
+    req.params.slug = chapterSlug;
+    return showBySlug(req, res);
+  } catch (error) {
+    console.error('Error fetching chapter by novel and chapter slug:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const listByManga = async (req, res) => {
+  try {
+    const { mangaId } = req.params;
+    const [chapters] = await db.execute(
+      `
+      SELECT 
+        c.id,
+        c.manga_id,
+        c.chapter_number,
+        c.title,
+        c.slug,
+        c.cover,
+        c.coin_price,
+        c.is_locked,
+        c.views,
+        c.created_at,
+        c.scheduled_release_at,
+        LENGTH(COALESCE(c.content, '')) AS content_length,
+        COUNT(ci.id) as image_count
+      FROM chapters c
+      LEFT JOIN chapter_images ci ON c.id = ci.chapter_id
+      WHERE c.manga_id = ?
+      GROUP BY c.id
+      ORDER BY CAST(c.chapter_number AS UNSIGNED) DESC, c.chapter_number DESC
+    `,
+      [mangaId]
+    );
+
+    res.json(chapters);
+  } catch (error) {
+    console.error('Error fetching chapters:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const showById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await db.execute('SELECT * FROM chapters WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Chapter not found' });
+    }
+    res.json({ status: true, data: rows[0] });
+  } catch (error) {
+    console.error('Error fetching chapter by id:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const unlockWithCoins = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ status: false, error: 'Silakan login terlebih dahulu untuk membuka chapter.' });
+    }
+    const { id, slug } = req.params;
+    let chapter = null;
+    if (id && !isNaN(parseInt(id, 10))) {
+      const [rows] = await db.execute('SELECT * FROM chapters WHERE id = ?', [id]);
+      if (rows.length > 0) chapter = rows[0];
+    }
+    if (!chapter && (slug || req.body?.slug)) {
+      const targetSlug = slug || req.body?.slug;
+      const [rows] = await db.execute('SELECT * FROM chapters WHERE slug = ?', [targetSlug]);
+      if (rows.length > 0) chapter = rows[0];
+    }
+    if (!chapter) {
+      return res.status(404).json({ status: false, error: 'Chapter tidak ditemukan' });
+    }
+
+    // Check if user is VIP
+    if (req.user.membership_active) {
+      return res.json({ status: true, message: 'Kamu adalah member VIP, semua chapter dapat dibaca gratis!', is_vip: true, is_unlocked: true });
+    }
+
+    // Check if already unlocked
+    const [alreadyUnlocked] = await db.execute(
+      'SELECT id FROM user_unlocked_chapters WHERE user_id = ? AND chapter_id = ?',
+      [req.user.id, chapter.id]
+    );
+    if (alreadyUnlocked.length > 0) {
+      return res.json({ status: true, message: 'Chapter ini sudah kamu buka sebelumnya', already_unlocked: true, is_unlocked: true });
+    }
+
+    const price = chapter.coin_price || 25;
+    const [userRows] = await db.execute('SELECT points FROM users WHERE id = ?', [req.user.id]);
+    const currentPoints = Number(userRows[0]?.points || 0);
+
+    if (currentPoints < price) {
+      return res.status(400).json({
+        status: false,
+        error: `Koin tidak mencukupi. Diperlukan ${price} koin (koin kamu: ${currentPoints}). Silakan top-up di Store.`,
+        required_coins: price,
+        current_coins: currentPoints,
+      });
+    }
+
+    // Deduct points & save unlock
+    await db.execute('UPDATE users SET points = points - ? WHERE id = ?', [price, req.user.id]);
+    await db.execute(
+      'INSERT INTO user_unlocked_chapters (user_id, chapter_id, coins_spent) VALUES (?, ?, ?)',
+      [req.user.id, chapter.id, price]
+    );
+
+    return res.json({
+      status: true,
+      message: `Berhasil membuka ${chapter.title || 'Chapter ' + chapter.chapter_number}!`,
+      remaining_coins: currentPoints - price,
+      chapter_id: chapter.id,
+      is_unlocked: true,
+    });
+  } catch (error) {
+    console.error('Error unlocking chapter with coins:', error);
+    return res.status(500).json({ status: false, error: 'Internal server error' });
+  }
+};
+
+const create = async (req, res) => {
+  try {
+    const { mangaId } = req.params;
+    const { title, chapter_number, content, coin_price, is_locked } = req.body;
+    let cover = null;
+    if (req.file) {
+      const ext = path.extname(req.file.originalname || req.file.filename || '') || '.webp';
+      const key = `komiknesia/chapters/${mangaId}/cover-${Date.now()}${ext}`;
+      cover = await uploadFileToS3(key, req.file.path, req.file.mimetype);
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch { }
+    }
+
+    const [mangaRows] = await db.execute('SELECT slug FROM manga WHERE id = ?', [mangaId]);
+    if (mangaRows.length === 0) {
+      return res.status(404).json({ error: 'Manga not found' });
+    }
+
+    const mangaSlug = mangaRows[0].slug;
+    const chapterSlug = `${mangaSlug}-chapter-${chapter_number}`;
+    const coinPrice = parseInt(coin_price, 10) || 25;
+    const isLocked = is_locked === '1' || is_locked === 1 || is_locked === true ? 1 : 0;
+
+    const [result] = await db.execute(
+      'INSERT INTO chapters (manga_id, title, chapter_number, slug, cover, content, coin_price, is_locked) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [mangaId, title, chapter_number, chapterSlug, cover, content || null, coinPrice, isLocked]
+    );
+
+    await refreshMangaChapterActivity(db, mangaId);
+    invalidateContentsCaches();
+
+    res.status(201).json({ id: result.insertId, message: 'Chapter created successfully' });
+  } catch (error) {
+    console.error('Error creating chapter:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const update = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, chapter_number, content, coin_price, is_locked, scheduled_release_at, release_mode, remove_cover } = req.body;
+
+    const [chapterRows] = await db.execute('SELECT manga_id FROM chapters WHERE id = ?', [id]);
+    if (chapterRows.length === 0) {
+      return res.status(404).json({ error: 'Chapter not found' });
+    }
+
+    const [mangaRows] = await db.execute('SELECT slug FROM manga WHERE id = ?', [
+      chapterRows[0].manga_id,
+    ]);
+    if (mangaRows.length === 0) {
+      return res.status(404).json({ error: 'Manga not found' });
+    }
+
+    const mangaSlug = mangaRows[0].slug;
+    const chapterSlug = `${mangaSlug}-chapter-${chapter_number}`;
+
+    let query = 'UPDATE chapters SET title = ?, chapter_number = ?, slug = ?';
+    const params = [title, chapter_number, chapterSlug];
+
+    if (content !== undefined) {
+      query += ', content = ?';
+      params.push(content);
+    }
+    if (coin_price !== undefined) {
+      query += ', coin_price = ?';
+      params.push(parseInt(coin_price, 10) || 25);
+    }
+    if (is_locked !== undefined) {
+      query += ', is_locked = ?';
+      params.push(is_locked === '1' || is_locked === 1 || is_locked === true ? 1 : 0);
+    }
+
+    const wantsScheduled = release_mode === 'scheduled';
+    const parsedSchedule = wantsScheduled ? parseScheduledReleaseAt(scheduled_release_at) : null;
+    query += ', scheduled_release_at = ?';
+    params.push(parsedSchedule);
+
+    if (req.file) {
+      const ext = path.extname(req.file.originalname || req.file.filename || '') || '.webp';
+      const key = `komiknesia/chapters/${chapterRows[0].manga_id}/cover-${Date.now()}${ext}`;
+      const url = await uploadFileToS3(key, req.file.path, req.file.mimetype);
+      query += ', cover = ?';
+      params.push(url);
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch { }
+    } else if (remove_cover === 'true' || remove_cover === true) {
+      query += ', cover = NULL';
+    }
+
+    query += ' WHERE id = ?';
+    params.push(id);
+
+    await db.execute(query, params);
+
+    await refreshMangaChapterActivity(db, chapterRows[0].manga_id);
+    invalidateContentsCaches();
+
+    res.json({ message: 'Chapter updated successfully' });
+  } catch (error) {
+    console.error('Error updating chapter:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const destroy = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [chapterRows] = await db.execute(
+      'SELECT cover, manga_id FROM chapters WHERE id = ?',
+      [id]
+    );
+
+    if (chapterRows.length === 0) {
+      return res.status(404).json({ error: 'Chapter not found' });
+    }
+
+    const chapter = chapterRows[0];
+
+    const [mangaRows] = await db.execute(
+      'SELECT is_input_manual FROM manga WHERE id = ?',
+      [chapter.manga_id]
+    );
+
+    if (mangaRows.length > 0 && mangaRows[0].is_input_manual) {
+      deleteFile(chapter.cover);
+      try {
+        await deleteUrlFromS3(chapter.cover);
+      } catch (e) {
+        console.warn('Failed deleting chapter cover from S3:', e.message);
+      }
+
+      const [images] = await db.execute(
+        'SELECT image_path FROM chapter_images WHERE chapter_id = ?',
+        [id]
+      );
+
+      for (const image of images) {
+        deleteFile(image.image_path);
+        try {
+          await deleteUrlFromS3(image.image_path);
+        } catch (e) {
+          console.warn('Failed deleting chapter image from S3:', e.message);
+        }
+      }
+    }
+
+    await db.execute('DELETE FROM chapters WHERE id = ?', [id]);
+    await refreshMangaChapterActivity(db, chapter.manga_id);
+    invalidateContentsCaches();
+    res.json({ message: 'Chapter deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting chapter:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const listImages = async (req, res) => {
+  try {
+    const { chapterId } = req.params;
+
+    const [images] = await db.execute(
+      'SELECT id, image_path, page_number, created_at FROM chapter_images WHERE chapter_id = ? ORDER BY page_number',
+      [chapterId]
+    );
+
+    res.json(
+      images.map((img) => ({
+        ...img,
+        image_path: toProxiedImagePathIfNeeded(img.image_path, req),
+      }))
+    );
+  } catch (error) {
+    console.error('Error fetching chapter images:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const uploadImages = async (req, res) => {
+  try {
+    const { chapterId } = req.params;
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'No images provided' });
+    }
+
+    const [maxPage] = await db.execute(
+      'SELECT COALESCE(MAX(page_number), 0) as max_page FROM chapter_images WHERE chapter_id = ?',
+      [chapterId]
+    );
+
+    const startPageNumber = maxPage[0].max_page + 1;
+
+    // Upload to S3 first, then insert URLs
+    const insertPromises = req.files.map(async (file, index) => {
+      const ext = path.extname(file.originalname || file.filename || '') || '.webp';
+      const key = `komiknesia/chapters/${chapterId}/pages/${startPageNumber + index}-${Date.now()}${ext}`;
+      const url = await uploadFileToS3(key, file.path, file.mimetype);
+      try {
+        fs.unlinkSync(file.path);
+      } catch { }
+      return db.execute(
+        'INSERT INTO chapter_images (chapter_id, image_path, page_number) VALUES (?, ?, ?)',
+        [chapterId, url, startPageNumber + index]
+      );
+    });
+
+    await Promise.all(insertPromises);
+
+    res.status(201).json({ message: 'Images uploaded successfully' });
+  } catch (error) {
+    console.error('Error uploading chapter images:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const deleteImage = async (req, res) => {
+  try {
+    const { chapterId, imageId } = req.params;
+
+    const [images] = await db.execute(
+      'SELECT id, image_path FROM chapter_images WHERE id = ? AND chapter_id = ?',
+      [imageId, chapterId]
+    );
+
+    if (images.length === 0) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    const imagePath = images[0].image_path;
+
+    const [mangaRows] = await db.execute(
+      `SELECT m.is_input_manual 
+       FROM manga m 
+       JOIN chapters c ON m.id = c.manga_id 
+       WHERE c.id = ?`,
+      [chapterId]
+    );
+
+    if (mangaRows.length > 0 && mangaRows[0].is_input_manual) {
+      deleteFile(imagePath);
+      try {
+        await deleteUrlFromS3(imagePath);
+      } catch (e) {
+        console.warn('Failed deleting chapter image from S3:', e.message);
+      }
+    }
+
+    await db.execute('DELETE FROM chapter_images WHERE id = ?', [imageId]);
+
+    res.json({ message: 'Image deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting chapter image:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const reorderImages = async (req, res) => {
+  let connection;
+  try {
+    const { chapterId } = req.params;
+    const { images } = req.body;
+
+    if (!Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({ error: 'Images array is required' });
+    }
+
+    for (const image of images) {
+      if (!image.id || image.page_number === undefined || image.page_number === null) {
+        return res
+          .status(400)
+          .json({ error: 'Each image must have id and page_number' });
+      }
+    }
+
+    const imageIds = images.map((img) => parseInt(img.id, 10)).filter((id) => !Number.isNaN(id));
+
+    if (imageIds.length === 0) {
+      return res.status(400).json({ error: 'No valid image IDs provided' });
+    }
+
+    const parsedChapterId = parseInt(chapterId, 10);
+    const pageNumbers = images.map((img) => parseInt(img.page_number, 10));
+
+    if (pageNumbers.some((pageNumber) => Number.isNaN(pageNumber) || pageNumber <= 0)) {
+      return res.status(400).json({ error: 'page_number must be a positive integer' });
+    }
+
+    const uniquePageNumbers = new Set(pageNumbers);
+    if (uniquePageNumbers.size !== pageNumbers.length) {
+      return res.status(400).json({ error: 'Duplicate page_number in payload' });
+    }
+
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    let existingImages;
+
+    if (imageIds.length === 1) {
+      [existingImages] = await connection.execute(
+        'SELECT id FROM chapter_images WHERE id = ? AND chapter_id = ? FOR UPDATE',
+        [imageIds[0], parsedChapterId]
+      );
+    } else {
+      const placeholders = imageIds.map(() => '?').join(',');
+      const query = `SELECT id FROM chapter_images WHERE id IN (${placeholders}) AND chapter_id = ? FOR UPDATE`;
+      const params = [...imageIds, parsedChapterId];
+      [existingImages] = await connection.execute(query, params);
+    }
+
+    if (existingImages.length !== images.length) {
+      await connection.rollback();
+      return res.status(400).json({
+        error: 'Some images do not belong to this chapter',
+        expected: images.length,
+        found: existingImages.length,
+      });
+    }
+
+    // Use temporary negative page numbers first to avoid unique index collisions.
+    for (let index = 0; index < images.length; index += 1) {
+      const imageId = parseInt(images[index].id, 10);
+      await connection.execute(
+        'UPDATE chapter_images SET page_number = ? WHERE id = ? AND chapter_id = ?',
+        [-(index + 1), imageId, parsedChapterId]
+      );
+    }
+
+    for (let index = 0; index < images.length; index += 1) {
+      const image = images[index];
+      const imageId = parseInt(image.id, 10);
+      const pageNumber = parseInt(image.page_number, 10);
+
+      if (Number.isNaN(imageId) || Number.isNaN(pageNumber)) {
+        await connection.rollback();
+        return res.status(400).json({
+          error: 'Invalid image data',
+          details: `id=${image.id}, page_number=${image.page_number}`,
+        });
+      }
+
+      await connection.execute(
+        'UPDATE chapter_images SET page_number = ? WHERE id = ? AND chapter_id = ?',
+        [pageNumber, imageId, parsedChapterId]
+      );
+    }
+
+    await connection.commit();
+
+    res.json({ message: 'Images reordered successfully' });
+  } catch (error) {
+    if (connection) {
+      try {
+        await connection.rollback();
+      } catch { }
+    }
+    console.error('Error reordering chapter images:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      details: error.message,
+    });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
+};
+
+const downloadBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    const [chapters] = await db.execute(
+      `
+      SELECT
+        c.id,
+        c.chapter_number as number,
+        c.title,
+        c.slug,
+        c.scheduled_release_at,
+        m.is_input_manual,
+        m.slug as manga_slug,
+        m.title as manga_title
+      FROM chapters c
+      JOIN manga m ON c.manga_id = m.id
+      WHERE c.slug = ?
+    `,
+      [slug]
+    );
+
+    if (!chapters.length) {
+      return res.status(404).json({ error: 'Chapter tidak ditemukan' });
+    }
+
+    const chapter = chapters[0];
+    if (isScheduledReleaseInFuture(chapter.scheduled_release_at)) {
+      return res.status(404).json({ error: 'Chapter belum dirilis' });
+    }
+
+    const [images] = await db.execute(
+      `
+      SELECT image_path
+      FROM chapter_images
+      WHERE chapter_id = ?
+      ORDER BY page_number
+    `,
+      [chapter.id]
+    );
+
+    if (!images.length) {
+      return res.status(404).json({ error: 'Chapter ini belum memiliki gambar' });
+    }
+
+    const safeManga = String(chapter.manga_slug || chapter.manga_title || 'manga')
+      .replace(/[^\w.-]+/g, '_')
+      .slice(0, 80);
+    const safeChapter = String(chapter.number || '0').replace(/[^\w.-]+/g, '_');
+    const zipFilename = `${safeManga}_chapter-${safeChapter}.zip`;
+
+    const zip = new AdmZip();
+    let added = 0;
+
+    for (let i = 0; i < images.length; i += 1) {
+      const entry = await loadImageZipEntry(images[i].image_path, i);
+      if (entry) {
+        zip.addFile(entry.name, entry.buffer);
+        added += 1;
+      }
+    }
+
+    if (added === 0) {
+      return res.status(404).json({ error: 'Tidak ada gambar yang bisa diunduh' });
+    }
+
+    const zipBuffer = zip.toBuffer();
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${zipFilename}"`);
+    res.setHeader('Content-Length', zipBuffer.length);
+    res.send(zipBuffer);
+    return undefined;
+  } catch (error) {
+    console.error('Error downloading chapter zip:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+};
+
+module.exports = {
+  showBySlug,
+  showByNovelAndChapter,
+  showById,
+  unlockWithCoins,
+  downloadBySlug,
+  listByManga,
+  create,
+  update,
+  destroy,
+  listImages,
+  uploadImages,
+  deleteImage,
+  reorderImages,
+};
+
