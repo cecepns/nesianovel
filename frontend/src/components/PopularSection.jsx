@@ -293,10 +293,10 @@ const PopularSection = () => {
                       {item.title}
                     </h3>
                     <p className="text-[10px] sm:text-[11px] lg:text-xs text-gray-400 mt-0.5 sm:mt-1 flex items-center gap-1">
-                      {Boolean(latestCh?.is_locked === true || latestCh?.is_locked === 1 || latestCh?.is_locked === '1') && (
+                      {Boolean(latestCh?.is_locked === true || latestCh?.is_locked === 1 || latestCh?.is_locked === '1' || latestCh?.is_locked === 'true') && (
                         <Lock className="h-3 w-3 text-amber-400 shrink-0" />
                       )}
-                      <span className={Boolean(latestCh?.is_locked === true || latestCh?.is_locked === 1 || latestCh?.is_locked === '1') ? 'text-amber-300 font-semibold' : ''}>
+                      <span className={Boolean(latestCh?.is_locked === true || latestCh?.is_locked === 1 || latestCh?.is_locked === '1' || latestCh?.is_locked === 'true') ? 'text-amber-300 font-semibold' : ''}>
                         Chapter {latestCh?.number || "N/A"}
                       </span>
                     </p>

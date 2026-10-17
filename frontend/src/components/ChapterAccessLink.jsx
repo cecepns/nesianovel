@@ -106,7 +106,8 @@ const ChapterAccessLink = ({
   const isCoinLocked = Boolean(
     chapter?.is_locked === true || 
     chapter?.is_locked === 1 || 
-    chapter?.is_locked === '1'
+    chapter?.is_locked === '1' ||
+    chapter?.is_locked === 'true'
   );
   const isGuestTimeLocked = requiresChapterLogin(chapter, isAuthenticated);
   const isLocked = isGuestTimeLocked || isCoinLocked;
