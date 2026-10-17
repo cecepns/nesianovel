@@ -9,17 +9,22 @@ async function fetchLocalManga(filters) {
     type,
     orderBy = 'Update',
     project,
+    is_pinned,
   } = filters || {};
 
   const whereConditions = [];
   const params = [];
 
-  if (project === 'true') {
-    whereConditions.push('m.is_project = TRUE');
+  if (is_pinned === 'true' || is_pinned === '1' || is_pinned === true) {
+    whereConditions.push('m.is_pinned = 1');
+  } else if (is_pinned === 'false' || is_pinned === '0' || is_pinned === false) {
+    whereConditions.push('(m.is_pinned IS NULL OR m.is_pinned = 0)');
+  } else if (project === 'true') {
+    whereConditions.push('m.is_project = 1');
   } else {
     whereConditions.push('m.is_input_manual = TRUE');
     if (project === 'false') {
-      whereConditions.push('(m.is_project IS NULL OR m.is_project = FALSE)');
+      whereConditions.push('(m.is_project IS NULL OR m.is_project = 0)');
     }
   }
 

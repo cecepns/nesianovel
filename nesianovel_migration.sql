@@ -46,7 +46,7 @@ CALL AddColumnIfNotExists('chapters', 'is_locked', 'TINYINT(1) NOT NULL DEFAULT 
 --    - is_pinned: Penanda series yang disematkan untuk slider PINNED SERIES di homepage
 -- ==============================================================================
 CALL AddColumnIfNotExists('manga', 'is_pinned', 'TINYINT(1) NOT NULL DEFAULT 0 AFTER `is_project`');
-UPDATE manga SET is_pinned = is_project WHERE is_project = 1 AND (is_pinned IS NULL OR is_pinned = 0);
+
 
 -- ==============================================================================
 -- 4. PERUBAHAN TABEL: users

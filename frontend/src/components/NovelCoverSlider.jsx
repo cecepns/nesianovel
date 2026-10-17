@@ -32,23 +32,32 @@ const NovelCoverSlider = ({
   const scrollLeftRef = useRef(0);
   const dragDistanceRef = useRef(0);
 
-  const fetchNovels = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await apiClient.getContents(fetchParams);
-      const items = res?.data || [];
-      setNovels(items);
-    } catch (err) {
-      console.error(`Error loading slider [${title}]:`, err);
-      setNovels([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchParams, title]);
+  const fetchParamsKey = JSON.stringify(fetchParams);
 
   useEffect(() => {
+    let isMounted = true;
+    const fetchNovels = async () => {
+      try {
+        setLoading(true);
+        const parsed = JSON.parse(fetchParamsKey);
+        const res = await apiClient.getContents(parsed);
+        if (isMounted) {
+          const items = res?.data || [];
+          setNovels(items);
+        }
+      } catch (err) {
+        console.error(`Error loading slider [${title}]:`, err);
+        if (isMounted) setNovels([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
     fetchNovels();
-  }, [fetchNovels]);
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchParamsKey, title]);
 
   const handleScroll = (direction) => {
     if (!scrollRef.current) return;

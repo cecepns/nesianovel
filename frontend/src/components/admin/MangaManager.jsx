@@ -19,6 +19,7 @@ import "react-quill/dist/quill.snow.css";
 import { apiClient, getImageUrl } from "../../utils/api";
 import { compressImage } from "../../utils/imageCompression";
 import LazyImage from "../LazyImage";
+import { toast } from "react-toastify";
 
 const quillModules = {
   toolbar: [
@@ -313,8 +314,24 @@ const MangaManager = () => {
       status: item.status || "ongoing",
       rating: item.rating || "",
       color: item.color || false,
-      is_project: !!(item.is_pinned !== undefined ? item.is_pinned : item.is_project),
-      is_pinned: !!(item.is_pinned !== undefined ? item.is_pinned : item.is_project),
+      is_project: Boolean(
+        item.is_pinned === true ||
+        item.is_pinned === 1 ||
+        item.is_pinned === "1" ||
+        item.is_pinned === "true" ||
+        item.is_project === true ||
+        item.is_project === 1 ||
+        item.is_project === "1"
+      ),
+      is_pinned: Boolean(
+        item.is_pinned === true ||
+        item.is_pinned === 1 ||
+        item.is_pinned === "1" ||
+        item.is_pinned === "true" ||
+        item.is_project === true ||
+        item.is_project === 1 ||
+        item.is_project === "1"
+      ),
     });
     setShowForm(true);
   };
@@ -926,48 +943,30 @@ const MangaManager = () => {
                   </p>
                 </div>
 
-                <div>
-                  <label className="flex items-center space-x-2 cursor-pointer">
+                <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/30">
+                  <label className="flex items-start space-x-3 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={formData.is_project}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          is_project: e.target.checked,
-                        }))
-                      }
-                      className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500 border-gray-300 dark:border-gray-600"
-                    />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Project (tampil di beranda)
-                    </span>
-                  </label>
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Centang untuk menampilkan novel di section Project di home
-                  </p>
-                </div>
-
-                <div>
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.is_pinned}
+                      checked={Boolean(formData.is_pinned)}
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
                           is_pinned: e.target.checked,
+                          is_project: e.target.checked,
                         }))
                       }
-                      className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500 border-gray-300 dark:border-gray-600"
+                      className="mt-0.5 w-5 h-5 text-purple-600 rounded focus:ring-purple-500 border-purple-300 dark:border-purple-600 bg-white dark:bg-purple-950"
                     />
-                    <span className="text-sm font-medium text-purple-700 dark:text-purple-300 font-bold">
-                      Pinned Series (PINNED SERIES Slider di Beranda)
-                    </span>
+                    <div>
+                      <span className="text-sm font-bold text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
+                        <Pin className="h-4 w-4 rotate-45 text-amber-400" />
+                        Pin Series (Tampilkan di Slider PINNED SERIES Beranda)
+                      </span>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        Centang untuk menyematkan novel ini ke slider PINNED SERIES paling atas di halaman utama.
+                      </p>
+                    </div>
                   </label>
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Centang untuk menyematkan novel ini di slider PINNED SERIES paling atas beranda
-                  </p>
                 </div>
 
                 <div>
@@ -1755,22 +1754,25 @@ const MangaManager = () => {
                           try {
                             const res = await apiClient.toggleMangaPin(item.id);
                             if (res && res.success) {
+                              const nextPinned = Boolean(res.is_pinned);
                               setManga((prev) =>
                                 prev.map((m) =>
-                                  m.id === item.id ? { ...m, is_pinned: res.is_pinned, is_project: res.is_pinned } : m
+                                  m.id === item.id ? { ...m, is_pinned: nextPinned, is_project: nextPinned } : m
                                 )
                               );
+                              toast.success(nextPinned ? `"${item.title}" disematkan ke PINNED SERIES!` : `Pin dilepas dari "${item.title}"`);
                             }
                           } catch (err) {
                             console.error(err);
+                            toast.error("Gagal mengubah status pin series");
                           }
                         }}
                         className={`p-2 rounded-full transition-colors ${
-                          item.is_pinned || item.is_project
+                          Boolean(item.is_pinned || item.is_project)
                             ? "bg-amber-500 hover:bg-amber-600 text-gray-950"
                             : "bg-white hover:bg-gray-100 text-gray-700"
                         }`}
-                        title={item.is_pinned || item.is_project ? "Lepas Pin Series" : "Pin Series (Slider Beranda)"}
+                        title={Boolean(item.is_pinned || item.is_project) ? "Lepas Pin Series" : "Pin Series (Slider Beranda)"}
                       >
                         <Pin className="h-4 w-4 rotate-45" />
                       </button>
@@ -1856,24 +1858,27 @@ const MangaManager = () => {
                       try {
                         const res = await apiClient.toggleMangaPin(item.id);
                         if (res && res.success) {
+                          const nextPinned = Boolean(res.is_pinned);
                           setManga((prev) =>
                             prev.map((m) =>
-                              m.id === item.id ? { ...m, is_pinned: res.is_pinned, is_project: res.is_pinned } : m
+                              m.id === item.id ? { ...m, is_pinned: nextPinned, is_project: nextPinned } : m
                             )
                           );
+                          toast.success(nextPinned ? `"${item.title}" disematkan ke PINNED SERIES!` : `Pin dilepas dari "${item.title}"`);
                         }
                       } catch (err) {
                         console.error(err);
+                        toast.error("Gagal mengubah status pin series");
                       }
                     }}
                     className={`mt-1.5 w-full px-2.5 py-1 text-[11px] font-bold rounded border flex items-center justify-center gap-1.5 transition-colors ${
-                      item.is_pinned || item.is_project
+                      Boolean(item.is_pinned || item.is_project)
                         ? "bg-amber-500/20 text-amber-600 dark:text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
                         : "bg-gray-100 dark:bg-purple-950/40 text-gray-700 dark:text-purple-300 border-gray-300 dark:border-purple-800/40 hover:bg-gray-200 dark:hover:bg-purple-900/50"
                     }`}
                   >
                     <Pin className="h-3 w-3 rotate-45" />
-                    <span>{item.is_pinned || item.is_project ? "Pinned (Klik Lepas)" : "Pin ke Beranda"}</span>
+                    <span>{Boolean(item.is_pinned || item.is_project) ? "Pinned (Klik Lepas)" : "Pin ke Beranda"}</span>
                   </button>
                 </div>
               </div>

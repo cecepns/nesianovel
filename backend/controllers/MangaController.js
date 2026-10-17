@@ -304,7 +304,7 @@ const store = async (req, res) => {
       cover_background = req.body.cover_background || null;
     }
 
-    const isPinned = parseBooleanField(req.body.is_pinned !== undefined ? req.body.is_pinned : is_project);
+    const isPinnedVal = parseBooleanField(req.body.is_pinned !== undefined ? req.body.is_pinned : req.body.is_project) ? 1 : 0;
 
     const [result] = await db.execute(
       `
@@ -322,14 +322,14 @@ const store = async (req, res) => {
         thumbnail,
         cover_background,
         alternative_name || null,
-        content_type || 'manga',
+        content_type || 'novel',
         country_id || null,
         release || null,
         status || 'ongoing',
         rating ? parseFloat(rating) : null,
-        parseBooleanField(color),
-        parseBooleanField(is_project),
-        isPinned,
+        parseBooleanField(color) ? 1 : 0,
+        isPinnedVal,
+        isPinnedVal,
         source || null,
         true,
       ]
@@ -385,8 +385,7 @@ const update = async (req, res) => {
       return res.status(400).json({ error: 'Manga dengan judul serupa sudah ada' });
     }
 
-    const isPinned = parseBooleanField(req.body.is_pinned !== undefined ? req.body.is_pinned : is_project);
-    const isProject = req.body.is_pinned !== undefined ? isPinned : parseBooleanField(is_project);
+    const isPinnedVal = parseBooleanField(req.body.is_pinned !== undefined ? req.body.is_pinned : req.body.is_project) ? 1 : 0;
 
     let query = `UPDATE manga SET 
       title = ?, slug = ?, author = ?, synopsis = ?, category_id = ?,
@@ -403,9 +402,9 @@ const update = async (req, res) => {
       release || null,
       status || 'ongoing',
       rating ? parseFloat(rating) : null,
-      parseBooleanField(color),
-      isProject,
-      isPinned,
+      parseBooleanField(color) ? 1 : 0,
+      isPinnedVal,
+      isPinnedVal,
       source || null,
     ];
 
@@ -586,11 +585,11 @@ const togglePin = async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Manga not found' });
     }
-    const current = !!(rows[0].is_pinned !== undefined ? rows[0].is_pinned : rows[0].is_project);
+    const current = Boolean(Number(rows[0].is_pinned) === 1 || Number(rows[0].is_project) === 1);
     const nextVal = current ? 0 : 1;
     await db.execute('UPDATE manga SET is_pinned = ?, is_project = ? WHERE id = ?', [nextVal, nextVal, id]);
     invalidateContentsCaches();
-    res.json({ success: true, is_pinned: !!nextVal });
+    res.json({ success: true, is_pinned: Boolean(nextVal === 1) });
   } catch (error) {
     console.error('Error toggling pin:', error);
     res.status(500).json({ error: 'Internal server error' });
