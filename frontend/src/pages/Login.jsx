@@ -59,8 +59,8 @@ const Login = () => {
 
   const whatsappHref = adminWhatsapp
     ? `https://wa.me/${adminWhatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(
-        'Halo admin, saya lupa password akun KomikNesia.'
-      )}`
+      'Halo admin, saya lupa password akun KomikNesia.'
+    )}`
     : null;
 
   return (
@@ -77,7 +77,7 @@ const Login = () => {
               <LogIn className="h-8 w-8 text-primary-600 dark:text-primary-400" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Komiknesia Admin
+              Nesianovel Admin
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
               Masuk ke panel administrasi

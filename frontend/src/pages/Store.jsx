@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { 
-  Coins, 
-  Crown, 
-  Sparkles, 
-  CheckCircle2, 
-  ExternalLink, 
-  Upload, 
-  Info, 
+import {
+  Coins,
+  Crown,
+  Sparkles,
+  CheckCircle2,
+  ExternalLink,
+  Upload,
+  Info,
   HelpCircle,
   Zap,
   ShieldCheck,
@@ -202,15 +202,14 @@ const Store = () => {
 
       {/* Store Navigation Tabs (Coins vs VIP) */}
       <div className="flex justify-center">
-        <div className="inline-flex p-1.5 rounded-2xl bg-[#130b29] border border-purple-800/40 shadow-xl">
+        <div className="inline-flex p-1.5 rounded-2xl bg-[#130b29] border border-purple-800/40 shadow-xl flex-wrap justify-center ">
           <button
             type="button"
             onClick={() => setActiveTab('coins')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-extrabold transition-all duration-200 ${
-              activeTab === 'coins'
-                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-gray-950 shadow-lg shadow-amber-500/20'
-                : 'text-gray-300 hover:text-white'
-            }`}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-extrabold transition-all duration-200 ${activeTab === 'coins'
+              ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-gray-950 shadow-lg shadow-amber-500/20'
+              : 'text-gray-300 hover:text-white'
+              }`}
           >
             <Coins className="h-4 w-4" />
             <span>Paket Koin Novel (4 Pilihan)</span>
@@ -218,11 +217,10 @@ const Store = () => {
           <button
             type="button"
             onClick={() => setActiveTab('premium')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-extrabold transition-all duration-200 ${
-              activeTab === 'premium'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-600/30'
-                : 'text-gray-300 hover:text-white'
-            }`}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-extrabold transition-all duration-200 ${activeTab === 'premium'
+              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-600/30'
+              : 'text-gray-300 hover:text-white'
+              }`}
           >
             <Crown className="h-4 w-4" />
             <span>VIP Premium (1, 3, 6, 12 Bulan)</span>
@@ -248,11 +246,10 @@ const Store = () => {
               return (
                 <div
                   key={pkg.id}
-                  className={`relative flex flex-col justify-between rounded-3xl border p-6 transition-all duration-200 hover:-translate-y-1 ${
-                    pkg.popular
-                      ? 'border-amber-400/80 bg-gradient-to-b from-[#241747] to-[#140b2b] shadow-xl shadow-amber-500/10 ring-1 ring-amber-400/40'
-                      : 'border-purple-800/40 bg-[#130b28] hover:border-purple-600/50 shadow-lg'
-                  }`}
+                  className={`relative flex flex-col justify-between rounded-3xl border p-6 transition-all duration-200 hover:-translate-y-1 ${pkg.popular
+                    ? 'border-amber-400/80 bg-gradient-to-b from-[#241747] to-[#140b2b] shadow-xl shadow-amber-500/10 ring-1 ring-amber-400/40'
+                    : 'border-purple-800/40 bg-[#130b28] hover:border-purple-600/50 shadow-lg'
+                    }`}
                 >
                   {pkg.popular && (
                     <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-0.5 text-[10px] font-black uppercase text-gray-950 shadow-md">
@@ -296,11 +293,10 @@ const Store = () => {
                   <button
                     type="button"
                     onClick={() => handleOpenOrder(pkg, 'coins')}
-                    className={`w-full py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-md ${
-                      pkg.popular
-                        ? 'bg-gradient-to-r from-amber-400 to-amber-500 hover:brightness-110 text-gray-950'
-                        : 'bg-purple-600 hover:bg-purple-500 text-white'
-                    }`}
+                    className={`w-full py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-md ${pkg.popular
+                      ? 'bg-gradient-to-r from-amber-400 to-amber-500 hover:brightness-110 text-gray-950'
+                      : 'bg-purple-600 hover:bg-purple-500 text-white'
+                      }`}
                   >
                     Beli Koin Sekarang
                   </button>
@@ -327,11 +323,10 @@ const Store = () => {
             {packagesData.premium_packages.map((pkg) => (
               <div
                 key={pkg.id}
-                className={`relative flex flex-col justify-between rounded-3xl border p-6 transition-all duration-200 hover:-translate-y-1 ${
-                  pkg.highlight
-                    ? 'border-purple-400/80 bg-gradient-to-b from-[#25154d] to-[#140b2b] shadow-xl shadow-purple-600/15 ring-1 ring-purple-400/40'
-                    : 'border-purple-800/40 bg-[#130b28] hover:border-purple-600/50 shadow-lg'
-                }`}
+                className={`relative flex flex-col justify-between rounded-3xl border p-6 transition-all duration-200 hover:-translate-y-1 ${pkg.highlight
+                  ? 'border-purple-400/80 bg-gradient-to-b from-[#25154d] to-[#140b2b] shadow-xl shadow-purple-600/15 ring-1 ring-purple-400/40'
+                  : 'border-purple-800/40 bg-[#130b28] hover:border-purple-600/50 shadow-lg'
+                  }`}
               >
                 {pkg.highlight && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 px-3 py-0.5 text-[10px] font-black uppercase text-white shadow-md">
@@ -379,11 +374,10 @@ const Store = () => {
                 <button
                   type="button"
                   onClick={() => handleOpenOrder(pkg, 'premium')}
-                  className={`w-full py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-md ${
-                    pkg.highlight
-                      ? 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:brightness-110 text-white'
-                      : 'bg-[#221345] hover:bg-purple-600 text-purple-200 hover:text-white border border-purple-700/50'
-                  }`}
+                  className={`w-full py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-md ${pkg.highlight
+                    ? 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:brightness-110 text-white'
+                    : 'bg-[#221345] hover:bg-purple-600 text-purple-200 hover:text-white border border-purple-700/50'
+                    }`}
                 >
                   Upgrade VIP Sekarang
                 </button>

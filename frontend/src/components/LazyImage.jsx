@@ -50,30 +50,30 @@ const LazyImage = ({
     <div className={`relative ${isLoading ? loadingClassName : ''} ${wrapperClassName}`}>
       {/* Loading Skeleton */}
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-800 animate-pulse min-h-[200px]">
-          <div className="h-8 w-8 rounded-full border-4 border-gray-300 dark:border-gray-700 border-t-blue-500 animate-spin" />
+        <div className="absolute inset-0 flex items-center justify-center bg-purple-950/40 animate-pulse">
+          <div className="h-7 w-7 rounded-full border-2 border-purple-500/30 border-t-purple-500 animate-spin" />
         </div>
       )}
 
       {/* Error State with Reload Button */}
       {hasError && (
-        <div className="flex flex-col items-center justify-center p-6 bg-gray-900 border border-gray-800 rounded-lg my-2 text-center min-h-[200px]">
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-3 bg-purple-950/40 text-center">
           <img 
             src={brokenImage} 
             alt="Gagal memuat gambar" 
-            className="max-h-32 opacity-75 mb-3 object-contain"
+            className="max-h-16 opacity-60 mb-2 object-contain"
             referrerPolicy={referrerPolicy}
           />
-          <p className="text-sm text-gray-400 mb-3 font-medium">Gambar gagal dimuat</p>
+          <p className="text-[11px] text-purple-300/80 mb-2 font-medium line-clamp-1">Gagal memuat</p>
           <button
             type="button"
             onClick={handleRetry}
-            className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white text-sm font-semibold rounded-lg shadow transition-colors flex items-center gap-2"
+            className="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            Muat Ulang Gambar
+            Muat Ulang
           </button>
         </div>
       )}

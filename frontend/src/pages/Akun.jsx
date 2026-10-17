@@ -563,7 +563,7 @@ const Akun = () => {
                     type="text"
                     value={profileName}
                     onChange={(e) => setProfileName(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     disabled={profileLoading}
                     required
                     autoComplete="name"
@@ -581,7 +581,7 @@ const Akun = () => {
                     type="text"
                     value={profileUsername}
                     onChange={(e) => setProfileUsername(e.target.value.toLowerCase().replace(/\s+/g, ''))}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     disabled={profileLoading}
                     minLength={3}
                     required
@@ -600,7 +600,7 @@ const Akun = () => {
                     type="email"
                     value={profileEmail}
                     onChange={(e) => setProfileEmail(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     disabled={profileLoading}
                     placeholder="email@contoh.com"
                     autoComplete="email"
@@ -617,7 +617,7 @@ const Akun = () => {
                     id="akun-profile-bio"
                     value={profileBio}
                     onChange={(e) => setProfileBio(e.target.value)}
-                    className="min-h-[7rem] w-full resize-y rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="min-h-[7rem] w-full resize-y rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     disabled={profileLoading}
                     rows={4}
                     maxLength={500}
@@ -630,7 +630,7 @@ const Akun = () => {
                 <button
                   type="submit"
                   disabled={profileLoading}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-600 py-3.5 text-[15px] font-bold text-white shadow-md transition-all duration-200 hover:bg-red-700 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3.5 text-[15px] font-bold text-white shadow-lg shadow-purple-950/40 transition-all duration-200 hover:from-purple-500 hover:to-indigo-500 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
                 >
                   {profileLoading ? <Loader2 className="h-5 w-5 shrink-0 animate-spin" /> : null}
                   Simpan profil
@@ -655,7 +655,7 @@ const Akun = () => {
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     disabled={passwordLoading}
                     autoComplete="current-password"
                   />
@@ -673,7 +673,7 @@ const Akun = () => {
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                       disabled={passwordLoading}
                       autoComplete="new-password"
                     />
@@ -690,7 +690,7 @@ const Akun = () => {
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                       disabled={passwordLoading}
                       autoComplete="new-password"
                     />
@@ -699,7 +699,7 @@ const Akun = () => {
                 <button
                   type="submit"
                   disabled={passwordLoading}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-600 py-3.5 text-[15px] font-bold text-white shadow-md transition-all duration-200 hover:bg-red-700 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3.5 text-[15px] font-bold text-white shadow-lg shadow-purple-950/40 transition-all duration-200 hover:from-purple-500 hover:to-indigo-500 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
                 >
                   {passwordLoading ? <Loader2 className="h-5 w-5 shrink-0 animate-spin" /> : null}
                   Simpan password
@@ -748,8 +748,8 @@ const Akun = () => {
                   onClick={() => setMode('login')}
                   className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all duration-200 ${
                     mode === 'login'
-                      ? 'bg-red-600 text-white shadow-md'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white'
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-900/40'
+                      : 'text-gray-300 hover:text-white'
                   }`}
                 >
                   <LogIn className="h-4 w-4 shrink-0" />
@@ -760,8 +760,8 @@ const Akun = () => {
                   onClick={() => setMode('register')}
                   className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all duration-200 ${
                     mode === 'register'
-                      ? 'bg-red-600 text-white shadow-md'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white'
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-900/40'
+                      : 'text-gray-300 hover:text-white'
                   }`}
                 >
                   <UserPlus className="h-4 w-4 shrink-0" />
@@ -776,7 +776,7 @@ const Akun = () => {
                 <div>
                   <label
                     htmlFor="akun-login-username"
-                    className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-gray-200"
+                    className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-200"
                   >
                     Username atau email
                   </label>
@@ -785,7 +785,7 @@ const Akun = () => {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     placeholder="Username atau email"
                     required
                     disabled={loading}
@@ -796,7 +796,7 @@ const Akun = () => {
                   <div className="flex items-center justify-between mb-2">
                     <label
                       htmlFor="akun-login-password"
-                      className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-gray-200"
+                      className="block text-xs font-semibold uppercase tracking-wider text-gray-200"
                     >
                       Password
                     </label>
@@ -806,7 +806,7 @@ const Akun = () => {
                         setForgotIdentifier(username || '');
                         setMode('forgot_password');
                       }}
-                      className="text-xs font-medium text-red-500 hover:text-red-400 underline transition-colors"
+                      className="text-xs font-medium text-purple-400 hover:text-purple-300 underline transition-colors"
                     >
                       Lupa password?
                     </button>
@@ -816,7 +816,7 @@ const Akun = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     placeholder="••••••••"
                     required
                     disabled={loading}
@@ -827,7 +827,7 @@ const Akun = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3.5 text-[15px] font-bold text-white shadow-md transition-all duration-200 hover:bg-red-700 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3.5 text-[15px] font-bold text-white shadow-lg shadow-purple-950/40 transition-all duration-200 hover:from-purple-500 hover:to-indigo-500 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
                 >
                   {loading ? (
                     <Loader2 className="h-5 w-5 shrink-0 animate-spin" />
@@ -854,7 +854,7 @@ const Akun = () => {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     placeholder="Nama Anda"
                     required
                     disabled={loading}
@@ -864,7 +864,7 @@ const Akun = () => {
                 <div>
                   <label
                     htmlFor="akun-reg-username"
-                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-gray-200"
+                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-200"
                   >
                     Username * (min. 3 karakter)
                   </label>
@@ -873,7 +873,7 @@ const Akun = () => {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, ''))}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     placeholder="username_kamu"
                     required
                     minLength={3}
@@ -884,7 +884,7 @@ const Akun = () => {
                 <div>
                   <label
                     htmlFor="akun-reg-email"
-                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-gray-200"
+                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-200"
                   >
                     Email Aktif * (untuk verifikasi OTP)
                   </label>
@@ -893,7 +893,7 @@ const Akun = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     placeholder="nama@email.com"
                     required
                     disabled={loading}
@@ -903,7 +903,7 @@ const Akun = () => {
                 <div>
                   <label
                     htmlFor="akun-reg-password"
-                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-gray-200"
+                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-200"
                   >
                     Password * (min. 6 karakter)
                   </label>
@@ -912,7 +912,7 @@ const Akun = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     placeholder="••••••••"
                     required
                     minLength={6}
@@ -925,7 +925,7 @@ const Akun = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3.5 text-[15px] font-bold text-white shadow-md transition-all duration-200 hover:bg-red-700 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3.5 text-[15px] font-bold text-white shadow-lg shadow-purple-950/40 transition-all duration-200 hover:from-purple-500 hover:to-indigo-500 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
                   >
                     {loading ? (
                       <Loader2 className="h-5 w-5 shrink-0 animate-spin" />
@@ -941,8 +941,8 @@ const Akun = () => {
             {/* 3. REGISTER OTP VERIFICATION - STEP 2 */}
             {mode === 'register_otp' && (
               <form onSubmit={handleVerifyRegisterOtp} className="space-y-5">
-                <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-center">
-                  <Mail className="mx-auto h-8 w-8 text-red-400 mb-2" />
+                <div className="rounded-2xl border border-purple-500/30 bg-purple-950/30 p-4 text-center">
+                  <Mail className="mx-auto h-8 w-8 text-purple-400 mb-2" />
                   <p className="text-xs text-gray-300">
                     Kami telah mengirimkan 6 digit kode OTP ke:
                   </p>
@@ -955,7 +955,7 @@ const Akun = () => {
                 <div>
                   <label
                     htmlFor="akun-reg-otp"
-                    className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-gray-200 text-center"
+                    className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-200 text-center"
                   >
                     Kode OTP (6 Digit)
                   </label>
@@ -965,7 +965,7 @@ const Akun = () => {
                     maxLength={6}
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center font-mono text-2xl tracking-[8px] font-bold text-red-400 placeholder:text-gray-600 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center font-mono text-2xl tracking-[8px] font-bold text-purple-400 placeholder:text-gray-600 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     placeholder="••••••"
                     required
                     disabled={loading}
@@ -979,7 +979,7 @@ const Akun = () => {
                     type="button"
                     onClick={handleResendRegisterOtp}
                     disabled={resendCooldown > 0 || loading}
-                    className="font-semibold text-red-500 hover:text-red-400 disabled:text-gray-500 transition-colors flex items-center gap-1"
+                    className="font-semibold text-purple-400 hover:text-purple-300 disabled:text-gray-500 transition-colors flex items-center gap-1"
                   >
                     <RefreshCw className="h-3 w-3" />
                     {resendCooldown > 0 ? `Kirim ulang (${resendCooldown}s)` : 'Kirim Ulang OTP'}
@@ -989,7 +989,7 @@ const Akun = () => {
                 <button
                   type="submit"
                   disabled={loading || otpCode.length < 6}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3.5 text-[15px] font-bold text-white shadow-md transition-all duration-200 hover:bg-red-700 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3.5 text-[15px] font-bold text-white shadow-lg shadow-purple-950/40 transition-all duration-200 hover:from-purple-500 hover:to-indigo-500 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
                 >
                   {loading ? (
                     <Loader2 className="h-5 w-5 shrink-0 animate-spin" />
@@ -1016,7 +1016,7 @@ const Akun = () => {
                 <div>
                   <label
                     htmlFor="akun-forgot-identifier"
-                    className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-gray-200"
+                    className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-200"
                   >
                     Email atau Username Terdaftar
                   </label>
@@ -1025,7 +1025,7 @@ const Akun = () => {
                     type="text"
                     value={forgotIdentifier}
                     onChange={(e) => setForgotIdentifier(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     placeholder="nama@email.com atau username"
                     required
                     disabled={loading}
@@ -1036,7 +1036,7 @@ const Akun = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3.5 text-[15px] font-bold text-white shadow-md transition-all duration-200 hover:bg-red-700 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3.5 text-[15px] font-bold text-white shadow-lg shadow-purple-950/40 transition-all duration-200 hover:from-purple-500 hover:to-indigo-500 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
                 >
                   {loading ? (
                     <Loader2 className="h-5 w-5 shrink-0 animate-spin" />
@@ -1060,8 +1060,8 @@ const Akun = () => {
             {/* 5. RESET PASSWORD - STEP 2 */}
             {mode === 'reset_password' && (
               <form onSubmit={handleVerifyResetPassword} className="space-y-4">
-                <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-center">
-                  <KeyRound className="mx-auto h-7 w-7 text-red-400 mb-1" />
+                <div className="rounded-2xl border border-purple-500/30 bg-purple-950/30 p-4 text-center">
+                  <KeyRound className="mx-auto h-7 w-7 text-purple-400 mb-1" />
                   <p className="text-xs text-gray-300">
                     Kode verifikasi reset telah dikirim ke:
                   </p>
@@ -1071,7 +1071,7 @@ const Akun = () => {
                 <div>
                   <label
                     htmlFor="akun-reset-otp"
-                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-gray-200"
+                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-200"
                   >
                     Kode OTP (6 Digit) *
                   </label>
@@ -1081,7 +1081,7 @@ const Akun = () => {
                     maxLength={6}
                     value={resetOtpCode}
                     onChange={(e) => setResetOtpCode(e.target.value.replace(/\D/g, ''))}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 font-mono text-center text-xl tracking-[6px] font-bold text-red-400 placeholder:text-gray-600 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 font-mono text-center text-xl tracking-[6px] font-bold text-purple-400 placeholder:text-gray-600 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     placeholder="••••••"
                     required
                     disabled={loading}
@@ -1092,7 +1092,7 @@ const Akun = () => {
                 <div>
                   <label
                     htmlFor="akun-reset-newpw"
-                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-gray-200"
+                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-200"
                   >
                     Password Baru * (min. 6 karakter)
                   </label>
@@ -1101,7 +1101,7 @@ const Akun = () => {
                     type="password"
                     value={resetNewPassword}
                     onChange={(e) => setResetNewPassword(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     placeholder="Password baru Anda"
                     required
                     minLength={6}
@@ -1113,7 +1113,7 @@ const Akun = () => {
                 <div>
                   <label
                     htmlFor="akun-reset-confirmpw"
-                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-gray-200"
+                    className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-200"
                   >
                     Konfirmasi Password Baru *
                   </label>
@@ -1122,7 +1122,7 @@ const Akun = () => {
                     type="password"
                     value={resetConfirmPassword}
                     onChange={(e) => setResetConfirmPassword(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-red-500 focus:ring-2 focus:ring-red-500/25"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[15px] text-gray-100 placeholder:text-gray-500 outline-none transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25"
                     placeholder="Ulangi password baru"
                     required
                     minLength={6}
@@ -1137,7 +1137,7 @@ const Akun = () => {
                     type="button"
                     onClick={handleRequestForgotOtp}
                     disabled={resendCooldown > 0 || loading}
-                    className="font-semibold text-red-500 hover:text-red-400 disabled:text-gray-500 transition-colors flex items-center gap-1"
+                    className="font-semibold text-purple-400 hover:text-purple-300 disabled:text-gray-500 transition-colors flex items-center gap-1"
                   >
                     <RefreshCw className="h-3 w-3" />
                     {resendCooldown > 0 ? `Kirim ulang (${resendCooldown}s)` : 'Kirim Ulang OTP'}
@@ -1148,7 +1148,7 @@ const Akun = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3.5 text-[15px] font-bold text-white shadow-md transition-all duration-200 hover:bg-red-700 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3.5 text-[15px] font-bold text-white shadow-lg shadow-purple-950/40 transition-all duration-200 hover:from-purple-500 hover:to-indigo-500 active:scale-98 disabled:pointer-events-none disabled:opacity-55"
                   >
                     {loading ? (
                       <Loader2 className="h-5 w-5 shrink-0 animate-spin" />

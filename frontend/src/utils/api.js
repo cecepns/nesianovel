@@ -4,13 +4,13 @@ export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:3001/api'
-    : 'https://api-be.komiknesia.my.id/api');
+    : 'https://api-be.nesianovel.com/api');
 
 export const API_BASE_URL_WITHOUT_API =
   import.meta.env.VITE_API_BASE_URL_WITHOUT_API ||
   (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:3001/'
-    : 'https://api-be.komiknesia.my.id/');
+    : 'https://api-be.nesianovel.com');
 
 /** Origin for static files (no trailing slash). Same host as API, path /uploads is served by backend. */
 const STATIC_ORIGIN = API_BASE_URL_WITHOUT_API.replace(/\/+$/, '');

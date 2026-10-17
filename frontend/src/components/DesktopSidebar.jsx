@@ -1,15 +1,15 @@
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  ShoppingBag, 
-  BookMarked, 
-  Compass, 
-  UserCircle, 
-  Megaphone, 
-  Trophy, 
-  CalendarDays, 
-  Coins, 
-  Crown, 
+import {
+  Home,
+  ShoppingBag,
+  BookMarked,
+  Compass,
+  UserCircle,
+  Megaphone,
+  Trophy,
+  CalendarDays,
+  Coins,
+  Crown,
   LogIn,
   ChevronRight,
   ShieldCheck
@@ -52,14 +52,14 @@ const DesktopSidebar = () => {
               className="h-10 w-auto object-contain drop-shadow-[0_0_12px_rgba(168,85,247,0.35)] transition-transform duration-300 group-hover:scale-105"
             />
           </div>
-          <div>
+          {/* <div>
             <span className="text-lg font-black tracking-tight text-white flex items-center gap-1">
               Nesia<span className="text-purple-400">Novel</span>
             </span>
             <span className="text-[10px] tracking-wider uppercase text-purple-300/70 font-semibold block">
               Web Novel Indonesia
             </span>
-          </div>
+          </div> */}
         </Link>
       </div>
 
@@ -77,17 +77,15 @@ const DesktopSidebar = () => {
                 <Link
                   key={item.id}
                   to={item.path}
-                  className={`group relative flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${
-                    isActive
+                  className={`group relative flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 ${isActive
                       ? 'bg-gradient-to-r from-purple-600/30 to-purple-800/20 text-white border border-purple-500/40 shadow-[0_0_15px_rgba(147,51,234,0.25)]'
                       : 'text-gray-300 hover:text-white hover:bg-white/5'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <Icon
-                      className={`h-5 w-5 transition-transform duration-200 group-hover:scale-110 ${
-                        isActive ? 'text-purple-400 drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]' : 'text-gray-400 group-hover:text-purple-300'
-                      }`}
+                      className={`h-5 w-5 transition-transform duration-200 group-hover:scale-110 ${isActive ? 'text-purple-400 drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]' : 'text-gray-400 group-hover:text-purple-300'
+                        }`}
                       strokeWidth={isActive ? 2.25 : 1.75}
                     />
                     <span>{item.label}</span>
@@ -119,11 +117,10 @@ const DesktopSidebar = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`group flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium transition-all duration-200 ${
-                    isActive
+                  className={`group flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium transition-all duration-200 ${isActive
                       ? 'bg-purple-900/30 text-purple-200 font-semibold border border-purple-500/20'
                       : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
-                  }`}
+                    }`}
                 >
                   <Icon className="h-4 w-4 text-gray-500 group-hover:text-purple-400 transition-colors" />
                   <span>{item.label}</span>

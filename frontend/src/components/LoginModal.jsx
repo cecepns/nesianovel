@@ -9,10 +9,10 @@ const labelClass =
   'mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-300';
 
 const inputClass =
-  'w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-white shadow-sm outline-none transition-all placeholder:text-gray-500 focus:border-red-500/60 focus:ring-2 focus:ring-red-500/25';
+  'w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-[15px] text-white shadow-sm outline-none transition-all placeholder:text-gray-500 focus:border-purple-500/60 focus:ring-2 focus:ring-purple-500/25';
 
 const primaryBtnClass =
-  'mt-1 flex w-full items-center justify-center gap-2 rounded-2xl bg-red-600 py-3.5 text-[15px] font-bold text-white shadow-lg transition-all duration-200 hover:bg-red-500 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-55';
+  'mt-1 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3.5 text-[15px] font-bold text-white shadow-lg shadow-purple-950/40 transition-all duration-200 hover:from-purple-500 hover:to-indigo-500 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-55';
 
 const LoginModal = ({ open, onClose, onSuccess, title, description }) => {
   const { login, register } = useAuth();
@@ -155,7 +155,7 @@ const LoginModal = ({ open, onClose, onSuccess, title, description }) => {
 
       <div className="relative z-[1] flex min-h-[100dvh] min-h-full items-center justify-center px-4 py-8 sm:px-6 sm:py-10">
         <div className="relative w-full max-w-md pb-5">
-          <div className="relative overflow-visible rounded-3xl border border-white/10 bg-slate-900/95 p-6 shadow-2xl backdrop-blur-md sm:p-8">
+          <div className="relative overflow-visible rounded-3xl border border-purple-900/30 bg-[#130d24]/95 p-6 shadow-2xl backdrop-blur-md sm:p-8">
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onClose?.(); }}
@@ -186,7 +186,7 @@ const LoginModal = ({ open, onClose, onSuccess, title, description }) => {
               onClick={() => setMode('login')}
               className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all duration-200 ${
                 mode === 'login'
-                  ? 'bg-red-600 text-white shadow-md font-bold'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md font-bold'
                   : 'text-gray-400 hover:text-gray-200'
               }`}
             >
@@ -198,7 +198,7 @@ const LoginModal = ({ open, onClose, onSuccess, title, description }) => {
               onClick={() => setMode('register')}
               className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all duration-200 ${
                 mode === 'register'
-                  ? 'bg-red-600 text-white shadow-md font-bold'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md font-bold'
                   : 'text-gray-400 hover:text-gray-200'
               }`}
             >
@@ -246,7 +246,7 @@ const LoginModal = ({ open, onClose, onSuccess, title, description }) => {
                 <Link
                   to="/contact"
                   onClick={onClose}
-                  className="font-semibold text-red-400 underline decoration-red-500/40 underline-offset-2 transition-colors hover:text-red-300"
+                  className="font-semibold text-purple-400 underline decoration-purple-500/40 underline-offset-2 transition-colors hover:text-purple-300"
                 >
                   Hubungi admin
                 </Link>

@@ -483,13 +483,15 @@ const Content = () => {
                 </button>
               )}
             </div>
-            <button
-              onClick={clearAllFilters}
-              className="hidden items-center gap-2 rounded-xl bg-purple-600 px-4 py-2 text-sm font-bold text-white shadow-md shadow-purple-950/50 transition-all hover:bg-purple-700 active:scale-95 md:inline-flex"
-            >
-              <X className="h-5 w-5 shrink-0" />
-              <span className="hidden md:inline">Reset Filter</span>
-            </button>
+            {activeFilterCount > 0 && (
+              <button
+                onClick={clearAllFilters}
+                className="hidden items-center gap-2 rounded-xl bg-purple-600 px-4 py-2 text-sm font-bold text-white shadow-md shadow-purple-950/50 transition-all hover:bg-purple-700 active:scale-95 md:inline-flex"
+              >
+                <X className="h-5 w-5 shrink-0" />
+                <span className="hidden md:inline">Reset Filter</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -498,13 +500,13 @@ const Content = () => {
         {/* Mobile Control Bar (View Mode Toggle & Filter Trigger) */}
         <div className="lg:hidden mb-2 flex items-center justify-between">
           {/* View Mode Toggle Pill */}
-          <div className="bg-[#141622] rounded-2xl p-1 flex items-center gap-1 shadow-md">
+          <div className="bg-[#130c24] border border-purple-900/30 rounded-2xl p-1 flex items-center gap-1 shadow-md">
             <button
               type="button"
               onClick={() => setViewMode("grid")}
               className={`p-2 rounded-xl transition-all ${viewMode === "grid"
-                  ? "bg-red-600 text-white shadow-md"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md"
+                  : "text-purple-300/60 hover:text-white"
                 }`}
               title="Grid View"
             >
@@ -514,8 +516,8 @@ const Content = () => {
               type="button"
               onClick={() => setViewMode("list")}
               className={`p-2 rounded-xl transition-all ${viewMode === "list"
-                  ? "bg-red-600 text-white shadow-md"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md"
+                  : "text-purple-300/60 hover:text-white"
                 }`}
               title="List View"
             >
@@ -527,12 +529,12 @@ const Content = () => {
           <button
             type="button"
             onClick={() => setShowMobileFilterModal(true)}
-            className="relative bg-[#141622] p-3 rounded-2xl text-red-500 hover:text-red-400 transition-colors shadow-md flex items-center justify-center"
+            className="relative bg-[#130c24] border border-purple-900/30 p-3 rounded-2xl text-purple-400 hover:text-purple-300 transition-colors shadow-md flex items-center justify-center"
             title="Filter"
           >
             <Filter className="h-5 w-5" />
             {activeFilterCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-sm ring-2 ring-[#141622]">
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white shadow-sm ring-2 ring-[#130c24]">
                 {activeFilterCount}
               </span>
             )}
@@ -582,8 +584,8 @@ const Content = () => {
                         type="button"
                         onClick={() => setStatusFilter(status)}
                         className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedStatus === status
-                            ? 'bg-red-600 text-white shadow-md'
-                            : 'bg-[#1e202e] text-gray-300 hover:bg-[#252839]'
+                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-900/40 border border-purple-400/40'
+                            : 'bg-purple-950/40 border border-purple-900/30 text-purple-200/80 hover:bg-purple-900/40 hover:text-white'
                           }`}
                       >
                         {status}
@@ -602,8 +604,8 @@ const Content = () => {
                         type="button"
                         onClick={() => setTypeFilter(type.value)}
                         className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedType === type.value
-                            ? 'bg-red-600 text-white shadow-md'
-                            : 'bg-[#1e202e] text-gray-300 hover:bg-[#252839]'
+                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-900/40 border border-purple-400/40'
+                            : 'bg-purple-950/40 border border-purple-900/30 text-purple-200/80 hover:bg-purple-900/40 hover:text-white'
                           }`}
                       >
                         {type.label}
@@ -622,8 +624,8 @@ const Content = () => {
                         type="button"
                         onClick={() => setProjectFilter(opt.value)}
                         className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedProject === opt.value
-                            ? 'bg-red-600 text-white shadow-md'
-                            : 'bg-[#1e202e] text-gray-300 hover:bg-[#252839]'
+                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-900/40 border border-purple-400/40'
+                            : 'bg-purple-950/40 border border-purple-900/30 text-purple-200/80 hover:bg-purple-900/40 hover:text-white'
                           }`}
                       >
                         {opt.label}
@@ -642,8 +644,8 @@ const Content = () => {
                         type="button"
                         onClick={() => setSourceFilter(opt.value)}
                         className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedSource === opt.value
-                            ? 'bg-red-600 text-white shadow-md'
-                            : 'bg-[#1e202e] text-gray-300 hover:bg-[#252839]'
+                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-900/40 border border-purple-400/40'
+                            : 'bg-purple-950/40 border border-purple-900/30 text-purple-200/80 hover:bg-purple-900/40 hover:text-white'
                           }`}
                       >
                         {opt.label}
@@ -662,8 +664,8 @@ const Content = () => {
                         type="button"
                         onClick={() => setOrderFilter(order)}
                         className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedOrder === order
-                            ? 'bg-red-600 text-white shadow-md'
-                            : 'bg-[#1e202e] text-gray-300 hover:bg-[#252839]'
+                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-900/40 border border-purple-400/40'
+                            : 'bg-purple-950/40 border border-purple-900/30 text-purple-200/80 hover:bg-purple-900/40 hover:text-white'
                           }`}
                       >
                         {order}
@@ -676,7 +678,7 @@ const Content = () => {
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2.5">GENRE</h4>
                   {genresLoading ? (
-                    <p className="text-xs text-gray-500">Memuat genre...</p>
+                    <p className="text-xs text-purple-400">Memuat genre...</p>
                   ) : (
                     <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-1">
                       {genres.map((genre) => {
@@ -687,8 +689,8 @@ const Content = () => {
                             type="button"
                             onClick={() => toggleGenre(genre.id)}
                             className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${isSelected
-                                ? 'bg-red-600 text-white shadow-md font-bold'
-                                : 'bg-[#1e202e] text-gray-300 hover:bg-[#252839]'
+                                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md font-bold border border-purple-400/40'
+                                : 'bg-purple-950/40 border border-purple-900/30 text-purple-200/80 hover:bg-purple-900/40 hover:text-white'
                               }`}
                           >
                             {genre.name}
@@ -701,11 +703,11 @@ const Content = () => {
               </div>
 
               {/* Modal Footer (Added extra bottom padding so it sits above BottomNavigation) */}
-              <div className="p-4 pb-20 sm:pb-4 border-t border-white/10 bg-[#141522]">
+              <div className="p-4 pb-20 sm:pb-4 border-t border-purple-900/30 bg-[#130c24]">
                 <button
                   type="button"
                   onClick={() => setShowMobileFilterModal(false)}
-                  className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-sm tracking-wider uppercase rounded-xl transition-all shadow-md"
+                  className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm tracking-wider uppercase rounded-xl transition-all shadow-md shadow-purple-950/50"
                 >
                   Terapkan Filter
                 </button>
@@ -716,7 +718,7 @@ const Content = () => {
 
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Filters Sidebar - Desktop Only */}
-          <div className="hidden lg:block lg:w-80 shrink-0">
+          <div className="hidden lg:block lg:w-72 xl:w-80 shrink-0">
             <div className="sticky top-24 rounded-2xl border border-purple-900/40 bg-[#130c24]/90 p-5 shadow-xl backdrop-blur-md">
               {/* Clear All button inside header */}
               <div className="mb-4 flex items-center justify-between pb-3 border-b border-purple-900/30">
@@ -837,7 +839,7 @@ const Content = () => {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {/* Active Filters */}
             {(searchQuery ||
               selectedGenres.length > 0 ||
@@ -846,10 +848,10 @@ const Content = () => {
               selectedOrder !== "Update" ||
               selectedProject !== "all" ||
               selectedSource !== "all") && (
-                <div className="mb-6 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm dark:border-primary-700 dark:bg-primary-900">
+                <div className="mb-6 rounded-2xl border border-purple-900/30 bg-[#130c24]/80 p-4 shadow-md backdrop-blur-md">
                   <div className="flex flex-wrap gap-2">
                     {searchQuery && (
-                      <span className="inline-flex items-center space-x-2 px-3 py-1 bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-300 rounded-full text-sm font-semibold border border-red-200 dark:border-red-900/40">
+                      <span className="inline-flex items-center space-x-2 px-3 py-1 bg-purple-950/80 text-purple-200 rounded-full text-xs font-semibold border border-purple-700/50">
                         <span>
                           Pencarian: {'"'}
                           {searchQuery}
@@ -857,9 +859,9 @@ const Content = () => {
                         </span>
                         <button
                           onClick={clearSearch}
-                          className="hover:text-red-900 dark:hover:text-red-100"
+                          className="hover:text-white"
                         >
-                          <X className="h-4 w-4" />
+                          <X className="h-3.5 w-3.5" />
                         </button>
                       </span>
                     )}
@@ -1044,7 +1046,7 @@ const Content = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-8">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 mb-8">
                     {mangaList.map((manga) => (
                       <div
                         key={manga.id}
@@ -1062,7 +1064,7 @@ const Content = () => {
                         </div>
 
                         {/* Info Section */}
-                        <div className="p-3 flex flex-col h-[185px]">
+                        <div className="p-3 flex flex-col flex-1 min-h-[175px]">
                           {/* Title */}
                           {!!manga.hot && (
                             <div className="mb-1 max-w-fit bg-purple-600/90 backdrop-blur-sm rounded-full px-2 py-0.5">

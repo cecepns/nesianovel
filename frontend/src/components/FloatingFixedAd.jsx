@@ -65,7 +65,7 @@ const FloatingFixedAd = ({ position, ads }) => {
     <button
       type="button"
       onClick={handleDismissAll}
-      className={`relative z-[2] bg-red-600 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-md ring-1 ring-red-800/60 transition-colors hover:bg-red-500 ${
+      className={`relative z-[2] bg-gradient-to-r from-purple-700 to-indigo-700 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-md ring-1 ring-purple-500/50 transition-all hover:from-purple-600 hover:to-indigo-600 ${
         isTop
           ? "mt-[-1px] rounded-b-md rounded-t-none"
           : "mb-[-1px] rounded-t-md rounded-b-none"

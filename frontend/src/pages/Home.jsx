@@ -307,7 +307,7 @@ const Home = () => {
             <div className="relative max-w-64 w-full">
               <button
                 onClick={handleClosePopupBanner}
-                className="absolute -top-2 -right-2 z-10 p-1.5 rounded-full bg-red-900 dark:bg-red-800 text-white hover:bg-gray-700 dark:hover:bg-gray-600 shadow-lg transition-colors"
+                className="absolute -top-2 -right-2 z-10 p-1.5 rounded-full bg-purple-900/90 dark:bg-purple-800 text-white hover:bg-purple-700 shadow-lg transition-colors border border-purple-500/30"
                 aria-label="Tutup banner"
               >
                 <X className="h-5 w-5" />
@@ -507,12 +507,12 @@ const Home = () => {
               </div>
 
               <p className="mb-4 text-sm text-slate-300">
-                Lakukan langkah sederhana berikut di browser HP kamu untuk memasang KomikNesia ke layar utama:
+                Lakukan langkah sederhana berikut di browser HP kamu untuk memasang NesiaNovel ke layar utama:
               </p>
 
               <div className="space-y-3 text-xs text-gray-200">
                 <div className="rounded-xl border border-white/10 bg-white/5 p-3.5">
-                  <p className="font-bold text-red-400 text-sm mb-1.5">Android / Google Chrome:</p>
+                  <p className="font-bold text-purple-400 text-sm mb-1.5">Android / Google Chrome:</p>
                   <ol className="list-decimal list-inside space-y-1 text-slate-300">
                     <li>Klik ikon <strong>Titik Tiga (⋮)</strong> di kanan atas browser.</li>
                     <li>Pilih menu <strong>"Tambahkan ke Layar Utama"</strong> atau <strong>"Install Aplikasi"</strong>.</li>
@@ -533,7 +533,7 @@ const Home = () => {
               <button
                 type="button"
                 onClick={() => setPwaGuideOpen(false)}
-                className="mt-5 flex w-full items-center justify-center rounded-xl bg-red-600 py-3 text-sm font-bold text-white shadow-md transition-colors hover:bg-red-700 active:scale-98"
+                className="mt-5 flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 py-3 text-sm font-bold text-white shadow-md shadow-purple-950/40 transition-all hover:from-purple-500 hover:to-indigo-500 active:scale-98"
               >
                 Mengerti
               </button>

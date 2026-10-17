@@ -284,7 +284,7 @@ const AdPopup = () => {
 
       <div className="relative z-10 flex flex-col w-full h-full">
         {/* Header Bar Control */}
-        <div className="flex-shrink-0 flex items-center justify-between gap-1.5 sm:gap-3 px-2.5 sm:px-6 py-2.5 bg-black/95 backdrop-blur-md border-b border-red-950/80 shadow-lg">
+        <div className="flex-shrink-0 flex items-center justify-between gap-1.5 sm:gap-3 px-2.5 sm:px-6 py-2.5 bg-black/95 backdrop-blur-md border-b border-purple-950/80 shadow-lg">
           {/* Kiri: Countdown angka (Abu-abu) */}
           <div className="flex items-center shrink-0">
             <span className="inline-flex items-center rounded-lg bg-gray-800/90 border border-gray-700/80 px-2 sm:px-3 py-1.5 text-[11px] sm:text-xs font-semibold text-gray-300 font-mono shadow-sm whitespace-nowrap">
@@ -292,11 +292,11 @@ const AdPopup = () => {
             </span>
           </div>
 
-          {/* Tengah: Skip Iklan (Merah) */}
+          {/* Tengah: Skip Iklan (Ungu) */}
           <button
             type="button"
             onClick={handleSkipAd}
-            className="inline-flex items-center justify-center shrink-0 rounded-xl bg-red-600 px-3 sm:px-6 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-white shadow-[0_3px_0_0_#991b1b] sm:shadow-[0_4px_0_0_#991b1b] transition-all whitespace-nowrap hover:-translate-y-0.5 hover:bg-red-500 active:translate-y-0.5 cursor-pointer"
+            className="inline-flex items-center justify-center shrink-0 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-3 sm:px-6 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-white shadow-[0_3px_0_0_#581c87] sm:shadow-[0_4px_0_0_#581c87] transition-all whitespace-nowrap hover:-translate-y-0.5 hover:from-purple-500 hover:to-indigo-500 active:translate-y-0.5 cursor-pointer"
           >
             Skip Iklan
           </button>

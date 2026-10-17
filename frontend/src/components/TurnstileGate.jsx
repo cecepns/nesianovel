@@ -156,12 +156,12 @@ export default function TurnstileGate({ children }) {
     <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-[#070b14]/95 text-gray-100 p-4 select-none backdrop-blur-md">
       {/* Background ambient lighting */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-red-600/15 rounded-full blur-[100px]"></div>
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-purple-600/15 rounded-full blur-[100px]"></div>
       </div>
 
       <div className="relative w-full max-w-sm sm:max-w-md bg-[#0f172a]/90 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/80 backdrop-blur-xl flex flex-col items-center text-center overflow-hidden">
         {/* Subtle accent border on top */}
-        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-red-500/80 to-transparent"></div>
+        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-purple-500/80 to-transparent"></div>
 
         {/* Logo KomikNesia */}
         <div className="mb-4 flex items-center justify-center">
@@ -184,7 +184,7 @@ export default function TurnstileGate({ children }) {
         <div className="w-full flex flex-col items-center justify-center min-h-[70px] mb-4">
           {(!turnstileLoaded || isVerifyingWithBackend) && (
             <div className="flex items-center gap-2 text-xs text-gray-400 py-3">
-              <Loader2 className="w-4 h-4 animate-spin text-red-500" />
+              <Loader2 className="w-4 h-4 animate-spin text-purple-500" />
               <span>{isVerifyingWithBackend ? 'Memvalidasi sesi keamanan...' : 'Memuat modul keamanan...'}</span>
             </div>
           )}

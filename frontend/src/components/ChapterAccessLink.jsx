@@ -206,7 +206,7 @@ const ChapterAccessLink = ({
       {label != null || meta != null ? (
         <>
           <span className="relative z-10 flex min-w-0 items-center gap-2 font-semibold">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-red-600 shadow-[0_0_6px_#dc2626]" />
+            <span className="h-2 w-2 shrink-0 rounded-full bg-purple-500 shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
             <span className="truncate text-gray-700 dark:text-white">{label}</span>
           </span>
           {meta ? (

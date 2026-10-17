@@ -192,14 +192,14 @@ const PopularSection = () => {
     return (
       <div className="mb-12">
         <div className="flex justify-center mb-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-pink-500/30 bg-[#12121a] px-5 py-2 shadow-lg">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 to-red-500 text-xs">🔥</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-[#12121a] px-5 py-2 shadow-lg">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 text-xs">🔥</span>
             <span className="text-sm font-bold text-white tracking-wide">Popular Today</span>
           </div>
         </div>
         <div className="text-center py-12 bg-gray-900/40 rounded-2xl border border-gray-800 max-w-xl mx-auto">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-red-500 mx-auto"></div>
-          <p className="text-gray-400 mt-4 text-sm">Memuat komik populer hari ini...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-500 mx-auto"></div>
+          <p className="text-gray-400 mt-4 text-sm">Memuat novel populer hari ini...</p>
         </div>
       </div>
     );
@@ -213,8 +213,8 @@ const PopularSection = () => {
     <div className="lg:mb-12 relative min-h-[440px] sm:min-h-[490px] md:min-h-[520px]">
       {/* Centered Pill Header Badge "Popular Today" */}
       <div className="flex justify-center mb-6">
-        <div className="inline-flex items-center gap-2 rounded-full border border-pink-500/30 bg-[#12121a] px-5 py-2 shadow-lg shadow-pink-950/20 backdrop-blur-md">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 via-rose-500 to-red-500 text-xs shadow-md">
+        <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-[#12121a] px-5 py-2 shadow-lg shadow-purple-950/20 backdrop-blur-md">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-purple-600 via-purple-500 to-indigo-600 text-xs shadow-md">
             🔥
           </span>
           <span className="text-sm sm:text-base font-bold text-white tracking-wide">
@@ -229,7 +229,7 @@ const PopularSection = () => {
         <button
           type="button"
           onClick={handlePrev}
-          className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/80 text-white shadow-2xl border border-white/20 hover:bg-red-600 hover:scale-110 active:scale-95 transition-all"
+          className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/80 text-white shadow-2xl border border-white/20 hover:bg-purple-600 hover:scale-110 active:scale-95 transition-all"
           aria-label="Previous"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -239,7 +239,7 @@ const PopularSection = () => {
         <button
           type="button"
           onClick={handleNext}
-          className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/80 text-white shadow-2xl border border-white/20 hover:bg-red-600 hover:scale-110 active:scale-95 transition-all"
+          className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/80 text-white shadow-2xl border border-white/20 hover:bg-purple-600 hover:scale-110 active:scale-95 transition-all"
           aria-label="Next"
         >
           <ChevronRight className="h-6 w-6" />
@@ -265,13 +265,13 @@ const PopularSection = () => {
                 onClick={() => {
                   if (dragDistanceRef.current > 10) return;
                   if (isActive) {
-                    navigate(`/komik/${item.slug}`);
+                    navigate(`/novel/${item.slug}`);
                   } else {
                     scrollToCard(index, true);
                   }
                 }}
                 className={`relative shrink-0 overflow-hidden rounded-2xl bg-[#1e1e26] border transition-all duration-300 flex flex-col justify-between select-none snap-center h-[330px] sm:h-[360px] md:h-[380px] w-[52vw] max-w-[200px] sm:w-[230px] md:w-[260px] lg:w-[280px] ${isActive
-                  ? "-translate-y-3.5 z-10 border-red-500/80 ring-2 ring-red-500/50 shadow-2xl shadow-red-950/60 opacity-100 cursor-pointer"
+                  ? "-translate-y-3.5 z-10 border-purple-500/80 ring-2 ring-purple-500/50 shadow-2xl shadow-purple-950/60 opacity-100 cursor-pointer"
                   : "translate-y-0 z-0 opacity-60 hover:opacity-85 border-white/10 cursor-pointer"
                   }`}
               >

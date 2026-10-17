@@ -14,6 +14,7 @@ const allowedHosts = [
   '02.komiknesia.asia',
   '03.komiknesia.asia',
   'id.komiknesia.net',
+  'id.nesianovel.com',
   'komiknesia.vercel.app',
   'komiknesia.site',
   'v1.komiknesiaku.com',

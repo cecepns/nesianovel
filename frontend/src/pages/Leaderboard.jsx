@@ -48,7 +48,7 @@ function getLevelBadgeStyle(level) {
   }
   return {
     label: `LVL ${lvl} • RECRUIT`,
-    badgeClass: "bg-red-950/60 text-red-300 border border-red-500/40 shadow-sm",
+    badgeClass: "bg-purple-950/60 text-purple-300 border border-purple-500/40 shadow-sm",
   };
 }
 
@@ -112,10 +112,10 @@ const Leaderboard = () => {
   return (
     <div className="min-h-screen bg-black text-gray-100 pt-5 md:pt-20 pb-24">
       <Helmet>
-        <title>Leaderboard | KomikNesia</title>
+        <title>Leaderboard | NesiaNovel</title>
         <meta
           name="description"
-          content="Lihat leaderboard komunitas KomikNesia dan cek posisi peringkatmu hari ini."
+          content="Lihat leaderboard komunitas NesiaNovel dan cek posisi peringkatmu hari ini."
         />
       </Helmet>
 
@@ -123,8 +123,8 @@ const Leaderboard = () => {
         
         {/* Header Title */}
         <div className="text-center pt-2">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-950/60 border border-red-600/30 text-[11px] font-bold text-red-400 uppercase tracking-widest shadow-md">
-            <Sparkles className="h-3.5 w-3.5" /> Tiga Besar KomikNesia
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-950/60 border border-purple-600/30 text-[11px] font-bold text-purple-400 uppercase tracking-widest shadow-md">
+            <Sparkles className="h-3.5 w-3.5" /> Tiga Besar NesiaNovel
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white mt-2 tracking-tight">
             Leaderboard Komunitas
@@ -174,7 +174,7 @@ const Leaderboard = () => {
                   </div>
                   <div>
                     <p className="text-[10px] uppercase font-bold text-gray-400">XP Bulanan</p>
-                    <p className="text-xs font-black text-red-400 mt-0.5">{(secondPlace.points || 0).toLocaleString()}</p>
+                    <p className="text-xs font-black text-purple-400 mt-0.5">{(secondPlace.points || 0).toLocaleString()}</p>
                   </div>
                 </div>
               </div>
@@ -184,7 +184,7 @@ const Leaderboard = () => {
             {firstPlace && (
               <div
                 onClick={() => firstPlace.username && navigate(`/profile/${encodeURIComponent(firstPlace.username)}`)}
-                className="relative rounded-3xl border-2 border-red-500/70 bg-gradient-to-b from-[#221217] to-[#14141c] p-7 text-center cursor-pointer transition-all hover:scale-[1.03] shadow-[0_0_30px_rgba(220,38,38,0.2)] order-1 md:order-2"
+                className="relative rounded-3xl border-2 border-purple-500/70 bg-gradient-to-b from-[#21122b] to-[#14141c] p-7 text-center cursor-pointer transition-all hover:scale-[1.03] shadow-[0_0_30px_rgba(168,85,247,0.25)] order-1 md:order-2"
               >
                 <div className="absolute -top-5 left-1/2 -translate-x-1/2 flex items-center justify-center">
                   <img src={crownImage} alt="Mahkota" className="h-8 w-8 drop-shadow-md" />
@@ -207,16 +207,16 @@ const Leaderboard = () => {
                   )}
                 </div>
                 <h3 className="text-lg font-extrabold text-white truncate">{firstPlace.name}</h3>
-                <p className="text-xs text-red-400 font-medium truncate">@{firstPlace.username || 'user'}</p>
+                <p className="text-xs text-purple-300 font-medium truncate">@{firstPlace.username || 'user'}</p>
 
-                <div className="mt-5 grid grid-cols-2 gap-2 rounded-2xl bg-black/60 border border-red-500/20 p-3 text-center shadow-inner">
+                <div className="mt-5 grid grid-cols-2 gap-2 rounded-2xl bg-black/60 border border-purple-500/20 p-3 text-center shadow-inner">
                   <div>
                     <p className="text-[10px] uppercase font-bold text-gray-400">Level</p>
                     <p className="text-sm font-black text-amber-400 mt-0.5">{firstPlace.level || 1}</p>
                   </div>
                   <div>
                     <p className="text-[10px] uppercase font-bold text-gray-400">XP Bulanan</p>
-                    <p className="text-sm font-black text-red-400 mt-0.5">{(firstPlace.points || 0).toLocaleString()}</p>
+                    <p className="text-sm font-black text-purple-400 mt-0.5">{(firstPlace.points || 0).toLocaleString()}</p>
                   </div>
                 </div>
               </div>
@@ -255,7 +255,7 @@ const Leaderboard = () => {
                   </div>
                   <div>
                     <p className="text-[10px] uppercase font-bold text-gray-400">XP Bulanan</p>
-                    <p className="text-xs font-black text-red-400 mt-0.5">{(thirdPlace.points || 0).toLocaleString()}</p>
+                    <p className="text-xs font-black text-purple-400 mt-0.5">{(thirdPlace.points || 0).toLocaleString()}</p>
                   </div>
                 </div>
               </div>
@@ -272,7 +272,7 @@ const Leaderboard = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari username..."
-              className="w-full rounded-xl border border-white/10 bg-black/50 pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-red-500/60 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-black/50 pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-purple-500/60 focus:outline-none"
             />
           </div>
         </div>
@@ -309,7 +309,7 @@ const Leaderboard = () => {
                     to={player.username ? `/profile/${encodeURIComponent(player.username)}` : '#'}
                     className={`flex flex-col sm:grid sm:grid-cols-12 gap-3 px-4 sm:px-6 py-4 transition-colors items-center ${
                       isUserRow
-                        ? "bg-red-950/40 border-l-4 border-red-600 ring-1 ring-red-500/40"
+                        ? "bg-purple-950/40 border-l-4 border-purple-600 ring-1 ring-purple-500/40"
                         : "hover:bg-white/[0.04]"
                     }`}
                   >
@@ -370,7 +370,7 @@ const Leaderboard = () => {
                     {/* XP Only */}
                     <div className="col-span-3 flex items-center justify-between sm:justify-end gap-2 w-full text-right">
                       <div>
-                        <p className="text-sm font-black text-red-400">{(player.points || 0).toLocaleString()} <span className="text-[10px] text-gray-400 font-semibold">XP</span></p>
+                        <p className="text-sm font-black text-purple-400">{(player.points || 0).toLocaleString()} <span className="text-[10px] text-gray-400 font-semibold">XP</span></p>
                       </div>
                     </div>
                   </Link>

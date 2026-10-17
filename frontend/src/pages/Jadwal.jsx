@@ -60,8 +60,8 @@ function ScheduleCard({ item }) {
 
   return (
     <Link
-      to={`/komik/${item.manga.slug}`}
-      className="group flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition hover:border-red-500/50 hover:bg-white/10 shadow-md"
+      to={`/novel/${item.manga.slug}`}
+      className="group flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition hover:border-purple-500/50 hover:bg-white/10 shadow-md"
     >
       <div className="h-[4.5rem] w-[3.25rem] shrink-0 overflow-hidden rounded-lg bg-gray-900 sm:h-20 sm:w-14">
         {cover ? (
@@ -76,7 +76,7 @@ function ScheduleCard({ item }) {
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-100 group-hover:text-red-400">
+        <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-100 group-hover:text-purple-400 transition-colors">
           {item.manga.title}
         </p>
         <p className="mt-0.5 line-clamp-1 text-xs text-gray-400">
@@ -84,7 +84,7 @@ function ScheduleCard({ item }) {
           {item.title ? ` — ${item.title}` : ''}
         </p>
         {releaseTime ? (
-          <p className="mt-1.5 inline-flex items-center gap-1 rounded-md bg-red-950/60 border border-red-500/30 px-2 py-0.5 text-[11px] font-medium text-red-300">
+          <p className="mt-1.5 inline-flex items-center gap-1 rounded-md bg-purple-950/60 border border-purple-500/30 px-2 py-0.5 text-[11px] font-medium text-purple-300">
             <Clock className="h-3 w-3 shrink-0" aria-hidden />
             {releaseTime} WIB
           </p>
@@ -101,7 +101,7 @@ function DaySection({ dayKey, dayLabel, dateLabel, items, isToday }) {
     <section
       className={`rounded-2xl border transition-colors ${
         isToday
-          ? 'border-red-500/50 bg-red-950/20'
+          ? 'border-purple-500/50 bg-purple-950/20'
           : 'border-white/10 bg-white/[0.03]'
       } ${isEmpty ? 'px-4 py-3 md:px-5 md:py-3.5' : 'p-4 md:p-5'}`}
     >
@@ -112,7 +112,7 @@ function DaySection({ dayKey, dayLabel, dateLabel, items, isToday }) {
               {dayLabel}
             </h2>
             {isToday ? (
-              <span className="rounded-full bg-red-600 px-2.5 py-0.5 text-[10px] font-bold text-white shadow-md">
+              <span className="rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-2.5 py-0.5 text-[10px] font-bold text-white shadow-md shadow-purple-900/40">
                 Hari ini
               </span>
             ) : null}
@@ -206,11 +206,11 @@ const Jadwal = () => {
           <div className="border-b border-white/10 px-6 py-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-red-500 font-bold">
+                <p className="text-xs uppercase tracking-[0.25em] text-purple-400 font-bold">
                   Release Schedule
                 </p>
                 <h1 className="mt-1 flex items-center gap-2 text-2xl font-extrabold text-white md:text-3xl">
-                  <CalendarDays className="h-7 w-7 text-red-500" />
+                  <CalendarDays className="h-7 w-7 text-purple-400" />
                   Jadwal Rilis
                 </h1>
                 <p className="mt-1 text-sm text-gray-400">
@@ -243,7 +243,7 @@ const Jadwal = () => {
                   <button
                     type="button"
                     onClick={() => setWeekOffset(0)}
-                    className="rounded-xl border border-sky-500/40 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-700 dark:border-cyan-400/30 dark:bg-cyan-950/40 dark:text-cyan-200"
+                    className="rounded-xl border border-purple-500/40 bg-purple-950/40 px-3 py-2 text-xs font-semibold text-purple-200 hover:bg-purple-900/50 transition-colors"
                   >
                     Minggu ini
                   </button>

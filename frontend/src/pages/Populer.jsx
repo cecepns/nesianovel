@@ -91,8 +91,8 @@ const Populer = () => {
   return (
     <div className="min-h-screen pb-20 pt-1 bg-black text-gray-100 dark:bg-black dark:text-gray-100">
       <Helmet>
-        <title>Populer - Komiknesia</title>
-        <meta name="description" content="Komik Populer Manhwa, Manga, dan Manhua di Komiknesia." />
+        <title>Populer - Nesianovel</title>
+        <meta name="description" content="Komik Populer Manhwa, Manga, dan Manhua di Nesianovel." />
       </Helmet>
 
       <div className="container mx-auto px-4 max-w-7xl pt-4 lg:pt-10">

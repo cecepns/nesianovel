@@ -52,10 +52,10 @@ function SpoilerBlock({ content }) {
           e.stopPropagation();
           setRevealed(true);
         }}
-        className="my-1.5 inline-flex items-center gap-1.5 rounded-xl bg-red-950/80 border border-red-700/60 px-3 py-1.5 text-xs font-bold text-red-300 hover:bg-red-900 transition-colors cursor-pointer select-none shadow-md"
+        className="my-1.5 inline-flex items-center gap-1.5 rounded-xl bg-purple-950/80 border border-purple-700/60 px-3 py-1.5 text-xs font-bold text-purple-300 hover:bg-purple-900 transition-colors cursor-pointer select-none shadow-md"
         title="Klik untuk membuka spoiler"
       >
-        <EyeOff className="h-3.5 w-3.5 text-red-400 shrink-0" />
+        <EyeOff className="h-3.5 w-3.5 text-purple-400 shrink-0" />
         <span>SPOILER (Klik untuk membuka)</span>
       </span>
     );
@@ -67,10 +67,10 @@ function SpoilerBlock({ content }) {
         e.stopPropagation();
         setRevealed(false);
       }}
-      className="my-1.5 block rounded-xl bg-white/[0.05] border-l-4 border-red-500 p-3 text-sm text-gray-200 cursor-pointer hover:bg-white/[0.08] transition-colors"
+      className="my-1.5 block rounded-xl bg-white/[0.05] border-l-4 border-purple-500 p-3 text-sm text-gray-200 cursor-pointer hover:bg-white/[0.08] transition-colors"
       title="Klik untuk menyembunyikan spoiler"
     >
-      <span className="text-[10px] font-extrabold uppercase tracking-wider text-red-400 mb-1 flex items-center gap-1 select-none">
+      <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-400 mb-1 flex items-center gap-1 select-none">
         <Eye className="h-3 w-3" /> SPOILER (Klik untuk tutup)
       </span>
       <span>{content}</span>
@@ -260,7 +260,7 @@ function CommentItem({ comment, onReply, getImageUrl, isAuthenticated, currentUs
                     {avatarUrl ? (
                       <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-red-600 flex items-center justify-center">
+                      <div className="w-full h-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center">
                         <span className="text-sm font-bold text-white">
                           {(comment.username || 'U').charAt(0).toUpperCase()}
                         </span>
@@ -279,7 +279,7 @@ function CommentItem({ comment, onReply, getImageUrl, isAuthenticated, currentUs
                     type="button"
                     onClick={handleDelete}
                     disabled={deleting}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-red-600 text-white hover:bg-red-500 disabled:opacity-50"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-rose-600 text-white hover:bg-rose-500 disabled:opacity-50"
                     aria-label="Hapus komentar"
                   >
                     {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
@@ -299,7 +299,7 @@ function CommentItem({ comment, onReply, getImageUrl, isAuthenticated, currentUs
                 type="button"
                 onClick={handleDelete}
                 disabled={deleting}
-                className="ml-auto inline-flex h-7 w-7 items-center justify-center rounded-lg bg-red-600/80 text-white hover:bg-red-600 disabled:opacity-50"
+                className="ml-auto inline-flex h-7 w-7 items-center justify-center rounded-lg bg-rose-600/80 text-white hover:bg-rose-600 disabled:opacity-50"
                 aria-label="Hapus komentar"
               >
                 {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
@@ -313,7 +313,7 @@ function CommentItem({ comment, onReply, getImageUrl, isAuthenticated, currentUs
             <button
               type="button"
               onClick={() => setShowReplyForm((v) => !v)}
-              className="mt-2 text-xs font-bold text-red-400 hover:text-red-300 flex items-center gap-1"
+              className="mt-2 text-xs font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1"
             >
               <Reply className="h-3 w-3" />
               Balas
@@ -331,7 +331,7 @@ function CommentItem({ comment, onReply, getImageUrl, isAuthenticated, currentUs
                 <button
                   type="submit"
                   disabled={!replyBody.trim() || submitting}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-xl text-white font-bold text-sm flex items-center gap-1"
+                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 rounded-xl text-white font-bold text-sm flex items-center gap-1 shadow-md shadow-purple-950/40"
                 >
                   {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </button>
@@ -580,7 +580,7 @@ export default function CommentSection({ mangaId, chapterId, externalSlug, scope
   return (
     <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 md:p-8 backdrop-blur-md">
       <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
-        <MessageCircle className="h-5 w-5 text-red-500" />
+        <MessageCircle className="h-5 w-5 text-purple-400" />
         KOMENTAR
       </h3>
 
@@ -673,7 +673,7 @@ export default function CommentSection({ mangaId, chapterId, externalSlug, scope
                 type="button"
                 onClick={() => insertBbCode('spoiler')}
                 disabled={!isAuthenticated || submitting}
-                className="p-1.5 hover:text-red-400 hover:bg-white/10 rounded transition-colors disabled:opacity-30"
+                className="p-1.5 hover:text-purple-400 hover:bg-white/10 rounded transition-colors disabled:opacity-30"
                 title="Sembunyikan Spoiler"
               >
                 <Eye className="h-4 w-4" />
@@ -722,7 +722,7 @@ export default function CommentSection({ mangaId, chapterId, externalSlug, scope
               <button
                 type="submit"
                 disabled={!body.trim() || submitting || !isAuthenticated || commentCooldown > 0}
-                className="px-5 py-2 bg-[#7e3844] hover:bg-red-600 disabled:opacity-40 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95"
+                className="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-40 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-purple-950/40 transition-all active:scale-95"
               >
                 {submitting ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -743,7 +743,7 @@ export default function CommentSection({ mangaId, chapterId, externalSlug, scope
       {/* Comment List */}
       {loading ? (
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-red-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
         </div>
       ) : comments.length === 0 ? (
         <div className="text-center py-8 border border-dashed border-white/10 rounded-2xl">

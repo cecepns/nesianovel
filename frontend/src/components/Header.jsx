@@ -104,9 +104,9 @@ const Header = () => {
                 alt="NesiaNovel"
                 className="h-8 w-auto object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]"
               />
-              <span className="text-base font-black text-white">
+              {/* <span className="text-base font-black text-white">
                 Nesia<span className="text-purple-400">Novel</span>
-              </span>
+              </span> */}
             </Link>
           </div>
 

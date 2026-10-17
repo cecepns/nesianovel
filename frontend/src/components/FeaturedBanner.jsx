@@ -88,7 +88,7 @@ function MobileFeaturedMeta({ item, onReadLatest }) {
   return (
     <div className="flex w-full flex-col items-center px-4 pb-4 pt-1">
       <div className="flex w-full max-w-sm flex-wrap items-center justify-center gap-2">
-        <span className="rounded-md bg-[#c61737] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+        <span className="rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
           {contentTypeLabel(item.content_type)}
         </span>
         {rating != null && !Number.isNaN(rating) ? (
@@ -105,7 +105,7 @@ function MobileFeaturedMeta({ item, onReadLatest }) {
       </div>
 
       <Link
-        to={`/komik/${item.slug}`}
+        to={`/novel/${item.slug}`}
         className="mt-2 line-clamp-2 max-w-sm text-center text-base font-bold leading-snug text-white transition-colors hover:text-amber-100"
       >
         {item.title}
@@ -138,7 +138,7 @@ function DesktopFeaturedSlide({ item, onReadLatest }) {
                 Chapter: {latest.number}
               </p>
             )}
-            <Link to={`/komik/${item.slug}`}>
+            <Link to={`/novel/${item.slug}`}>
               <h2 className="text-2xl font-bold leading-tight line-clamp-2 cursor-pointer transition-colors hover:text-white/90 md:text-4xl lg:text-5xl">
                 {item.title}
               </h2>
@@ -189,7 +189,7 @@ function DesktopFeaturedSlide({ item, onReadLatest }) {
 
           <div className="relative z-[1] flex justify-center lg:justify-end">
             <Link
-              to={`/komik/${item.slug}`}
+              to={`/novel/${item.slug}`}
               className="group relative block"
               aria-label={item.title}
             >

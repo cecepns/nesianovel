@@ -95,10 +95,10 @@ function SpoilerBlock({ content }) {
           e.stopPropagation();
           setRevealed(true);
         }}
-        className="my-1.5 inline-flex items-center gap-1.5 rounded-xl bg-red-950/80 border border-red-700/60 px-2.5 py-1 text-xs font-bold text-red-300 hover:bg-red-900 transition-colors cursor-pointer select-none shadow-md"
+        className="my-1.5 inline-flex items-center gap-1.5 rounded-xl bg-purple-950/80 border border-purple-700/60 px-2.5 py-1 text-xs font-bold text-purple-300 hover:bg-purple-900 transition-colors cursor-pointer select-none shadow-md"
         title="Klik untuk membuka spoiler"
       >
-        <EyeOff className="h-3.5 w-3.5 text-red-400 shrink-0" />
+        <EyeOff className="h-3.5 w-3.5 text-purple-400 shrink-0" />
         <span>SPOILER (Klik untuk membuka)</span>
       </span>
     );
@@ -110,10 +110,10 @@ function SpoilerBlock({ content }) {
         e.stopPropagation();
         setRevealed(false);
       }}
-      className="my-1.5 block rounded-xl bg-white/[0.05] border-l-4 border-red-500 p-2.5 text-xs sm:text-sm text-gray-200 cursor-pointer hover:bg-white/[0.08] transition-colors"
+      className="my-1.5 block rounded-xl bg-white/[0.05] border-l-4 border-purple-500 p-2.5 text-xs sm:text-sm text-gray-200 cursor-pointer hover:bg-white/[0.08] transition-colors"
       title="Klik untuk menyembunyikan spoiler"
     >
-      <span className="text-[10px] font-extrabold uppercase tracking-wider text-red-400 mb-1 flex items-center gap-1 select-none">
+      <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-400 mb-1 flex items-center gap-1 select-none">
         <Eye className="h-3 w-3" /> SPOILER (Klik untuk tutup)
       </span>
       <span>{content}</span>
@@ -471,7 +471,7 @@ const LiveChatWidget = () => {
       className="fixed right-4 z-[70] bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:bottom-5 md:right-5"
     >
       <div
-        className={`absolute bottom-[72px] right-0 w-[min(92vw,380px)] rounded-2xl border border-white/20 bg-gray-950/95 text-white shadow-2xl backdrop-blur-xl overflow-hidden transition-all duration-300 ${
+        className={`absolute bottom-[72px] right-0 w-[min(92vw,380px)] rounded-2xl border border-purple-900/30 bg-[#130d24]/95 text-white shadow-2xl backdrop-blur-xl overflow-hidden transition-all duration-300 ${
           chatOpen
             ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
             : "opacity-0 translate-y-4 scale-95 pointer-events-none"
@@ -653,7 +653,7 @@ const LiveChatWidget = () => {
               <button
                 type="button"
                 onClick={() => insertBbCode('spoiler')}
-                className="px-2 py-1 rounded bg-white/5 hover:bg-white/15 text-[10px] font-semibold text-red-400 flex items-center gap-1"
+                className="px-2 py-1 rounded bg-white/5 hover:bg-white/15 text-[10px] font-semibold text-purple-400 flex items-center gap-1"
                 title="Tambah Spoiler [spoiler]"
               >
                 <Eye className="h-3 w-3" /> Spoiler
@@ -675,7 +675,7 @@ const LiveChatWidget = () => {
               onChange={(e) => setChatInput(e.target.value)}
               rows={3}
               placeholder="Tulis pesan..."
-              className="w-full rounded-xl border border-white/10 bg-black/50 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 resize-y min-h-[4.5rem]"
+              className="w-full rounded-xl border border-white/10 bg-black/50 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-y min-h-[4.5rem]"
             />
             <div className="flex items-center justify-between gap-2 pt-1">
               <button
@@ -691,7 +691,7 @@ const LiveChatWidget = () => {
               <button
                 type="submit"
                 disabled={chatSending || chatCooldown > 0 || !chatInput.trim()}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-red-700 px-4 py-2.5 text-sm font-semibold hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-purple-950/40 transition-all"
               >
                 <Send className="h-4 w-4" />
                 {chatSending
@@ -707,7 +707,7 @@ const LiveChatWidget = () => {
             <span>Login dulu untuk kirim chat.</span>
             <Link
               to="/akun"
-              className="inline-flex items-center justify-center rounded-xl bg-red-700 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600 transition-colors"
+              className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:from-purple-500 hover:to-indigo-500 shadow-md shadow-purple-950/40 transition-all"
             >
               Masuk
             </Link>
@@ -725,7 +725,7 @@ const LiveChatWidget = () => {
           type="button"
           onClick={() => setChatOpen((prev) => !prev)}
           aria-label={chatOpen ? "Tutup live chat" : "Buka live chat"}
-          className={`relative h-14 w-14 rounded-full bg-gradient-to-br from-red-600 to-rose-700 text-white shadow-[0_12px_35px_rgba(225,29,72,0.45)] transition-all duration-300 hover:scale-110 active:scale-95 ${
+          className={`relative h-14 w-14 rounded-full bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-700 text-white shadow-[0_12px_35px_rgba(147,51,234,0.45)] transition-all duration-300 hover:scale-110 active:scale-95 ${
             chatOpen ? "rotate-180" : ""
           }`}
         >

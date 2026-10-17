@@ -41,6 +41,7 @@ import { apiClient, getImageUrl } from '../utils/api';
 import AdBanner from '../components/AdBanner';
 import { useAds } from '../hooks/useAds';
 import CommentSection from '../components/CommentSection';
+import DesktopSidebar from '../components/DesktopSidebar';
 import { useAuth } from '../contexts/AuthContext';
 import { REACTION_OPTIONS, emptyReactionCounts, sumReactionCounts } from '../constants/reactions';
 import LoginModal from '../components/LoginModal';
@@ -388,9 +389,12 @@ const ChapterReader = () => {
         />
       </Helmet>
 
+      {/* Desktop Left Sidebar Navigation */}
+      <DesktopSidebar />
+
       {/* Top Floating Control Bar */}
       <div
-        className={`fixed top-0 left-0 right-0 z-40 transition-transform duration-300 ${
+        className={`fixed top-0 left-0 right-0 md:left-64 z-40 transition-transform duration-300 ${
           isControlsVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
@@ -638,7 +642,7 @@ const ChapterReader = () => {
       {/* Main Content Area */}
       <main
         onClick={handleMainAreaClick}
-        className="min-h-screen py-8 px-3 sm:px-6 cursor-default"
+        className="min-h-screen py-8 px-3 sm:px-6 cursor-default md:pl-64"
       >
         <div className="max-w-4xl mx-auto">
           {/* Top Navigation Row */}

@@ -78,8 +78,8 @@ const ProjectSection = () => {
     <>
       {projectTopBanner}
       <div className="mb-12">
-        {/* Title Bar with Red Background */}
-        <div className="w-full bg-red-600 dark:bg-red-600 text-white rounded-xl px-4 py-3 mb-6 flex items-center justify-between shadow-lg shadow-red-900/20">
+        {/* Title Bar with Purple Gradient Background */}
+        <div className="w-full bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-600 text-white rounded-xl px-4 py-3 mb-6 flex items-center justify-between shadow-lg shadow-purple-950/40 border border-purple-500/20">
           <div className="flex items-center gap-3">
             <FolderKanban className="h-5 w-5 sm:h-6 sm:w-6 text-white shrink-0" />
             <h2 className="text-base sm:text-lg font-bold tracking-wide uppercase text-white">
@@ -121,7 +121,7 @@ const ProjectSection = () => {
           {visibleManga.map((manga) => (
             <div
               key={manga.id}
-              onClick={() => navigate(`/komik/${manga.slug}`)}
+              onClick={() => navigate(`/novel/${manga.slug}`)}
               className={`bg-white dark:bg-white/[0.06] dark:border dark:border-white/10 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer ${cardLayout === "horizontal"
                   ? "flex flex-row gap-3 p-3 sm:gap-4 sm:p-4"
                   : "flex flex-col"
@@ -140,13 +140,6 @@ const ProjectSection = () => {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   wrapperClassName="w-full h-full"
                 />
-                {/* {manga.rating > 0 && (
-                <div className="absolute top-2 left-2 h-8 w-8 rounded-full bg-yellow-500/95 text-white shadow-lg backdrop-blur-sm flex items-center justify-center">
-                  <span className="text-[11px] font-bold leading-none">
-                    {Number(manga.rating).toFixed(1)}
-                  </span>
-                </div>
-              )} */}
               </div>
 
               <div
@@ -158,10 +151,10 @@ const ProjectSection = () => {
               >
                 {!!manga.hot && (
                   <div
-                    className={`max-w-fit rounded-full bg-red-500/90 px-2 py-1 backdrop-blur-sm ${cardLayout === "vertical" ? "mb-1" : "mb-0"
+                    className={`max-w-fit rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2 py-0.5 backdrop-blur-sm shadow-sm ${cardLayout === "vertical" ? "mb-1" : "mb-0"
                       }`}
                   >
-                    <span className="text-xs font-bold text-white">HOT</span>
+                    <span className="text-[10px] font-extrabold text-white uppercase tracking-wider">HOT</span>
                   </div>
                 )}
                 <div
@@ -172,12 +165,12 @@ const ProjectSection = () => {
                   }
                 >
                   <Link
-                    to={`/komik/${manga.slug}`}
+                    to={`/novel/${manga.slug}`}
                     onClick={(e) => e.stopPropagation()}
                     className="block w-full"
                   >
                     <h3
-                      className={`font-bold line-clamp-2 text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors ${cardLayout === "vertical" ? "text-xs md:text-sm" : "text-sm sm:text-base"
+                      className={`font-bold line-clamp-2 text-gray-900 dark:text-gray-100 hover:text-purple-400 transition-colors ${cardLayout === "vertical" ? "text-xs md:text-sm" : "text-sm sm:text-base"
                         }`}
                     >
                       {manga.title}
@@ -199,7 +192,7 @@ const ProjectSection = () => {
                         chapter={chapter}
                         to={`/view/${chapter.slug}`}
                         onClick={(e) => e.stopPropagation()}
-                        accent="red"
+                        accent="purple"
                         className={
                           cardLayout === "vertical"
                             ? "text-xs"
@@ -228,7 +221,7 @@ const ProjectSection = () => {
           <button
             type="button"
             onClick={() => navigate("/content?project=true")}
-            className="group inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-red-900/30 hover:bg-red-700 hover:scale-105 active:scale-95 transition-all"
+            className="group inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-purple-950/40 hover:from-purple-500 hover:to-indigo-500 hover:scale-105 active:scale-95 transition-all"
           >
             Lihat semua
             <ChevronRight className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" />

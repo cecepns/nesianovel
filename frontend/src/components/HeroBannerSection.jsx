@@ -68,7 +68,7 @@ const HeroBannerSection = ({ banners = [] }) => {
         {/* Top Badges: Series Tag & Rating */}
         <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 flex items-center gap-2">
           {currentItem.series && (
-            <span className="rounded-md bg-red-600 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-xs font-black tracking-wider text-white shadow-md uppercase">
+            <span className="rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-xs font-black tracking-wider text-white shadow-md uppercase">
               {currentItem.series}
             </span>
           )}
@@ -90,8 +90,8 @@ const HeroBannerSection = ({ banners = [] }) => {
             {/* Read Now Button (Compact size for mobile) */}
             {currentItem.href || currentItem.link || currentItem.slug ? (
               <Link
-                to={currentItem.href || currentItem.link || `/komik/${currentItem.slug}`}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-[11px] font-bold text-white shadow-md transition-all hover:bg-red-700 active:scale-95 sm:rounded-xl sm:px-5 sm:py-2.5 sm:text-sm"
+                to={currentItem.href || currentItem.link || `/novel/${currentItem.slug}`}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-3 py-1.5 text-[11px] font-bold text-white shadow-md shadow-purple-950/40 transition-all hover:from-purple-500 hover:to-indigo-500 active:scale-95 sm:rounded-xl sm:px-5 sm:py-2.5 sm:text-sm"
               >
                 <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>READ NOW</span>
@@ -99,24 +99,12 @@ const HeroBannerSection = ({ banners = [] }) => {
             ) : (
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-[11px] font-bold text-white shadow-md transition-all hover:bg-red-700 active:scale-95 sm:rounded-xl sm:px-5 sm:py-2.5 sm:text-sm"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-3 py-1.5 text-[11px] font-bold text-white shadow-md shadow-purple-950/40 transition-all hover:from-purple-500 hover:to-indigo-500 active:scale-95 sm:rounded-xl sm:px-5 sm:py-2.5 sm:text-sm"
               >
                 <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>READ NOW</span>
               </button>
             )}
-
-            {/* Info Circle Button */}
-            {/* {(currentItem.slug || currentItem.href) && (
-              <button
-                type="button"
-                onClick={() => navigate(currentItem.href || `/komik/${currentItem.slug}`)}
-                className="inline-flex h-7 w-7 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-md transition-all hover:bg-white/20 hover:scale-105"
-                title="Detail Komik"
-              >
-                <Info className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
-              </button>
-            )} */}
           </div>
         </div>
 
@@ -152,7 +140,7 @@ const HeroBannerSection = ({ banners = [] }) => {
               type="button"
               onClick={() => setCurrentIndex(idx)}
               className={`h-2 rounded-full transition-all duration-300 ${currentIndex === idx
-                ? "w-6 bg-red-600 shadow-[0_0_8px_#dc2626]"
+                ? "w-6 bg-gradient-to-r from-purple-500 to-indigo-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]"
                 : "w-2 bg-white/40 hover:bg-white/70"
                 }`}
               aria-label={`Go to slide ${idx + 1}`}

@@ -459,8 +459,8 @@ const MangaDetail = () => {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin text-red-600 mx-auto mb-3" />
-          <p className="text-gray-400 text-sm">Memuat komik...</p>
+          <Loader2 className="h-10 w-10 animate-spin text-purple-500 mx-auto mb-3" />
+          <p className="text-gray-400 text-sm">Memuat novel...</p>
         </div>
       </div>
     );
@@ -470,10 +470,10 @@ const MangaDetail = () => {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-400 mb-4">{error || 'Manga tidak ditemukan'}</p>
+          <p className="text-rose-400 mb-4">{error || 'Novel tidak ditemukan'}</p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-2 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors"
+            className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-xl hover:from-purple-500 hover:to-indigo-500 transition-all shadow-lg shadow-purple-950/40"
           >
             Kembali ke Beranda
           </button>
@@ -482,15 +482,15 @@ const MangaDetail = () => {
     );
   }
 
-  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://komiknesia.com';
-  const pageUrl = `${siteUrl}/komik/${slug}`;
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  const pageUrl = `${siteUrl}/novel/${slug}`;
   const mangaShareUrl = pageUrl;
 
   return (
     <div className="min-h-screen bg-black text-gray-100">
       <Helmet>
-        <title>{manga?.title ? `${manga.title} Bahasa Indonesia - KomikNesia` : 'KomikNesia'}</title>
-        <meta name="description" content={`Baca ${manga?.title || 'komik'} Bahasa Indonesia di KomikNesia.`} />
+        <title>{manga?.title ? `${manga.title} Bahasa Indonesia - NesiaNovel` : 'NesiaNovel'}</title>
+        <meta name="description" content={`Baca ${manga?.title || 'novel'} Bahasa Indonesia di NesiaNovel.`} />
         <link rel="canonical" href={pageUrl} />
       </Helmet>
 
@@ -574,8 +574,8 @@ const MangaDetail = () => {
 
                   {/* Badges */}
                   <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-6">
-                    <span className="px-3 py-1 bg-red-600/30 border border-red-500/40 text-red-300 text-xs font-bold rounded-lg uppercase">
-                      {manga.content_type || 'MANHWA'}
+                    <span className="px-3 py-1 bg-purple-600/30 border border-purple-500/40 text-purple-300 text-xs font-bold rounded-lg uppercase">
+                      {manga.content_type || 'NOVEL'}
                     </span>
                     <span className="px-3 py-1 bg-white/10 border border-white/15 text-gray-300 text-xs font-bold rounded-lg uppercase">
                       {manga.status || 'ONGOING'}
@@ -592,7 +592,7 @@ const MangaDetail = () => {
                         if (chapters.length > 0) openChapter(navigate, chapters[chapters.length - 1], false);
                       }}
                       disabled={chapters.length === 0}
-                      className="flex items-center justify-center gap-1.5 rounded-xl bg-red-600 px-3 py-3 text-xs font-bold text-white shadow-lg hover:bg-red-700 active:scale-[0.99] disabled:opacity-50 transition-all"
+                      className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-3 py-3 text-xs font-bold text-white shadow-lg shadow-purple-950/40 hover:from-purple-500 hover:to-indigo-500 active:scale-[0.99] disabled:opacity-50 transition-all"
                     >
                       <Play className="h-4 w-4 shrink-0" />
                       FIRST CHAPTER
@@ -603,7 +603,7 @@ const MangaDetail = () => {
                         if (chapters.length > 0) openChapter(navigate, chapters[0], true);
                       }}
                       disabled={chapters.length === 0}
-                      className="flex items-center justify-center gap-1.5 rounded-xl bg-red-600 px-3 py-3 text-xs font-bold text-white shadow-lg hover:bg-red-700 active:scale-[0.99] disabled:opacity-50 transition-all"
+                      className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-3 py-3 text-xs font-bold text-white shadow-lg shadow-purple-950/40 hover:from-purple-500 hover:to-indigo-500 active:scale-[0.99] disabled:opacity-50 transition-all"
                     >
                       <Play className="h-4 w-4 shrink-0" />
                       LAST CHAPTER
@@ -654,8 +654,8 @@ const MangaDetail = () => {
               onClick={() => setSharePopupOpen(true)}
               className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-black/90 backdrop-blur-md px-3 py-3 shadow-md transition-all hover:scale-[1.02] hover:border-white/20 hover:bg-white/10"
             >
-              <Share2 className="h-5 w-5 text-red-500 shrink-0" />
-              <span className="text-xs font-bold text-white sm:text-sm">SHARE KOMIK</span>
+              <Share2 className="h-5 w-5 text-purple-400 shrink-0" />
+              <span className="text-xs font-bold text-white sm:text-sm">SHARE NOVEL</span>
             </button>
           </div>
 
@@ -668,7 +668,7 @@ const MangaDetail = () => {
                 onClick={() => setActiveTab('chapters')}
                 className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
                   activeTab === 'chapters'
-                    ? 'bg-red-600 text-white shadow-md'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
                     : 'bg-white/5 text-gray-400 hover:text-white'
                 }`}
               >
@@ -680,7 +680,7 @@ const MangaDetail = () => {
                 onClick={() => setActiveTab('rekomendasi')}
                 className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
                   activeTab === 'rekomendasi'
-                    ? 'bg-red-600 text-white shadow-md'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
                     : 'bg-white/5 text-gray-400 hover:text-white'
                 }`}
               >
@@ -694,7 +694,7 @@ const MangaDetail = () => {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-base sm:text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <span className="text-red-500">ℹ️</span> Series Information
+                    <span className="text-purple-400">ℹ️</span> Series Information
                   </h2>
 
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
@@ -731,7 +731,7 @@ const MangaDetail = () => {
                             <span
                               key={g.id}
                               onClick={() => navigate(`/content?genre=${encodeURIComponent(g.name)}`)}
-                              className="px-2.5 py-1 rounded-lg bg-red-600/20 border border-red-500/30 text-red-300 font-bold text-[10px] uppercase cursor-pointer hover:bg-red-600 hover:text-white transition-all"
+                              className="px-2.5 py-1 rounded-lg bg-purple-950/60 border border-purple-800/40 text-purple-200 font-bold text-[10px] uppercase cursor-pointer hover:bg-purple-600 hover:text-white transition-all"
                             >
                               {g.name}
                             </span>
@@ -762,7 +762,7 @@ const MangaDetail = () => {
                 {/* Synopsis Section */}
                 <div className="border-t border-white/10 pt-4">
                   <h2 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
-                    <span className="text-red-500">≡</span> Synopsis
+                    <span className="text-purple-400">≡</span> Synopsis
                   </h2>
                   <div
                     className={`prose prose-sm max-w-none text-gray-300 leading-relaxed transition-all duration-300 ${
@@ -774,7 +774,7 @@ const MangaDetail = () => {
                     <button
                       type="button"
                       onClick={() => setSynopsisExpanded(!synopsisExpanded)}
-                      className="mt-2 text-xs font-bold text-red-500 hover:text-red-400 flex items-center gap-1"
+                      className="mt-2 text-xs font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1"
                     >
                       {synopsisExpanded ? 'SHOW LESS ▲' : 'SHOW MORE ▼'}
                     </button>
@@ -793,17 +793,17 @@ const MangaDetail = () => {
 
                 {recommendedLoading ? (
                   <div className="py-12 text-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-red-600 mx-auto mb-2" />
-                    <p className="text-gray-400 text-xs">Memuat komik rekomendasi...</p>
+                    <Loader2 className="h-8 w-8 animate-spin text-purple-500 mx-auto mb-2" />
+                    <p className="text-gray-400 text-xs">Memuat novel rekomendasi...</p>
                   </div>
                 ) : recommendedManga.length === 0 ? (
-                  <p className="text-gray-400 text-sm">Tidak ada rekomendasi komik lain saat ini.</p>
+                  <p className="text-gray-400 text-sm">Tidak ada rekomendasi novel lain saat ini.</p>
                 ) : (
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 sm:gap-4">
                     {recommendedManga.map((rec) => (
                       <div
                         key={rec.id}
-                        onClick={() => navigate(`/komik/${rec.slug}`)}
+                        onClick={() => navigate(`/novel/${rec.slug}`)}
                         className="bg-white/[0.06] border border-white/10 rounded-xl overflow-hidden cursor-pointer group shadow-md hover:shadow-xl transition-all flex flex-col justify-between"
                       >
                         <div className="relative aspect-[3/4] overflow-hidden">
@@ -815,7 +815,7 @@ const MangaDetail = () => {
                           />
                         </div>
                         <div className="p-3">
-                          <h3 className="text-xs font-bold text-white line-clamp-2 group-hover:text-red-400 transition-colors">
+                          <h3 className="text-xs font-bold text-white line-clamp-2 group-hover:text-purple-400 transition-colors">
                             {rec.title}
                           </h3>
                         </div>
@@ -838,7 +838,7 @@ const MangaDetail = () => {
             {/* List Chapter Header, Search Bar & Sort Toggle */}
             <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/[0.04] border border-white/10 p-4 rounded-2xl backdrop-blur-md">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-red-500" />
+                <BookOpen className="h-5 w-5 text-purple-400" />
                 List Chapter ({chapters.length})
               </h2>
 
@@ -849,7 +849,7 @@ const MangaDetail = () => {
                     placeholder="Cari Chapter Ex: 99..."
                     value={searchChapter}
                     onChange={(e) => setSearchChapter(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 border border-white/10 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white/5 text-gray-100 placeholder:text-gray-500 text-xs"
+                    className="w-full pl-9 pr-4 py-2 border border-white/10 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 bg-white/5 text-gray-100 placeholder:text-gray-500 text-xs"
                   />
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
                 </div>
@@ -881,7 +881,7 @@ const MangaDetail = () => {
                         ? 'border-amber-500/30'
                         : isRead
                         ? 'border-white/5 hover:border-white/10'
-                        : 'border-white/10 hover:border-red-500/50'
+                        : 'border-white/10 hover:border-purple-500/50'
                     } ${isRead ? 'bg-[#05060a]/90 opacity-70' : 'bg-[#0a0a0e]'}`}
                   >
                     <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -917,7 +917,7 @@ const MangaDetail = () => {
 
                     <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
                       {isLatest && (
-                        <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+                        <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
                           NEW
                         </span>
                       )}
@@ -967,7 +967,7 @@ const MangaDetail = () => {
                       onClick={() => setCurrentPage(item)}
                       className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all ${
                         currentPage === item
-                          ? 'bg-red-600 text-white shadow-md'
+                          ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
                           : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10'
                       }`}
                     >
@@ -1012,10 +1012,10 @@ const MangaDetail = () => {
             </a>
           </div>
 
-          {/* 7. REAKSI KOMIK (DI ATAS KOMENTAR) */}
+          {/* 7. REAKSI NOVEL (DI ATAS KOMENTAR) */}
           <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md shadow-xl">
             <div className="mb-4 text-center">
-              <h3 className="text-base sm:text-lg font-bold text-white">Reaksi Komik Ini</h3>
+              <h3 className="text-base sm:text-lg font-bold text-white">Reaksi Novel Ini</h3>
               <p className="mt-0.5 text-xs text-gray-400">
                 {sumReactionCounts(mangaReactionData).toLocaleString('id-ID')} reaksi pembaca
               </p>
@@ -1029,7 +1029,7 @@ const MangaDetail = () => {
                   disabled={mangaReactionLoading}
                   className={`flex min-w-[4.5rem] flex-col items-center rounded-xl border px-3 py-2.5 transition-all ${
                     selectedMangaReaction === opt.id
-                      ? 'border-red-500 bg-red-950/50 ring-2 ring-red-500/60'
+                      ? 'border-purple-500 bg-purple-950/50 ring-2 ring-purple-500/60'
                       : 'border-white/10 bg-white/5 hover:border-white/20'
                   } ${mangaReactionLoading ? 'cursor-not-allowed opacity-50' : ''}`}
                 >
@@ -1179,13 +1179,13 @@ const MangaDetail = () => {
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-red-600/20 text-red-500 border border-red-500/30">
+                <div className="p-2 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500/30">
                   <ListChecks className="h-5 w-5" />
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-white">Simpan ke Readlist</h3>
                   <p className="text-xs text-gray-400 truncate max-w-[240px]">
-                    {manga?.title || 'Komik'}
+                    {manga?.title || 'Novel'}
                   </p>
                 </div>
               </div>
@@ -1211,12 +1211,12 @@ const MangaDetail = () => {
                   value={newReadlistTitle}
                   onChange={(e) => setNewReadlistTitle(e.target.value)}
                   maxLength={100}
-                  className="flex-1 rounded-xl bg-white/5 border border-white/10 px-3.5 py-2 text-xs sm:text-sm text-white placeholder-gray-500 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all"
+                  className="flex-1 rounded-xl bg-white/5 border border-white/10 px-3.5 py-2 text-xs sm:text-sm text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all"
                 />
                 <button
                   type="submit"
                   disabled={creatingNewReadlist || !newReadlistTitle.trim()}
-                  className="flex items-center gap-1.5 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white px-3.5 py-2 text-xs font-bold transition-all shadow-md active:scale-95 shrink-0"
+                  className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 text-white px-3.5 py-2 text-xs font-bold transition-all shadow-md active:scale-95 shrink-0"
                 >
                   {creatingNewReadlist ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -1237,7 +1237,7 @@ const MangaDetail = () => {
             <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar min-h-[120px] max-h-[260px]">
               {readlistsPickerLoading ? (
                 <div className="flex flex-col items-center justify-center py-8 text-gray-400">
-                  <Loader2 className="h-6 w-6 animate-spin text-red-500 mb-2" />
+                  <Loader2 className="h-6 w-6 animate-spin text-purple-500 mb-2" />
                   <p className="text-xs">Memuat readlist...</p>
                 </div>
               ) : readlistsForPicker.length === 0 ? (
@@ -1255,21 +1255,21 @@ const MangaDetail = () => {
                       type="button"
                       onClick={() => addMangaToReadlist(rl.id)}
                       disabled={isSubmitting}
-                      className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-red-500/40 transition-all text-left group"
+                      className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-500/40 transition-all text-left group"
                     >
                       <div className="min-w-0 pr-3">
-                        <p className="text-xs sm:text-sm font-semibold text-white truncate group-hover:text-red-400 transition-colors">
+                        <p className="text-xs sm:text-sm font-semibold text-white truncate group-hover:text-purple-400 transition-colors">
                           {rl.title}
                         </p>
                         <p className="text-[11px] text-gray-400">
-                          {rl.manga_count || 0} komik
+                          {rl.manga_count || 0} novel
                         </p>
                       </div>
                       <div className="shrink-0">
                         {isSubmitting ? (
-                          <Loader2 className="h-4 w-4 animate-spin text-red-500" />
+                          <Loader2 className="h-4 w-4 animate-spin text-purple-500" />
                         ) : (
-                          <div className="p-1.5 rounded-lg bg-white/10 group-hover:bg-red-600 text-white transition-colors">
+                          <div className="p-1.5 rounded-lg bg-white/10 group-hover:bg-purple-600 text-white transition-colors">
                             <Plus className="h-3.5 w-3.5" />
                           </div>
                         )}
