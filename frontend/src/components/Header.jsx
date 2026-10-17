@@ -37,26 +37,43 @@ const Header = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMenuAnimating, setIsMenuAnimating] = useState(false);
   const searchDesktopRef = useRef(null);
   const searchMobileRef = useRef(null);
 
+  const openMobileMenu = () => {
+    setMobileMenuOpen(true);
+  };
+
+  const handleCloseMenu = () => {
+    setIsMenuAnimating(false);
+    setTimeout(() => {
+      setMobileMenuOpen(false);
+    }, 300);
+  };
+
   // Close mobile menu on route change
   useEffect(() => {
+    setIsMenuAnimating(false);
     setMobileMenuOpen(false);
     setMobileSearchOpen(false);
   }, [location.pathname]);
 
-  // Lock body scroll when mobile menu is open
+  // Lock body scroll and trigger slide animation when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = "hidden";
+      const timer = setTimeout(() => setIsMenuAnimating(true), 20);
+      return () => clearTimeout(timer);
     } else {
+      setIsMenuAnimating(false);
       document.body.style.overflow = "";
     }
     return () => {
       document.body.style.overflow = "";
     };
   }, [mobileMenuOpen]);
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -129,17 +146,22 @@ const Header = () => {
     <header className="fixed top-0 right-0 left-0 md:left-64 z-30 bg-[#0d081f]/90 backdrop-blur-md border-b border-purple-900/30 transition-all duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 gap-4">
-          {/* Mobile Logo */}
-          <div className="flex items-center md:hidden">
+          {/* Mobile Logo & Left Hamburger Toggle */}
+          <div className="flex items-center gap-2 md:hidden">
+            <button
+              type="button"
+              onClick={openMobileMenu}
+              className="p-2 -ml-1.5 rounded-xl text-purple-200 hover:text-white bg-purple-950/40 border border-purple-800/40 hover:bg-purple-900/50 active:scale-95 transition-all"
+              aria-label="Buka Menu Navigasi"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
             <Link to="/" className="flex items-center gap-2">
               <img
                 src={Logo}
                 alt="NesiaNovel"
                 className="h-8 w-auto object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]"
               />
-              {/* <span className="text-base font-black text-white">
-                Nesia<span className="text-purple-400">Novel</span>
-              </span> */}
             </Link>
           </div>
 
@@ -258,8 +280,8 @@ const Header = () => {
             {/* Mobile Hamburger Menu (Garis 3) - Matches Windows Navigation */}
             <button
               type="button"
-              onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-2 rounded-xl text-purple-200 hover:text-white bg-purple-950/40 border border-purple-800/40 hover:bg-purple-900/50 transition-colors"
+              onClick={openMobileMenu}
+              className="md:hidden p-2 rounded-xl text-purple-200 hover:text-white bg-purple-950/40 border border-purple-800/40 hover:bg-purple-900/50 active:scale-95 transition-all"
               aria-label="Menu Navigasi"
             >
               <Menu className="h-5 w-5" />
@@ -361,27 +383,34 @@ const Header = () => {
         )}
       </div>
 
-      {/* Mobile Slide-out Menu (Garis 3) - Rendered via createPortal to escape header stacking context */}
+      {/* Mobile Slide-out Menu (Left Sidebar) - Rendered via createPortal to escape header stacking context */}
       {mobileMenuOpen && typeof document !== "undefined" && createPortal(
         <div className="md:hidden fixed inset-0 z-[9999] flex">
-          {/* Backdrop */}
+          {/* Backdrop with smooth fade transition */}
           <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
-            onClick={() => setMobileMenuOpen(false)}
+            className={`fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
+              isMenuAnimating ? 'opacity-100' : 'opacity-0'
+            }`}
+            onClick={handleCloseMenu}
           />
 
-          {/* Drawer Content */}
-          <div className="relative ml-auto w-72 max-w-[85vw] h-full bg-[#0d081e] border-l border-purple-900/40 p-4 flex flex-col justify-between shadow-2xl z-10 overflow-y-auto">
+          {/* Left Drawer Content with smooth slide animation */}
+          <div
+            className={`relative mr-auto w-72 max-w-[85vw] h-full bg-[#0d081e] border-r border-purple-900/40 p-4 flex flex-col justify-between shadow-[8px_0_30px_rgba(0,0,0,0.85)] z-10 overflow-y-auto transform transition-transform duration-300 ease-out ${
+              isMenuAnimating ? 'translate-x-0' : '-translate-x-full'
+            }`}
+          >
             <div className="space-y-5">
               {/* Drawer Header */}
               <div className="flex items-center justify-between pb-3 border-b border-purple-900/30">
-                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
-                  <img src={Logo} alt="NesiaNovel" className="h-8 w-auto object-contain" />
+                <Link to="/" onClick={handleCloseMenu} className="flex items-center gap-2">
+                  <img src={Logo} alt="NesiaNovel" className="h-8 w-auto object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]" />
                 </Link>
                 <button
                   type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-1.5 rounded-xl bg-purple-950/60 border border-purple-800/40 text-gray-300 hover:text-white"
+                  onClick={handleCloseMenu}
+                  className="p-1.5 rounded-xl bg-purple-950/60 border border-purple-800/40 text-gray-300 hover:text-white hover:bg-purple-900/50 active:scale-95 transition-all"
+                  aria-label="Tutup Menu"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -419,7 +448,7 @@ const Header = () => {
                     </div>
                     <Link
                       to="/store"
-                      onClick={() => setMobileMenuOpen(false)}
+                      onClick={handleCloseMenu}
                       className="text-[10px] font-bold text-purple-300 hover:text-white bg-purple-600/50 hover:bg-purple-600 px-2 py-0.5 rounded-lg transition-colors flex items-center gap-0.5"
                     >
                       Top-up <ChevronRight className="h-2.5 w-2.5" />
@@ -429,7 +458,7 @@ const Header = () => {
               ) : (
                 <Link
                   to="/akun"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={handleCloseMenu}
                   className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs shadow-md"
                 >
                   <LogIn className="h-4 w-4" />
@@ -456,7 +485,7 @@ const Header = () => {
                       <Link
                         key={item.id}
                         to={item.path}
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={handleCloseMenu}
                         className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                           isActive
                             ? 'bg-gradient-to-r from-purple-600/30 to-purple-800/20 text-white border border-purple-500/40 shadow-sm'
@@ -495,7 +524,7 @@ const Header = () => {
                       <Link
                         key={item.path}
                         to={item.path}
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={handleCloseMenu}
                         className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                           isActive
                             ? 'bg-purple-900/30 text-purple-200 font-semibold border border-purple-500/20'
@@ -518,7 +547,7 @@ const Header = () => {
                   </div>
                   <Link
                     to="/admin/dashboard"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={handleCloseMenu}
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold bg-purple-950/60 text-purple-300 border border-purple-800/40 hover:bg-purple-900/50 transition-colors"
                   >
                     <ShieldCheck className="h-4 w-4 text-purple-400" />
