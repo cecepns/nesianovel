@@ -25,7 +25,6 @@ async function run() {
 
     // 2. Manga
     await ensureColumn('manga', 'is_pinned', 'TINYINT(1) NOT NULL DEFAULT 0 AFTER `is_project`');
-    await db.query(`UPDATE manga SET is_pinned = is_project WHERE is_project = 1`);
 
     // 3. User Unlocked Chapters
     await db.query(`
