@@ -192,4 +192,6 @@ module.exports = {
   detailBySlug,
   incrementView,
 };
+module.exports.default = module.exports;
+
 
