@@ -858,8 +858,8 @@ const MangaDetail = () => {
             <div className="space-y-3">
               {paginatedChapters.map((chapter) => {
                 const isLatest = isLatestChapterInList(chapters, chapter.slug);
-                const isCoinLocked = Boolean(chapter.is_locked) || (Number(chapter.coin_price) > 0);
-                const isVipLocked = Boolean(chapter.is_vip_locked || (!isCoinLocked && chapter.is_locked));
+                const isCoinLocked = Boolean(chapter.is_locked === true || chapter.is_locked === 1 || chapter.is_locked === '1');
+                const isVipLocked = Boolean(chapter.is_vip_locked);
                 const chapterLocked = requiresChapterLogin(chapter, isAuthenticated) || isCoinLocked;
                 const isRead = readChapterSlugs.has(chapter.slug) || readChapterSlugs.has(chapter.id);
                 const thumbUrl = getImageUrl(chapter.cover || chapter.thumbnail || manga?.cover);

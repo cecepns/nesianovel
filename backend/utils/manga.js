@@ -153,6 +153,8 @@ async function fetchLocalManga(filters) {
           c.chapter_number AS number,
           c.title,
           c.slug,
+          c.is_locked,
+          c.coin_price,
           c.created_at,
           UNIX_TIMESTAMP(c.created_at) AS created_at_timestamp
         FROM (
@@ -175,6 +177,8 @@ async function fetchLocalManga(filters) {
         number: row.number,
         title: row.title,
         slug: row.slug,
+        is_locked: row.is_locked == 1 || row.is_locked === true,
+        coin_price: Number(row.coin_price || 25),
         created_at: {
           time: parseInt(row.created_at_timestamp, 10),
         },

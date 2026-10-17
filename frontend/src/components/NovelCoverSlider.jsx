@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Star, Pin, Sparkles, Heart, Flame } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star, Pin, Sparkles, Heart, Flame, Lock } from "lucide-react";
 import LazyImage from "./LazyImage";
 import { apiClient, getImageUrl } from "../utils/api";
 
@@ -235,8 +235,13 @@ const NovelCoverSlider = ({
                   {/* Bottom Chapter Badge on Cover */}
                   {chNumber && (
                     <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between pointer-events-none">
-                      <span className="inline-block rounded-md bg-purple-950/80 border border-purple-500/40 px-2 py-0.5 text-[11px] font-bold text-purple-200 backdrop-blur-md shadow-sm">
-                        Ch. {chNumber}
+                      <span className="inline-flex items-center gap-1 rounded-md bg-purple-950/80 border border-purple-500/40 px-2 py-0.5 text-[11px] font-bold text-purple-200 backdrop-blur-md shadow-sm">
+                        {Boolean(latestCh?.is_locked === true || latestCh?.is_locked === 1 || latestCh?.is_locked === '1') && (
+                          <Lock className="h-3 w-3 text-amber-400 shrink-0" />
+                        )}
+                        <span className={Boolean(latestCh?.is_locked === true || latestCh?.is_locked === 1 || latestCh?.is_locked === '1') ? 'text-amber-300' : ''}>
+                          Ch. {chNumber}
+                        </span>
                       </span>
                     </div>
                   )}

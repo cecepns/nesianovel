@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star, Lock } from "lucide-react";
 import LazyImage from "./LazyImage";
 import { apiClient, getImageUrl } from "../utils/api";
 
@@ -292,8 +292,13 @@ const PopularSection = () => {
                     <h3 className={`font-bold line-clamp-1 leading-snug transition-colors ${isActive ? 'text-white text-xs sm:text-sm md:text-base lg:text-lg' : 'text-gray-300 text-[11px] sm:text-xs lg:text-sm'}`}>
                       {item.title}
                     </h3>
-                    <p className="text-[10px] sm:text-[11px] lg:text-xs text-gray-400 mt-0.5 sm:mt-1">
-                      Chapter {latestCh?.number || "N/A"}
+                    <p className="text-[10px] sm:text-[11px] lg:text-xs text-gray-400 mt-0.5 sm:mt-1 flex items-center gap-1">
+                      {Boolean(latestCh?.is_locked === true || latestCh?.is_locked === 1 || latestCh?.is_locked === '1') && (
+                        <Lock className="h-3 w-3 text-amber-400 shrink-0" />
+                      )}
+                      <span className={Boolean(latestCh?.is_locked === true || latestCh?.is_locked === 1 || latestCh?.is_locked === '1') ? 'text-amber-300 font-semibold' : ''}>
+                        Chapter {latestCh?.number || "N/A"}
+                      </span>
                     </p>
                   </div>
 

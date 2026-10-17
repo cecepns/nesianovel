@@ -25,13 +25,7 @@ export function getChapterAccessLinkClassName({
   return [base, locked ? lockedCls : unlocked, className].filter(Boolean).join(' ');
 }
 
-/* ── Visibility-aware animation engine ──
- * IntersectionObserver tracks which elements are on-screen.
- * RAF loop ONLY runs when ≥1 element is visible.
- * Off-screen elements: cheap static border (::after only).
- * On-screen elements: animated gradient border (::before + ::after).
- * Cost: 0 CPU when no elements are visible.
- */
+/* ── Visibility-aware animation engine ── */
 let rafId = null;
 const visibleElements = new Set();
 
@@ -75,7 +69,7 @@ function getObserver() {
           stopLoop();
         }
       },
-      { rootMargin: '200px 0px' }, // start animation 200px before entering viewport
+      { rootMargin: '200px 0px' },
     );
   }
   return sharedObserver;
@@ -108,7 +102,15 @@ const ChapterAccessLink = ({
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [loginOpen, setLoginOpen] = useState(false);
-  const locked = requiresChapterLogin(chapter, isAuthenticated);
+
+  const isCoinLocked = Boolean(
+    chapter?.is_locked === true || 
+    chapter?.is_locked === 1 || 
+    chapter?.is_locked === '1'
+  );
+  const isGuestTimeLocked = requiresChapterLogin(chapter, isAuthenticated);
+  const isLocked = isGuestTimeLocked || isCoinLocked;
+
   const animRef = useRef(null);
 
   /* Observe / unobserve the animated element for viewport visibility */
@@ -117,7 +119,7 @@ const ChapterAccessLink = ({
     if (!el) return;
     observeEl(el);
     return () => unobserveEl(el);
-  }, [locked]); // re-run when locked changes since the DOM element changes
+  }, [isLocked]);
 
   /* Block ALL event types from reaching parent card containers */
   const stopAllPropagation = (e) => {
@@ -129,7 +131,8 @@ const ChapterAccessLink = ({
     e.stopPropagation();
     if (e.nativeEvent) e.nativeEvent.stopImmediatePropagation();
 
-    if (locked) {
+    // Guest trying to open a locked chapter -> prompt login modal
+    if (!isAuthenticated && isLocked) {
       e.preventDefault();
       setLoginOpen(true);
       return;
@@ -138,16 +141,38 @@ const ChapterAccessLink = ({
   };
 
   const linkClassName = getChapterAccessLinkClassName({
-    locked,
+    locked: isLocked,
     className,
     compact,
   });
 
   const labelNode = label ?? children;
 
-  if (locked) {
+  const contentNode = label != null || meta != null ? (
+    <>
+      <span className="relative z-10 flex min-w-0 items-center gap-1.5 font-semibold">
+        {isLocked ? (
+          <Lock className="h-3.5 w-3.5 shrink-0 text-amber-400" aria-hidden />
+        ) : (
+          <span className="h-2 w-2 shrink-0 rounded-full bg-purple-500 shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
+        )}
+        <span className={`truncate ${isLocked ? 'text-amber-300 font-bold' : 'text-gray-200 dark:text-white'}`}>
+          {label}
+        </span>
+      </span>
+      {meta ? (
+        <span className={`relative z-10 shrink-0 pl-2 text-[11px] md:text-xs ${isLocked ? 'text-amber-200/75' : 'text-gray-500 dark:text-gray-400'}`}>
+          {meta}
+        </span>
+      ) : null}
+    </>
+  ) : (
+    labelNode
+  );
+
+  // If locked and not authenticated, use button that triggers LoginModal
+  if (isLocked && !isAuthenticated) {
     return (
-      /* This wrapper div blocks ALL event types from bubbling to parent card onClick */
       <div
         onClick={stopAllPropagation}
         onMouseDown={stopAllPropagation}
@@ -164,24 +189,7 @@ const ChapterAccessLink = ({
           className={linkClassName}
           {...rest}
         >
-          {label != null || meta != null ? (
-            <>
-              <span className="relative z-10 flex min-w-0 items-center gap-2 font-semibold">
-                <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400 shadow-[0_0_6px_#f59e0b]" />
-                <span className="truncate text-amber-300">{label}</span>
-                {showLockIcon ? (
-                  <Lock className="h-3.5 w-3.5 shrink-0 text-amber-400 dark:text-amber-300" aria-hidden />
-                ) : null}
-              </span>
-              {meta ? (
-                <span className="relative z-10 shrink-0 pl-2 text-[11px] md:text-xs text-amber-200/75 dark:text-amber-200/70">
-                  {meta}
-                </span>
-              ) : null}
-            </>
-          ) : (
-            labelNode
-          )}
+          {contentNode}
         </button>
         <LoginModal
           open={loginOpen}
@@ -195,6 +203,7 @@ const ChapterAccessLink = ({
     );
   }
 
+  // Otherwise (unlocked OR authenticated user navigating to reader/detail)
   return (
     <Link
       ref={animRef}
@@ -203,24 +212,7 @@ const ChapterAccessLink = ({
       className={linkClassName}
       {...rest}
     >
-      {label != null || meta != null ? (
-        <>
-          <span className="relative z-10 flex min-w-0 items-center gap-2 font-semibold">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
-            <span className="truncate text-gray-700 dark:text-white">{label}</span>
-            {(Boolean(chapter?.is_locked) || Number(chapter?.coin_price) > 0) && (
-              <Lock className="h-3.5 w-3.5 shrink-0 text-amber-400" aria-hidden />
-            )}
-          </span>
-          {meta ? (
-            <span className="relative z-10 shrink-0 pl-2 text-[11px] md:text-xs text-gray-500 dark:text-gray-400">
-              {meta}
-            </span>
-          ) : null}
-        </>
-      ) : (
-        labelNode
-      )}
+      {contentNode}
     </Link>
   );
 };
