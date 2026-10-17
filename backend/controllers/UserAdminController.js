@@ -50,6 +50,7 @@ const listUsers = async (req, res) => {
             u.username,
             u.email,
             u.points,
+            u.coins,
             u.is_membership,
             u.membership_type,
             u.membership_expires_at,
@@ -70,6 +71,7 @@ const listUsers = async (req, res) => {
               u.username,
               u.email,
               u.points,
+              u.coins,
               u.is_membership,
               u.membership_expires_at,
               u.profile_image,
@@ -94,6 +96,7 @@ const listUsers = async (req, res) => {
           is_membership: !!row.is_membership,
           membership_type: row.membership_type || 'web',
           points: Number(row.points || 0),
+          coins: Number(row.coins || 0),
           role: row.role || 'user',
         })),
         pagination: {
@@ -111,12 +114,13 @@ const listUsers = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const { username, password, email, points, is_membership, membership_type, membership_expires_at, role } =
+    const { username, password, email, points, coins, is_membership, membership_type, membership_expires_at, role } =
       req.body || {};
     const usernameTrim = String(username || '').trim();
     const emailTrim = String(email || '').trim();
     const passwordVal = String(password || '');
     const pointsVal = Number.isFinite(Number(points)) ? Math.max(0, parseInt(points, 10)) : 0;
+    const coinsVal = Number.isFinite(Number(coins)) ? Math.max(0, parseInt(coins, 10)) : 0;
     const membershipVal = parseBoolean(is_membership);
     const membershipType = ['web', 'mobile', 'both'].includes(String(membership_type || '').toLowerCase())
       ? String(membership_type).toLowerCase()
@@ -159,13 +163,14 @@ const createUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(passwordVal, 10);
     try {
       await db.execute(
-        `INSERT INTO users (username, password, email, points, is_membership, membership_type, membership_expires_at, role)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO users (username, password, email, points, coins, is_membership, membership_type, membership_expires_at, role)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           usernameTrim,
           hashedPassword,
           emailTrim || null,
           pointsVal,
+          coinsVal,
           membershipVal ? 1 : 0,
           membershipType,
           membershipVal ? membershipExpireDate : null,
@@ -202,7 +207,7 @@ const createUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const userId = parseInt(req.params.id, 10);
-    const { username, email, password, points, is_membership, membership_type, membership_expires_at, role } =
+    const { username, email, password, points, coins, is_membership, membership_type, membership_expires_at, role } =
       req.body || {};
     if (!Number.isFinite(userId)) {
       return res.status(400).json({ status: false, error: 'Invalid user id' });
@@ -263,6 +268,12 @@ const updateUser = async (req, res) => {
       const pointsVal = Number.isFinite(Number(points)) ? Math.max(0, parseInt(points, 10)) : 0;
       updates.push('points = ?');
       params.push(pointsVal);
+    }
+
+    if (coins !== undefined) {
+      const coinsVal = Number.isFinite(Number(coins)) ? Math.max(0, parseInt(coins, 10)) : 0;
+      updates.push('coins = ?');
+      params.push(coinsVal);
     }
 
     if (is_membership !== undefined || membership_expires_at !== undefined || membership_type !== undefined) {

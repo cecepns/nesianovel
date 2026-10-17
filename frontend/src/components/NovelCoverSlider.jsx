@@ -125,29 +125,29 @@ const NovelCoverSlider = ({
 
   return (
     <div className="mb-10 sm:mb-12">
-      {/* Header bar */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-950/80 border border-purple-700/40 shadow-sm shadow-purple-950/50">
+      {/* Header bar with purple container box like Last Update */}
+      <div className="w-full bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-600 text-white rounded-xl px-4 py-3 mb-4 flex items-center justify-between shadow-lg shadow-purple-950/40 border border-purple-500/20">
+        <div className="flex items-center gap-3">
+          <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-black/20 text-white shadow-sm">
             {renderIcon()}
           </div>
           <div>
-            <h2 className="text-base sm:text-lg md:text-xl font-bold uppercase tracking-wider text-white">
+            <h2 className="text-base sm:text-lg font-bold tracking-wide uppercase text-white">
               {title}
             </h2>
             {subtitle && (
-              <p className="text-xs text-purple-300/70 font-medium">{subtitle}</p>
+              <p className="text-[11px] sm:text-xs text-purple-100/80 font-medium hidden sm:block">{subtitle}</p>
             )}
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Arrow navigation buttons */}
-          <div className="hidden sm:flex items-center gap-1.5 mr-2">
+          <div className="hidden sm:flex items-center gap-1.5 mr-1">
             <button
               type="button"
               onClick={() => handleScroll("left")}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-purple-800/40 bg-purple-950/60 text-purple-200 transition-all hover:bg-purple-800 hover:text-white active:scale-95"
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/20 text-white transition-all hover:bg-black/40 active:scale-95"
               aria-label="Scroll Left"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -155,7 +155,7 @@ const NovelCoverSlider = ({
             <button
               type="button"
               onClick={() => handleScroll("right")}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-purple-800/40 bg-purple-950/60 text-purple-200 transition-all hover:bg-purple-800 hover:text-white active:scale-95"
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/20 text-white transition-all hover:bg-black/40 active:scale-95"
               aria-label="Scroll Right"
             >
               <ChevronRight className="h-4 w-4" />
@@ -164,7 +164,7 @@ const NovelCoverSlider = ({
 
           <Link
             to={targetUrl}
-            className="inline-flex items-center gap-1 rounded-lg border border-purple-700/40 bg-purple-900/30 px-3 py-1.5 text-xs font-semibold text-purple-200 transition-all hover:bg-purple-800/60 hover:text-white hover:border-purple-500/60"
+            className="inline-flex items-center gap-1 rounded-lg bg-black/25 px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-black/45"
           >
             <span>Lihat Semua</span>
             <ChevronRight className="h-3.5 w-3.5" />

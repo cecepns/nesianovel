@@ -14,6 +14,7 @@ Disallow: /akun
 
 # Allow search engines to crawl all manga and chapter pages
 Allow: /komik/
+Allow: /baca/
 Allow: /view/
 Allow: /content
 Allow: /library

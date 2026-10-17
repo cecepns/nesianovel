@@ -206,8 +206,11 @@ const ChapterAccessLink = ({
       {label != null || meta != null ? (
         <>
           <span className="relative z-10 flex min-w-0 items-center gap-2 font-semibold">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-purple-500 shadow-[0_0_6px_rgba(168,85,247,0.8)]" />
+            <span className="h-2 w-2 shrink-0 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
             <span className="truncate text-gray-700 dark:text-white">{label}</span>
+            {(Boolean(chapter?.is_locked) || Number(chapter?.coin_price) > 0) && (
+              <Lock className="h-3.5 w-3.5 shrink-0 text-amber-400" aria-hidden />
+            )}
           </span>
           {meta ? (
             <span className="relative z-10 shrink-0 pl-2 text-[11px] md:text-xs text-gray-500 dark:text-gray-400">

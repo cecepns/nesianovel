@@ -23,7 +23,7 @@ const Contact = () => {
     }
   };
 
-  const rawTelegram = contactInfo?.telegram || '@KomikNesiaOfficial';
+  const rawTelegram = contactInfo?.telegram || '@NesiaNovelOfficial';
   let telegramUrl = rawTelegram;
   if (!rawTelegram.startsWith('http://') && !rawTelegram.startsWith('https://')) {
     const handle = rawTelegram.startsWith('@') ? rawTelegram.slice(1) : rawTelegram;
@@ -38,7 +38,7 @@ const Contact = () => {
     telegramHandle = `@${rawTelegram}`;
   }
 
-  const emailAddress = contactInfo?.email || 'admin@komiknesia.net';
+  const emailAddress = contactInfo?.email || 'admin@nesianovel.com';
 
   if (loading) {
     return (
@@ -54,8 +54,8 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-black text-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <Helmet>
-        <title>Hubungi Kami | KomikNesia</title>
-        <meta name="description" content="Hubungi tim KomikNesia melalui email atau Telegram. Kami siap membantu menjawab pertanyaan dan mendengarkan saran Anda." />
+        <title>Hubungi Kami | NesiaNovel</title>
+        <meta name="description" content="Hubungi tim NesiaNovel melalui email atau Telegram. Kami siap membantu menjawab pertanyaan dan mendengarkan saran Anda." />
       </Helmet>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
@@ -135,7 +135,7 @@ const Contact = () => {
           <div className="mt-8 pt-8 border-t border-white/10">
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href={`mailto:${emailAddress}?subject=Pertanyaan tentang KomikNesia`}
+                href={`mailto:${emailAddress}?subject=Pertanyaan tentang NesiaNovel`}
                 className="inline-flex items-center justify-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg transition-all"
               >
                 <Mail className="h-5 w-5 mr-2" />

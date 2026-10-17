@@ -88,27 +88,13 @@ const UpdateSection = () => {
             </h2>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() =>
-                setCardLayout((prev) =>
-                  prev === "vertical" ? "horizontal" : "vertical"
-                )
-              }
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-black/20 text-white transition-colors hover:bg-black/40"
-              title={
-                cardLayout === "vertical"
-                  ? "Tampilan baris (horizontal)"
-                  : "Tampilan grid (vertical)"
-              }
-              aria-label="Ubah mode tampilan"
+            <Link
+              to="/novels"
+              className="inline-flex items-center gap-1 rounded-lg bg-black/25 px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-black/45"
             >
-              {cardLayout === "vertical" ? (
-                <List className="h-4 w-4" aria-hidden />
-              ) : (
-                <LayoutGrid className="h-4 w-4" aria-hidden />
-              )}
-            </button>
+              <span>Lihat Semua</span>
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
         </div>
 
@@ -216,7 +202,7 @@ const UpdateSection = () => {
                         <ChapterAccessLink
                           key={chapter.slug}
                           chapter={chapter}
-                          to={`/view/${chapter.slug}`}
+                          to={`/baca/${chapter.slug}`}
                           onClick={(e) => e.stopPropagation()}
                           accent="purple"
                           className={

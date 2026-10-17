@@ -32,6 +32,7 @@ router.put(
   ]),
   MangaController.update
 );
+router.patch('/:id/pin', authenticateToken, requireAdmin, MangaController.togglePin);
 router.delete('/:id', authenticateToken, requireAdmin, MangaController.destroy);
 
 // Chapters under a manga

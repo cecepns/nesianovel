@@ -14,6 +14,6 @@ export function resolveActiveNavId(pathname) {
   if (pathname === '/library') return 'library';
   if (pathname === '/novels' || pathname === '/content' || pathname === '/daftar-komik' || pathname === '/daftar-novel') return 'novels';
   if (pathname === '/akun' || pathname === '/profile' || pathname === '/login' || pathname === '/register') return 'account';
-  if (pathname === '/' || pathname.startsWith('/novel/') || pathname.startsWith('/view/') || pathname.startsWith('/komik/')) return 'home';
+  if (pathname === '/' || pathname.startsWith('/novel/') || pathname.startsWith('/baca/') || pathname.startsWith('/view/') || pathname.startsWith('/komik/')) return 'home';
   return 'home';
 }

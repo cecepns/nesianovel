@@ -323,6 +323,7 @@ const showBySlug = async (req, res) => {
         const [userRows] = await db.execute(
           `SELECT
             points,
+            coins,
             is_membership,
             membership_expires_at,
             CASE
@@ -336,7 +337,7 @@ const showBySlug = async (req, res) => {
         );
 
         if (userRows.length > 0) {
-          userCoins = Number(userRows[0].points || 0);
+          userCoins = Number(userRows[0].coins || 0);
           isVip = !!userRows[0].membership_active;
         }
 
@@ -421,11 +422,11 @@ const showBySlug = async (req, res) => {
               [expGain, req.user.id]
             );
             gainedExp = expGain;
-            userCoins += expGain;
           }
 
           responseData.reader = {
-            points: userCoins,
+            points: Number(userRows[0]?.points || 0) + gainedExp,
+            coins: userCoins,
             gained_exp: gainedExp,
             is_membership: isVip,
             membership_active: isVip,
@@ -557,20 +558,20 @@ const unlockWithCoins = async (req, res) => {
     }
 
     const price = chapter.coin_price || 25;
-    const [userRows] = await db.execute('SELECT points FROM users WHERE id = ?', [req.user.id]);
-    const currentPoints = Number(userRows[0]?.points || 0);
+    const [userRows] = await db.execute('SELECT coins FROM users WHERE id = ?', [req.user.id]);
+    const currentCoins = Number(userRows[0]?.coins || 0);
 
-    if (currentPoints < price) {
+    if (currentCoins < price) {
       return res.status(400).json({
         status: false,
-        error: `Koin tidak mencukupi. Diperlukan ${price} koin (koin kamu: ${currentPoints}). Silakan top-up di Store.`,
+        error: `Koin tidak mencukupi. Diperlukan ${price} koin (koin kamu: ${currentCoins}). Silakan top-up di Store.`,
         required_coins: price,
-        current_coins: currentPoints,
+        current_coins: currentCoins,
       });
     }
 
-    // Deduct points & save unlock
-    await db.execute('UPDATE users SET points = points - ? WHERE id = ?', [price, req.user.id]);
+    // Deduct coins & save unlock
+    await db.execute('UPDATE users SET coins = coins - ? WHERE id = ?', [price, req.user.id]);
     await db.execute(
       'INSERT INTO user_unlocked_chapters (user_id, chapter_id, coins_spent) VALUES (?, ?, ?)',
       [req.user.id, chapter.id, price]
@@ -579,7 +580,7 @@ const unlockWithCoins = async (req, res) => {
     return res.json({
       status: true,
       message: `Berhasil membuka ${chapter.title || 'Chapter ' + chapter.chapter_number}!`,
-      remaining_coins: currentPoints - price,
+      remaining_coins: currentCoins - price,
       chapter_id: chapter.id,
       is_unlocked: true,
     });

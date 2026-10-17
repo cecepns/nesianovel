@@ -199,7 +199,7 @@ const ComicTypeSection = ({ title, type, targetUrl }) => {
                       <ChapterAccessLink
                         key={chapter.slug}
                         chapter={chapter}
-                        to={`/view/${chapter.slug}`}
+                        to={`/baca/${chapter.slug}`}
                         onClick={(e) => e.stopPropagation()}
                         accent="purple"
                         className={

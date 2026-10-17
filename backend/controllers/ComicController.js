@@ -43,6 +43,8 @@ const detailBySlug = async (req, res) => {
           c.title,
           c.slug,
           c.cover,
+          c.coin_price,
+          c.is_locked,
           c.created_at,
           c.updated_at,
           COALESCE(c.views, 0) AS views,
@@ -90,6 +92,8 @@ const detailBySlug = async (req, res) => {
             slug: ch.slug,
             cover: ch.cover || null,
             thumbnail: ch.cover || null,
+            coin_price: Number(ch.coin_price) || 0,
+            is_locked: Boolean(ch.is_locked),
             views: Number(ch.views) || 0,
             reaction_count: Number(ch.reaction_count) || 0,
             created_at: {

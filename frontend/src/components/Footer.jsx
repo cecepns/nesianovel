@@ -8,7 +8,7 @@ const Footer = () => {
   useEffect(() => {
     try {
       window._Hasync = window._Hasync || [];
-      window._Hasync.push(['Histats.start', '1,5006437,4,239,241,20,00001010']);
+      window._Hasync.push(['Histats.start', '1,5058854,4,2051,280,25,00001010']);
       window._Hasync.push(['Histats.fasi', '1']);
       window._Hasync.push(['Histats.track_hits', '']);
       window._Hasync.push(['Histats.framed_page', '']);
@@ -23,6 +23,8 @@ const Footer = () => {
     }
   }, []);
 
+  const navButtonClass = "px-4 py-1.5 rounded-xl border border-purple-600/50 bg-purple-950/40 text-purple-200 hover:text-white hover:border-purple-400 hover:bg-purple-900/50 transition-all font-semibold text-xs uppercase tracking-wider shadow-sm";
+
   return (
     <footer className="bg-gray-900 pb-20 dark:bg-primary-950 text-gray-300 dark:text-gray-400 border-t border-gray-800 dark:border-primary-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -31,51 +33,51 @@ const Footer = () => {
           <div className="flex items-center">
             <img 
               src={Logo} 
-              alt="KomikNesia" 
+              alt="NesiaNovel" 
               className="w-36 md:w-44 h-auto cursor-pointer" 
               onClick={() => navigate('/')}
             />
           </div>
 
-          {/* Links */}
-          <div className="flex flex-wrap justify-center gap-4 text-sm">
+          {/* Links with Purple Border */}
+          <div className="flex flex-wrap justify-center gap-2.5 text-sm">
             <button
               onClick={() => navigate('/')}
-              className="text-gray-400 hover:text-gray-300 dark:text-gray-500 dark:hover:text-gray-400 transition-colors"
+              className={navButtonClass}
             >
-              Home
+              HOME
             </button>
             <button
-              onClick={() => navigate('/content')}
-              className="text-gray-400 hover:text-gray-300 dark:text-gray-500 dark:hover:text-gray-400 transition-colors"
+              onClick={() => navigate('/novels')}
+              className={navButtonClass}
             >
-              Daftar Komik
+              DAFTAR NOVEL
             </button>
             <button
               onClick={() => navigate('/library')}
-              className="text-gray-400 hover:text-gray-300 dark:text-gray-500 dark:hover:text-gray-400 transition-colors"
+              className={navButtonClass}
             >
-              Library
+              LIBRARY
             </button>
             <button
               onClick={() => navigate('/contact')}
-              className="text-gray-400 hover:text-gray-300 dark:text-gray-500 dark:hover:text-gray-400 transition-colors"
+              className={navButtonClass}
             >
-              Kontak Kami
+              KONTAK KAMI
             </button>
           </div>
 
           {/* Copyright */}
           <div className="text-center">
             <p className="text-sm font-medium text-gray-300 dark:text-gray-300">
-              Copyright ©2025 KomikNesia, All Rights Reserved.
+              Copyright ©2026 NesiaNovel, All Rights Reserved.
             </p>
           </div>
 
           {/* Disclaimer */}
           <div className="text-center max-w-3xl">
             <p className="text-xs leading-relaxed text-gray-400 dark:text-gray-500">
-              Semua komik di website ini hanya preview dari komik aslinya, mungkin terdapat banyak kesalahan bahasa, nama tokoh, dan alur cerita. Untuk versi aslinya, silahkan beli komiknya jika tersedia di kotamu.
+              Semua novel di website ini hanya preview dari novel aslinya, mungkin terdapat banyak kesalahan bahasa, nama tokoh, dan alur cerita. Untuk versi aslinya, silahkan beli novelnya jika tersedia di kotamu.
             </p>
           </div>
 
@@ -84,7 +86,7 @@ const Footer = () => {
             <div id="histats_counter"></div>
             <noscript>
               <a href="/" target="_blank" rel="noopener noreferrer">
-                <img src="//sstatic1.histats.com/0.gif?5006437&101" alt="Histats Counter" border="0" />
+                <img src="//sstatic1.histats.com/0.gif?5058854&101" alt="Histats Counter" border="0" />
               </a>
             </noscript>
           </div>

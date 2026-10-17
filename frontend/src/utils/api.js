@@ -609,6 +609,12 @@ class APIClient {
     });
   }
 
+  toggleMangaPin(id) {
+    return this.request(`/manga/${id}/pin`, {
+      method: 'PATCH',
+    });
+  }
+
   // Votes (by slug; token sent when logged in so vote is per-user)
   getVotes(slug) {
     return this.request(`/votes/${encodeURIComponent(slug)}`);
@@ -1165,6 +1171,8 @@ class APIClient {
     if (params.type_id) queryParams.append('type_id', params.type_id.toString());
     if (params.orderBy) queryParams.append('orderBy', params.orderBy);
     if (params.project) queryParams.append('project', params.project);
+    if (params.is_pinned !== undefined && params.is_pinned !== null) queryParams.append('is_pinned', params.is_pinned.toString());
+    if (params.pinned !== undefined && params.pinned !== null) queryParams.append('pinned', params.pinned.toString());
     if (params.popularWindow) queryParams.append('popularWindow', params.popularWindow);
 
     const queryString = queryParams.toString();

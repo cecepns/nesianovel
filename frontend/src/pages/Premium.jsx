@@ -108,10 +108,10 @@ const Premium = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white pt-5 md:pt-20 pb-4">
       <Helmet>
-        <title>Premium | KomikNesia</title>
+        <title>Premium | NesiaNovel</title>
         <meta
           name="description"
-          content="Upgrade ke KomikNesia Premium untuk membaca lebih nyaman tanpa iklan, bonus point tambahan, dan auto scroll manga."
+          content="Upgrade ke NesiaNovel Premium untuk membaca lebih nyaman tanpa iklan, bonus coin tambahan, dan fitur VIP novel."
         />
       </Helmet>
 
@@ -208,12 +208,12 @@ const Premium = () => {
             <form onSubmit={handleSubmitOrder} className="p-5 space-y-4">
               <div className="rounded-xl border border-dashed border-amber-300 dark:border-amber-500/30 p-3 bg-amber-50/50 dark:bg-amber-500/5">
                 <p className="text-sm text-amber-700 dark:text-amber-300">
-                  Transfer ke QRIS KomikNesia, lalu upload bukti transfer Anda di bawah ini.
+                  Transfer ke QRIS NesiaNovel, lalu upload bukti transfer Anda di bawah ini.
                 </p>
                 <div className="mt-3">
                   <img
                     src={qrisImage}
-                    alt="QRIS KomikNesia"
+                    alt="QRIS NesiaNovel"
                     className="w-full max-w-xs mx-auto rounded-lg border border-amber-200 dark:border-amber-500/20"
                   />
                 </div>

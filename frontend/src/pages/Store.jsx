@@ -46,9 +46,21 @@ const Store = () => {
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     username: user?.username || '',
+    email: user?.email || '',
     proofImage: null,
     preview: '',
   });
+
+  useEffect(() => {
+    if (orderModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [orderModalOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -66,8 +78,12 @@ const Store = () => {
   }, []);
 
   useEffect(() => {
-    if (user?.username) {
-      setForm((prev) => ({ ...prev, username: user.username }));
+    if (user?.username || user?.email) {
+      setForm((prev) => ({
+        ...prev,
+        username: user?.username || prev.username,
+        email: user?.email || prev.email,
+      }));
     }
   }, [user]);
 
@@ -79,6 +95,7 @@ const Store = () => {
     setSelectedPackage({ ...pkg, order_type: type });
     setForm({
       username: user?.username || '',
+      email: user?.email || '',
       proofImage: null,
       preview: '',
     });
@@ -122,6 +139,9 @@ const Store = () => {
     try {
       const formData = new FormData();
       formData.append('username', form.username.trim());
+      if (form.email.trim()) {
+        formData.append('email', form.email.trim());
+      }
       formData.append('package_id', selectedPackage.id);
       formData.append('package_name', selectedPackage.name || `${selectedPackage.coins} Koin`);
       formData.append('package_price', selectedPackage.price);
@@ -174,7 +194,7 @@ const Store = () => {
           </h1>
 
           <p className="text-sm sm:text-base text-purple-200/80 leading-relaxed">
-            Buka bab novel terbaru favoritmu menggunakan Koin (25 Koin/bab) atau upgrade ke VIP Premium untuk akses tanpa batas ke semua novel tanpa gangguan iklan.
+            Buka bab novel terbaru favoritmu menggunakan Koin atau upgrade ke VIP Premium untuk akses tanpa batas ke semua novel tanpa gangguan iklan.
           </p>
 
           {/* User Status Bar */}
@@ -182,7 +202,7 @@ const Store = () => {
             <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
               <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#190f36] border border-purple-700/50 text-xs font-bold text-amber-300">
                 <Coins className="h-4 w-4 text-amber-400" />
-                <span>Saldo Koin: {Number(user.points || 0).toLocaleString()}</span>
+                <span>Saldo Koin: {Number(user.coins !== undefined ? user.coins : user.points || 0).toLocaleString()}</span>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#190f36] border border-purple-700/50 text-xs font-bold text-purple-200">
                 <Crown className="h-4 w-4 text-amber-300" />
@@ -212,7 +232,7 @@ const Store = () => {
               }`}
           >
             <Coins className="h-4 w-4" />
-            <span>Paket Koin Novel (4 Pilihan)</span>
+            <span>(COINS)</span>
           </button>
           <button
             type="button"
@@ -223,7 +243,7 @@ const Store = () => {
               }`}
           >
             <Crown className="h-4 w-4" />
-            <span>VIP Premium (1, 3, 6, 12 Bulan)</span>
+            <span>(VIP PREMIUM)</span>
           </button>
         </div>
       </div>
@@ -236,64 +256,45 @@ const Store = () => {
               Pilih Paket Koin
             </h2>
             <p className="text-xs sm:text-sm text-purple-300/70 mt-1">
-              Setiap bab novel terkunci dapat dibuka dengan 25 koin dan bisa dibaca selamanya.
+              Setiap bab novel terkunci dapat dibuka dengan koin dan bisa dibaca selamanya.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {packagesData.coin_packages.map((pkg) => {
-              const chaptersEstimate = Math.floor(pkg.coins / (packagesData.coin_unlock_price || 25));
               return (
                 <div
                   key={pkg.id}
-                  className={`relative flex flex-col justify-between rounded-3xl border p-6 transition-all duration-200 hover:-translate-y-1 ${pkg.popular
+                  className={`relative flex flex-col justify-between rounded-2xl sm:rounded-3xl border p-3.5 sm:p-6 transition-all duration-200 hover:-translate-y-1 ${pkg.popular
                     ? 'border-amber-400/80 bg-gradient-to-b from-[#241747] to-[#140b2b] shadow-xl shadow-amber-500/10 ring-1 ring-amber-400/40'
                     : 'border-purple-800/40 bg-[#130b28] hover:border-purple-600/50 shadow-lg'
                     }`}
                 >
                   {pkg.popular && (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-0.5 text-[10px] font-black uppercase text-gray-950 shadow-md">
+                    <span className="absolute -top-2.5 sm:-top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-2 sm:px-3 py-0.5 text-[9px] sm:text-[10px] font-black uppercase text-gray-950 shadow-md whitespace-nowrap">
                       Paling Populer
                     </span>
                   )}
 
                   <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="p-3 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400">
-                        <Coins className="h-6 w-6" />
+                    <div className="mb-3">
+                      <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 w-fit">
+                        <Coins className="h-5 w-5 sm:h-6 sm:w-6" />
                       </div>
-                      <span className="text-xs font-bold text-purple-300/80">
-                        ~{chaptersEstimate} Bab
-                      </span>
                     </div>
 
-                    <div className="text-3xl font-black text-white mb-1">
-                      {pkg.coins} <span className="text-base font-bold text-amber-400">Koin</span>
+                    <div className="text-lg sm:text-3xl font-black text-white mb-0.5">
+                      {pkg.coins} <span className="text-xs sm:text-base font-bold text-amber-400">Koin</span>
                     </div>
-                    <div className="text-xl font-extrabold text-purple-200 mb-4">
+                    <div className="text-sm sm:text-xl font-extrabold text-purple-200 mb-4">
                       {pkg.price}
                     </div>
-
-                    <ul className="text-xs text-purple-300/80 space-y-2 mb-6 border-t border-purple-900/30 pt-4">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-green-400 shrink-0" />
-                        <span>Buka ~{chaptersEstimate} bab terkunci</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-green-400 shrink-0" />
-                        <span>Koin aktif selamanya (tanpa expired)</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-green-400 shrink-0" />
-                        <span>Bisa dipakai di semua judul novel</span>
-                      </li>
-                    </ul>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => handleOpenOrder(pkg, 'coins')}
-                    className={`w-full py-3 rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-md ${pkg.popular
+                    className={`w-full py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-200 shadow-md ${pkg.popular
                       ? 'bg-gradient-to-r from-amber-400 to-amber-500 hover:brightness-110 text-gray-950'
                       : 'bg-purple-600 hover:bg-purple-500 text-white'
                       }`}
@@ -451,8 +452,8 @@ const Store = () => {
 
       {/* ORDER CONFIRMATION MODAL */}
       {orderModalOpen && selectedPackage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-lg rounded-3xl bg-[#140c2e] border border-purple-800/60 p-6 sm:p-8 text-white shadow-2xl relative space-y-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="w-full max-w-lg max-h-[90vh] my-auto overflow-y-auto rounded-3xl bg-[#140c2e] border border-purple-800/60 p-5 sm:p-7 text-white shadow-2xl relative space-y-5 overscroll-contain">
             <button
               type="button"
               onClick={() => setOrderModalOpen(false)}
@@ -471,28 +472,48 @@ const Store = () => {
             </div>
 
             {/* Saweria Direct Link Box */}
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200/90 flex items-start gap-3">
-              <Info className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold text-white mb-1">
-                  Sudah mentransfer via Saweria?
-                </p>
-                <p>
-                  Jika belum, silakan buka{' '}
-                  <a
-                    href={packagesData.saweria_url || 'https://saweria.co/nesianovel'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-bold text-amber-300 underline inline-flex items-center gap-0.5"
-                  >
-                    saweria.co/nesianovel <ExternalLink className="h-3 w-3" />
-                  </a>{' '}
-                  sebesar <strong>{selectedPackage.price}</strong> dan cantumkan username akun kamu.
-                </p>
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200/90 space-y-3">
+              <div className="flex items-start gap-3">
+                <Info className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-white mb-1">
+                    Sudah mentransfer via Saweria?
+                  </p>
+                  <p>
+                    Jika belum, silakan klik tombol di bawah untuk membuka{' '}
+                    <span className="font-bold text-amber-300">Saweria</span> sebesar{' '}
+                    <strong>{selectedPackage.price}</strong> dan cantumkan username akun kamu.
+                  </p>
+                </div>
               </div>
+
+              {/* Prominent Saweria Payment Button */}
+              <a
+                href={packagesData.saweria_url || 'https://saweria.co/nesianovel'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:brightness-110 text-gray-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all text-center"
+              >
+                <ExternalLink className="h-4 w-4 shrink-0" />
+                <span>Bayar Sekarang via Saweria ({selectedPackage.price})</span>
+              </a>
             </div>
 
             <form onSubmit={handleSubmitOrder} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-purple-200 block mb-1.5">
+                  Email Akun NesiaNovel
+                </label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="emailkamu@gmail.com"
+                  className="w-full px-4 py-3 rounded-xl bg-[#1b103b] border border-purple-800/50 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                />
+              </div>
+
               <div>
                 <label className="text-xs font-bold text-purple-200 block mb-1.5">
                   Username Akun NesiaNovel

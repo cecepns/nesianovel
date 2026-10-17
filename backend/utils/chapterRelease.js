@@ -178,6 +178,8 @@ function mapLastChapterRow(row) {
     number: row.number,
     title: row.title,
     slug: row.slug,
+    is_locked: row.is_locked == 1 || row.is_locked === true,
+    coin_price: Number(row.coin_price || 25),
     created_at: { time: createdTs },
   };
   if (updatedTs != null && !Number.isNaN(updatedTs)) {
@@ -208,6 +210,8 @@ async function fetchLastChaptersByMangaIds(db, mangaIds, limit = 3) {
       c.chapter_number AS number,
       c.title,
       c.slug,
+      c.is_locked,
+      c.coin_price,
       UNIX_TIMESTAMP(COALESCE(c.scheduled_release_at, c.created_at)) AS release_at_timestamp,
       UNIX_TIMESTAMP(c.created_at) AS created_at_timestamp,
       UNIX_TIMESTAMP(c.updated_at) AS updated_at_timestamp

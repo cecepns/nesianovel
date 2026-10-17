@@ -51,11 +51,11 @@ const Home = () => {
   const [installModalOpen, setInstallModalOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
 
-  const shareUrl = typeof window !== "undefined" ? window.location.origin : "https://komiknesia.com";
+  const shareUrl = typeof window !== "undefined" ? window.location.origin : "https://id.nesianovel.com";
   const shareTitle =
-    "Baca komik, manga, manhwa, dan manhua Bahasa Indonesia di KomikNesia!";
+    "Baca novel, web novel, dan light novel Bahasa Indonesia di NesiaNovel!";
   const discordInviteUrl = "https://discord.gg/dgC22PSm9h";
-  const donateUrl = "https://saweria.co/KomikNesia";
+  const donateUrl = "https://saweria.co/nesianovel";
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
@@ -76,7 +76,7 @@ const Home = () => {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === "accepted") {
-          toast.success("Terima kasih telah memasang aplikasi KomikNesia!");
+          toast.success("Terima kasih telah memasang aplikasi NesiaNovel!");
           setDeferredPrompt(null);
           return;
         }
@@ -129,6 +129,7 @@ const Home = () => {
 
   // Fetch ads by type
   const { ads: homeTopAds } = useAds("home-top");
+  const { ads: pinTopAds } = useAds("project-top");
   const { ads: populerAds } = useAds("populer");
   const { ads: homeFooterAds } = useAds("home-footer");
   const { ads: homePopupAds } = useAds("home-popup");
@@ -400,11 +401,11 @@ const Home = () => {
             className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
             role="dialog"
             aria-modal="true"
-            aria-label="Bagikan KomikNesia"
+            aria-label="Bagikan NesiaNovel"
           >
             <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/10 bg-slate-900 p-5 text-left shadow-2xl">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-white">Bagikan KomikNesia</h3>
+                <h3 className="text-lg font-semibold text-white">Bagikan NesiaNovel</h3>
                 <button
                   type="button"
                   onClick={() => setSharePopupOpen(false)}
@@ -495,7 +496,7 @@ const Home = () => {
           >
             <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/10 bg-slate-900 p-5 text-left shadow-2xl">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-white">Pasang Aplikasi KomikNesia</h3>
+                <h3 className="text-lg font-semibold text-white">Pasang Aplikasi NesiaNovel</h3>
                 <button
                   type="button"
                   onClick={() => setPwaGuideOpen(false)}
@@ -557,12 +558,17 @@ const Home = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* 1. PINNED SERIES */}
+        {pinTopAds.length > 0 && (
+          <div className="mb-6" data-aos="fade-up">
+            <AdBanner ads={pinTopAds} layout="grid" columns={2} />
+          </div>
+        )}
         <div data-aos="fade-up" data-aos-delay="200">
           <NovelCoverSlider
             title="PINNED SERIES"
             subtitle="Rekomendasi novel pilihan editor"
             iconType="pin"
-            targetUrl="/novels?project=true"
+            targetUrl="/content?is_pinned=true"
             fetchParams={{ page: 1, per_page: 15, orderBy: "Update", is_pinned: "true" }}
           />
         </div>
@@ -583,7 +589,7 @@ const Home = () => {
             title="NEW SERIES"
             subtitle="Novel terbaru yang baru saja ditambahkan"
             iconType="sparkles"
-            targetUrl="/novels?orderBy=Added"
+            targetUrl="/content?order=Added"
             fetchParams={{ page: 1, per_page: 15, orderBy: "Added" }}
           />
         </div>
@@ -599,7 +605,7 @@ const Home = () => {
             title="FOR YOU"
             subtitle="Rekomendasi novel spesial untukmu"
             iconType="heart"
-            targetUrl="/novels?orderBy=Random"
+            targetUrl="/novels?orderBy=Added&order=Popular"
             fetchParams={{ page: 1, per_page: 15, orderBy: "Random" }}
           />
         </div>

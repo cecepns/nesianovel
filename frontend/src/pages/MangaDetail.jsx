@@ -137,7 +137,7 @@ const MangaDetail = () => {
   const { ads: topUpvoteAds } = useAds('top-upvote');
 
   const discordInviteUrl = 'https://discord.gg/dgC22PSm9h';
-  const donateUrl = 'https://saweria.co/KomikNesia';
+  const donateUrl = 'https://saweria.co/nesianovel';
 
   useEffect(() => {
     setReadChapterSlugs(getReadChapterSlugs());
@@ -487,50 +487,40 @@ const MangaDetail = () => {
   const mangaShareUrl = pageUrl;
 
   return (
-    <div className="min-h-screen bg-black text-gray-100">
+    <div className="min-h-screen bg-transparent text-gray-100">
       <Helmet>
         <title>{manga?.title ? `${manga.title} Bahasa Indonesia - NesiaNovel` : 'NesiaNovel'}</title>
         <meta name="description" content={`Baca ${manga?.title || 'novel'} Bahasa Indonesia di NesiaNovel.`} />
         <link rel="canonical" href={pageUrl} />
       </Helmet>
 
-      {/* Header Navigation */}
-      <header className="bg-black/90 backdrop-blur-md border-b border-white/10 fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-3.5">
-            <button
-              type="button"
-              onClick={() => navigate('/content')}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors text-white"
-              title="Kembali ke daftar komik"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
+      {/* Top Back & Quick Actions Bar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-1">
+        <div className="flex justify-between items-center">
+          <button
+            type="button"
+            onClick={() => navigate('/novels')}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-950/40 border border-purple-900/40 text-purple-200 hover:text-white hover:border-purple-600/50 transition-all text-xs font-semibold"
+            title="Kembali ke daftar novel"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Daftar Novel</span>
+          </button>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => navigate('/')}
-                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors text-white"
-                title="Beranda"
-              >
-                <Home className="h-5 w-5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/premium')}
-                className="p-2 rounded-xl bg-amber-600 hover:bg-amber-500 transition-colors text-white shadow-md"
-                title="Premium"
-              >
-                <Crown className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/store')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-gray-950 font-bold text-xs shadow-md hover:from-amber-400 hover:to-amber-500 transition-all"
+            title="Store Koin & VIP"
+          >
+            <Crown className="h-4 w-4" />
+            <span>Store / VIP</span>
+          </button>
         </div>
-      </header>
+      </div>
 
       {/* Main Container */}
-      <main className="pt-20 pb-24 md:pb-8">
+      <div className="pt-2 pb-16 md:pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
           {/* Top Ads Banner (Paling Atas) */}
@@ -788,7 +778,7 @@ const MangaDetail = () => {
               <div className="py-2">
                 <div className="mb-6">
                   <h2 className="text-lg font-extrabold text-white">Mirip dengan series ini</h2>
-                  <p className="text-xs text-gray-400 mt-1">Rekomendasi komik seru dengan genre serupa</p>
+                  <p className="text-xs text-gray-400 mt-1">Rekomendasi novel seru dengan genre serupa</p>
                 </div>
 
                 {recommendedLoading ? (
@@ -868,7 +858,9 @@ const MangaDetail = () => {
             <div className="space-y-3">
               {paginatedChapters.map((chapter) => {
                 const isLatest = isLatestChapterInList(chapters, chapter.slug);
-                const chapterLocked = requiresChapterLogin(chapter, isAuthenticated);
+                const isCoinLocked = Boolean(chapter.is_locked) || (Number(chapter.coin_price) > 0);
+                const isVipLocked = Boolean(chapter.is_vip_locked || (!isCoinLocked && chapter.is_locked));
+                const chapterLocked = requiresChapterLogin(chapter, isAuthenticated) || isCoinLocked;
                 const isRead = readChapterSlugs.has(chapter.slug) || readChapterSlugs.has(chapter.id);
                 const thumbUrl = getImageUrl(chapter.cover || chapter.thumbnail || manga?.cover);
 
@@ -878,11 +870,11 @@ const MangaDetail = () => {
                     onClick={() => openChapter(navigate, chapter, isLatest)}
                     className={`rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer flex items-center justify-between gap-3 p-3 border transition-colors ${
                       chapterLocked
-                        ? 'border-amber-500/30'
+                        ? 'border-amber-500/40 bg-gradient-to-r from-[#140e24] to-[#0d091a]'
                         : isRead
-                        ? 'border-white/5 hover:border-white/10'
-                        : 'border-white/10 hover:border-purple-500/50'
-                    } ${isRead ? 'bg-[#05060a]/90 opacity-70' : 'bg-[#0a0a0e]'}`}
+                        ? 'border-white/5 hover:border-white/10 bg-[#05060a]/90 opacity-70'
+                        : 'border-white/10 hover:border-purple-500/50 bg-[#0a0a0e]'
+                    }`}
                   >
                     <div className="flex min-w-0 flex-1 items-center gap-3">
                       <div className="relative aspect-[3/4] w-12 shrink-0 overflow-hidden rounded-lg bg-gray-950 border border-white/10">
@@ -892,13 +884,31 @@ const MangaDetail = () => {
                           className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 ${isRead ? 'opacity-50' : ''}`}
                           wrapperClassName="h-full w-full"
                         />
+                        {chapterLocked && (
+                          <div className="absolute top-1 right-1 p-1 rounded-md bg-black/85 text-amber-400 border border-amber-500/40 shadow-md">
+                            <Lock className="h-3 w-3" />
+                          </div>
+                        )}
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <h3 className={`mb-1 flex items-center gap-1.5 text-sm sm:text-base transition-colors ${isRead ? 'text-gray-500 font-medium' : 'text-white font-extrabold'}`}>
-                          <span className="min-w-0 truncate">{chapter.title}</span>
-                          {chapterLocked && <Lock className="h-3.5 w-3.5 text-amber-400" />}
-                        </h3>
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <h3 className={`flex items-center gap-1.5 text-sm sm:text-base transition-colors ${isRead ? 'text-gray-500 font-medium' : 'text-white font-extrabold'}`}>
+                            <span className="min-w-0 truncate">{chapter.title}</span>
+                          </h3>
+                          {isCoinLocked && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-black shadow-sm">
+                              <Lock className="h-3 w-3 text-amber-400" />
+                              <span>{Number(chapter.coin_price) > 0 ? `${chapter.coin_price} Koin` : 'Koin'}</span>
+                            </span>
+                          )}
+                          {!isCoinLocked && chapterLocked && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[11px] font-black shadow-sm">
+                              <Crown className="h-3 w-3 text-amber-400" />
+                              <span>VIP Member</span>
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-gray-400 mb-1">
                           {formatTimeAgo(chapter.uploadedAt)}
                         </p>
@@ -916,6 +926,12 @@ const MangaDetail = () => {
                     </div>
 
                     <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+                      {isCoinLocked && (
+                        <div className="hidden md:flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-950/60 border border-amber-500/40 text-amber-300 font-bold text-xs">
+                          <Lock className="h-3.5 w-3.5 text-amber-400" />
+                          <span>Berbayar Koin</span>
+                        </div>
+                      )}
                       {isLatest && (
                         <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
                           NEW
@@ -1062,7 +1078,7 @@ const MangaDetail = () => {
           )}
 
         </div>
-      </main>
+      </div>
 
       <LoginModal open={loginOpen} onClose={closeLogin} onSuccess={handleLoginSuccess} />
 
@@ -1088,7 +1104,7 @@ const MangaDetail = () => {
             </div>
 
             <p className="mb-4 text-sm text-slate-400">
-              Pilih cara membagikan tautan komik ini ke teman atau medsos kamu.
+              Pilih cara membagikan tautan novel ini ke teman atau medsos kamu.
             </p>
 
             <div className="flex flex-col gap-2.5">
@@ -1112,7 +1128,7 @@ const MangaDetail = () => {
 
               <WhatsappShareButton
                 url={mangaShareUrl}
-                title={manga?.title ? manga.title : 'KomikNesia'}
+                title={manga?.title ? manga.title : 'NesiaNovel'}
                 separator=" — "
                 className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-left text-sm font-medium text-white transition-colors hover:bg-white/10"
                 resetButtonStyle={false}
@@ -1124,7 +1140,7 @@ const MangaDetail = () => {
 
               <TwitterShareButton
                 url={mangaShareUrl}
-                title={manga?.title ? manga.title : 'KomikNesia'}
+                title={manga?.title ? manga.title : 'NesiaNovel'}
                 className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-left text-sm font-medium text-white transition-colors hover:bg-white/10"
                 resetButtonStyle={false}
                 onClick={() => setSharePopupOpen(false)}
@@ -1283,7 +1299,6 @@ const MangaDetail = () => {
         </div>
       )}
 
-      <BottomNavigation />
       <LiveChatWidget />
 
       <LoginModal

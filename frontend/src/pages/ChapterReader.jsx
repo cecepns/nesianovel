@@ -122,7 +122,7 @@ const ChapterReader = () => {
   const discordInviteUrl = 'https://discord.gg/dgC22PSm9h';
   const donateUrl = 'https://saweria.co/nesianovel';
   const chapterOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://nesianovel.com';
-  const chapterShareUrl = effectiveChapterSlug ? `${chapterOrigin}/view/${effectiveChapterSlug}` : '';
+  const chapterShareUrl = effectiveChapterSlug ? `${chapterOrigin}/baca/${effectiveChapterSlug}` : '';
   const [chapterSharePopupOpen, setChapterSharePopupOpen] = useState(false);
 
   const copyChapterShareLink = async () => {
@@ -242,7 +242,7 @@ const ChapterReader = () => {
     }
 
     const price = chapterData?.coin_price || 25;
-    const userCoins = Number(user?.points || 0);
+    const userCoins = Number(user?.coins ?? user?.points ?? 0);
 
     if (userCoins < price) {
       toast.error(
@@ -280,7 +280,7 @@ const ChapterReader = () => {
     if (novelSlug) {
       navigate(`/novel/${novelSlug}/${chapter.slug}`);
     } else {
-      navigate(`/view/${chapter.slug}`);
+      navigate(`/baca/${chapter.slug}`);
     }
   };
 
@@ -717,9 +717,9 @@ const ChapterReader = () => {
                     <div className="text-xs text-purple-300 font-medium">
                       Saldo kamu:{' '}
                       <span className="font-extrabold text-amber-300 text-sm">
-                        {Number(user?.points || 0).toLocaleString()} Koin
+                        {Number(user?.coins ?? user?.points ?? 0).toLocaleString()} Koin
                       </span>
-                      {(user?.points || 0) < (chapterData?.coin_price || 25) && (
+                      {(user?.coins ?? user?.points ?? 0) < (chapterData?.coin_price || 25) && (
                         <span className="text-red-400 block sm:inline mt-1 sm:mt-0 sm:ml-2">
                           (Koin belum cukup, silakan beli di Store)
                         </span>

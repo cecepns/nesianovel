@@ -6,9 +6,10 @@ const initialForm = {
   username: '',
   email: '',
   password: '',
+  coins: 0,
   points: 0,
   is_membership: false,
-  membership_type: 'web', // Default yang web terselect!
+  membership_type: 'web',
   membership_expires_at: '',
   role: 'user',
 };
@@ -66,7 +67,8 @@ export default function UserManager() {
   const displayedUsers = useMemo(() => {
     if (membershipFilter === 'all') return users;
     if (membershipFilter === 'non_membership') return users.filter((u) => !u.is_membership);
-    return users.filter((u) => u.is_membership && (u.membership_type || 'web') === membershipFilter);
+    if (membershipFilter === 'vip') return users.filter((u) => u.is_membership);
+    return users;
   }, [users, membershipFilter]);
 
   const openCreate = () => {
@@ -83,9 +85,10 @@ export default function UserManager() {
       username: user.username || '',
       email: user.email || '',
       password: '',
+      coins: Number(user.coins ?? 0),
       points: Number(user.points || 0),
       is_membership: !!user.is_membership,
-      membership_type: user.membership_type || 'web', // default web jika belum ada
+      membership_type: user.membership_type || 'web',
       membership_expires_at: formatToInputString(user.membership_expires_at),
       role: user.role === 'admin' ? 'admin' : 'user',
     });
@@ -109,6 +112,7 @@ export default function UserManager() {
       const payload = {
         username: form.username.trim(),
         email: form.email.trim(),
+        coins: Number(form.coins || 0),
         points: Number(form.points || 0),
         is_membership: !!form.is_membership,
         membership_type: form.membership_type || 'web',
@@ -198,39 +202,26 @@ export default function UserManager() {
             </button>
             <button
               type="button"
-              onClick={() => setMembershipFilter('web')}
-              className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
-                membershipFilter === 'web'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 hover:bg-blue-100'
+              onClick={() => setMembershipFilter('all')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                membershipFilter === 'all'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200'
               }`}
             >
-              <Globe className="w-3 h-3" />
-              VIP Web
+              Semua
             </button>
             <button
               type="button"
-              onClick={() => setMembershipFilter('mobile')}
+              onClick={() => setMembershipFilter('vip')}
               className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
-                membershipFilter === 'mobile'
+                membershipFilter === 'vip'
                   ? 'bg-purple-600 text-white'
                   : 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 hover:bg-purple-100'
               }`}
             >
-              <Smartphone className="w-3 h-3" />
-              VIP Mobile
-            </button>
-            <button
-              type="button"
-              onClick={() => setMembershipFilter('both')}
-              className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
-                membershipFilter === 'both'
-                  ? 'bg-amber-600 text-white'
-                  : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 hover:bg-amber-100'
-              }`}
-            >
-              <Crown className="w-3 h-3" />
-              VIP Keduanya
+              <Crown className="w-3 h-3 text-amber-500" />
+              VIP Member
             </button>
             <button
               type="button"
@@ -256,6 +247,7 @@ export default function UserManager() {
                 <th className="text-left px-4 py-3">User</th>
                 <th className="text-left px-4 py-3">Role</th>
                 <th className="text-left px-4 py-3">Membership VIP</th>
+                <th className="text-left px-4 py-3">Koin</th>
                 <th className="text-left px-4 py-3">Point</th>
                 <th className="text-left px-4 py-3">Aksi</th>
               </tr>
@@ -263,14 +255,14 @@ export default function UserManager() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                     <Loader2 className="h-5 w-5 animate-spin inline-block mr-2" />
                     Loading user...
                   </td>
                 </tr>
               ) : displayedUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                     Tidak ada user yang sesuai kriteria.
                   </td>
                 </tr>
@@ -295,22 +287,10 @@ export default function UserManager() {
                     <td className="px-4 py-3">
                       {user.is_membership ? (
                         <div className="space-y-1">
-                          {user.membership_type === 'mobile' ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-bold rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
-                              <Smartphone className="w-3 h-3" />
-                              VIP Mobile
-                            </span>
-                          ) : user.membership_type === 'both' ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-bold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-                              <Crown className="w-3 h-3" />
-                              VIP Web & Mobile
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-bold rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                              <Globe className="w-3 h-3" />
-                              VIP Web
-                            </span>
-                          )}
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-bold rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
+                            <Crown className="w-3 h-3 text-amber-500" />
+                            VIP Member
+                          </span>
                           <div className="text-[11px] text-gray-500">
                             {user.membership_expires_at
                               ? `Sampai: ${formatToLocaleString(user.membership_expires_at)}`
@@ -323,7 +303,12 @@ export default function UserManager() {
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">{Number(user.points || 0).toLocaleString()}</td>
+                    <td className="px-4 py-3 font-semibold text-amber-600 dark:text-amber-400">
+                      {Number(user.coins ?? 0).toLocaleString()}
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">
+                      {Number(user.points || 0).toLocaleString()}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button onClick={() => openEdit(user)} className="h-8 px-3 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 inline-flex items-center gap-1 text-xs font-medium">
@@ -410,7 +395,31 @@ export default function UserManager() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm block mb-1 font-medium">Point</label>
+                  <label className="text-sm block mb-1 font-medium">Role User</label>
+                  <select
+                    value={form.role}
+                    onChange={(e) => setForm((prev) => ({ ...prev, role: e.target.value }))}
+                    className="w-full h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm"
+                  >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm block mb-1 font-medium">Saldo Koin (Untuk Beli Bab)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={form.coins}
+                    onChange={(e) => setForm((prev) => ({ ...prev, coins: e.target.value }))}
+                    className="w-full h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm block mb-1 font-medium">Point EXP (Leaderboard)</label>
                   <input
                     type="number"
                     min={0}
@@ -419,18 +428,6 @@ export default function UserManager() {
                     className="w-full h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="text-sm block mb-1 font-medium">Role User</label>
-                <select
-                  value={form.role}
-                  onChange={(e) => setForm((prev) => ({ ...prev, role: e.target.value }))}
-                  className="w-full h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm"
-                >
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-                </select>
               </div>
 
               {/* MEMBERSHIP VIP SECTION WITH SEPARATE PLATFORM (WEB / MOBILE / BOTH) */}
@@ -456,12 +453,12 @@ export default function UserManager() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   {/* Option 1: Non-Member */}
                   <button
                     type="button"
                     onClick={() => setForm((prev) => ({ ...prev, is_membership: false }))}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border text-center transition-all cursor-pointer ${
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer ${
                       !form.is_membership
                         ? 'border-gray-400 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-bold ring-2 ring-gray-400'
                         : 'border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
@@ -469,52 +466,22 @@ export default function UserManager() {
                   >
                     <X className="w-5 h-5 mb-1 text-gray-400" />
                     <span className="text-xs font-semibold">Non-VIP</span>
-                    <span className="text-[10px] text-gray-500">Bukan Member</span>
+                    <span className="text-[10px] text-gray-500">Bukan Member VIP</span>
                   </button>
 
-                  {/* Option 2: VIP Web */}
+                  {/* Option 2: VIP Member */}
                   <button
                     type="button"
                     onClick={() => setForm((prev) => ({ ...prev, is_membership: true, membership_type: 'web' }))}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border text-center transition-all cursor-pointer ${
-                      form.is_membership && (form.membership_type === 'web' || !form.membership_type)
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold ring-2 ring-blue-500'
-                        : 'border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
-                    }`}
-                  >
-                    <Globe className="w-5 h-5 mb-1 text-blue-500" />
-                    <span className="text-xs font-semibold">🌐 VIP Web</span>
-                    <span className="text-[10px] text-gray-500">Website Saja</span>
-                  </button>
-
-                  {/* Option 3: VIP Mobile */}
-                  <button
-                    type="button"
-                    onClick={() => setForm((prev) => ({ ...prev, is_membership: true, membership_type: 'mobile' }))}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border text-center transition-all cursor-pointer ${
-                      form.is_membership && form.membership_type === 'mobile'
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                      form.is_membership
                         ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-bold ring-2 ring-purple-500'
                         : 'border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
                     }`}
                   >
-                    <Smartphone className="w-5 h-5 mb-1 text-purple-500" />
-                    <span className="text-xs font-semibold">📱 VIP Mobile</span>
-                    <span className="text-[10px] text-gray-500">App HP Saja</span>
-                  </button>
-
-                  {/* Option 4: VIP Keduanya */}
-                  <button
-                    type="button"
-                    onClick={() => setForm((prev) => ({ ...prev, is_membership: true, membership_type: 'both' }))}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border text-center transition-all cursor-pointer ${
-                      form.is_membership && form.membership_type === 'both'
-                        ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-bold ring-2 ring-amber-500'
-                        : 'border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400'
-                    }`}
-                  >
                     <Crown className="w-5 h-5 mb-1 text-amber-500" />
-                    <span className="text-xs font-semibold">👑 VIP Keduanya</span>
-                    <span className="text-[10px] text-gray-500">Web & Mobile</span>
+                    <span className="text-xs font-semibold">👑 VIP Premium</span>
+                    <span className="text-[10px] text-gray-500">Akses Semua Novel</span>
                   </button>
                 </div>
 

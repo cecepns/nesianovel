@@ -130,6 +130,11 @@ export default function OrderManager() {
                   <tr key={order.id} className="border-t border-gray-200 dark:border-gray-700">
                     <td className="px-4 py-3">
                       <div className="font-semibold text-gray-900 dark:text-gray-100">@{order.username}</div>
+                      {order.email ? (
+                        <div className="text-xs font-medium text-purple-600 dark:text-purple-300">
+                          {order.email}
+                        </div>
+                      ) : null}
                       <div className="text-xs text-gray-500">
                         {order.package_name} {order.package_price ? `(${order.package_price})` : ''}
                       </div>

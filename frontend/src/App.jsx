@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useParams } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
@@ -27,6 +27,11 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+function ViewChapterRedirect() {
+  const { chapterSlug } = useParams();
+  return <Navigate to={`/baca/${chapterSlug}`} replace />;
+}
+
 function AppContent() {
   const location = useLocation();
   const { user } = useAuth();
@@ -50,10 +55,25 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-        <Route path="/view/:chapterSlug" element={<ChapterReader />} />
+        <Route path="/baca/:chapterSlug" element={<ChapterReader />} />
+        <Route path="/view/:chapterSlug" element={<ViewChapterRedirect />} />
         <Route path="/novel/:novelSlug/:chapterSlug" element={<ChapterReader />} />
-        <Route path="/komik/:slug" element={<MangaDetail />} />
-        <Route path="/novel/:slug" element={<MangaDetail />} />
+        <Route
+          path="/komik/:slug"
+          element={
+            <Layout>
+              <MangaDetail />
+            </Layout>
+          }
+        />
+        <Route
+          path="/novel/:slug"
+          element={
+            <Layout>
+              <MangaDetail />
+            </Layout>
+          }
+        />
         <Route path="/profile/:username" element={<ProfileUser />} />
         <Route
           path="/library"

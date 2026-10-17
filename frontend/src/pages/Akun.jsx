@@ -501,12 +501,39 @@ const Akun = () => {
                 </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-black text-white">
-                    {Number(user?.points || 0).toLocaleString('id-ID')}
+                    {Number(user?.coins ?? 0).toLocaleString('id-ID')}
                   </span>
                   <span className="text-sm font-semibold text-amber-300">Koin</span>
                 </div>
                 <p className="mt-1 text-[11px] text-amber-200/70">
-                  Gunakan koin untuk membuka chapter novel terkunci (25 koin/chapter).
+                  Gunakan koin untuk membuka chapter novel terkunci.
+                </p>
+              </div>
+
+              {/* Point Leaderboard Card */}
+              <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-indigo-500/10 via-purple-500/5 to-transparent p-4 backdrop-blur-md">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 text-indigo-300">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/20 border border-indigo-500/40">
+                      <Sparkles className="h-4 w-4 text-indigo-400" />
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider">EXP Leaderboard</span>
+                  </div>
+                  <Link
+                    to="/leaderboard"
+                    className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-3 py-1 text-xs font-bold text-white shadow-md hover:from-indigo-500 hover:to-purple-500 active:scale-95 transition-all"
+                  >
+                    Lihat Peringkat
+                  </Link>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-black text-white">
+                    {Number(user?.points || 0).toLocaleString('id-ID')}
+                  </span>
+                  <span className="text-sm font-semibold text-indigo-300">EXP / Point</span>
+                </div>
+                <p className="mt-1 text-[11px] text-indigo-200/70">
+                  Dapatkan poin EXP setiap membaca chapter novel untuk naik peringkat di Leaderboard.
                 </p>
               </div>
 
@@ -733,7 +760,7 @@ const Akun = () => {
               </h1>
               <p className="mt-2 text-sm leading-relaxed text-gray-400">
                 {mode === 'login' && 'Masuk untuk mengakses bookmark, histori baca, dan fitur premium.'}
-                {mode === 'register' && 'Buat akun KomikNesia gratis untuk pengalaman membaca terbaik.'}
+                {mode === 'register' && 'Buat akun NesiaNovel gratis untuk pengalaman membaca terbaik.'}
                 {mode === 'register_otp' && `Masukkan 6 digit kode OTP yang telah dikirim ke ${email}.`}
                 {mode === 'forgot_password' && 'Masukkan username atau email Anda untuk menerima kode reset.'}
                 {mode === 'reset_password' && `Masukkan kode OTP yang dikirim ke ${maskedEmail || resetEmail}.`}

@@ -199,7 +199,7 @@ const Populer = () => {
                         <ChapterAccessLink
                           key={ch.slug}
                           chapter={ch}
-                          to={`/view/${ch.slug}`}
+                          to={`/baca/${ch.slug}`}
                           onClick={(e) => e.stopPropagation()}
                           label={`Chapter ${ch.number || "N/A"}`}
                           meta={getChapterTimeAgo(ch) || null}

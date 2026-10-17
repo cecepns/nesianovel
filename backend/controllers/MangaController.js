@@ -347,6 +347,7 @@ const store = async (req, res) => {
       }
     }
 
+    invalidateContentsCaches();
     res.status(201).json({ id: mangaId, message: 'Manga created successfully' });
   } catch (error) {
     console.error('Error creating manga:', error);
@@ -385,6 +386,7 @@ const update = async (req, res) => {
     }
 
     const isPinned = parseBooleanField(req.body.is_pinned !== undefined ? req.body.is_pinned : is_project);
+    const isProject = req.body.is_pinned !== undefined ? isPinned : parseBooleanField(is_project);
 
     let query = `UPDATE manga SET 
       title = ?, slug = ?, author = ?, synopsis = ?, category_id = ?,
@@ -396,13 +398,13 @@ const update = async (req, res) => {
       synopsis,
       category_id,
       alternative_name || null,
-      content_type || 'manga',
+      content_type || 'novel',
       country_id || null,
       release || null,
       status || 'ongoing',
       rating ? parseFloat(rating) : null,
       parseBooleanField(color),
-      parseBooleanField(is_project),
+      isProject,
       isPinned,
       source || null,
     ];
@@ -448,6 +450,7 @@ const update = async (req, res) => {
       }
     }
 
+    invalidateContentsCaches();
     res.json({ message: 'Manga updated successfully' });
   } catch (error) {
     console.error('Error updating manga:', error);
@@ -508,6 +511,7 @@ const destroy = async (req, res) => {
     }
 
     await db.execute('DELETE FROM manga WHERE id = ?', [id]);
+    invalidateContentsCaches();
     res.json({ message: 'Manga deleted successfully' });
   } catch (error) {
     console.error('Error deleting manga:', error);
@@ -575,6 +579,24 @@ const search = async (req, res) => {
   }
 };
 
+const togglePin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await db.execute('SELECT is_pinned, is_project FROM manga WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Manga not found' });
+    }
+    const current = !!(rows[0].is_pinned !== undefined ? rows[0].is_pinned : rows[0].is_project);
+    const nextVal = current ? 0 : 1;
+    await db.execute('UPDATE manga SET is_pinned = ?, is_project = ? WHERE id = ?', [nextVal, nextVal, id]);
+    invalidateContentsCaches();
+    res.json({ success: true, is_pinned: !!nextVal });
+  } catch (error) {
+    console.error('Error toggling pin:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 module.exports = {
   index,
   listChapters,
@@ -584,5 +606,6 @@ module.exports = {
   update,
   destroy,
   search,
+  togglePin,
 };
 

@@ -179,7 +179,7 @@ const DesktopSidebar = () => {
             <div className="flex items-center justify-between bg-black/40 rounded-xl px-2.5 py-1.5 mb-2 border border-purple-900/40">
               <div className="flex items-center gap-1.5 text-xs text-amber-300 font-bold">
                 <Coins className="h-3.5 w-3.5 text-amber-400" />
-                <span>{Number(user.points || 0).toLocaleString()} Koin</span>
+                <span>{Number(user.coins !== undefined ? user.coins : user.points || 0).toLocaleString()} Koin</span>
               </div>
               <Link
                 to="/store"
@@ -191,7 +191,7 @@ const DesktopSidebar = () => {
           </div>
         ) : (
           <Link
-            to="/login"
+            to="/akun"
             className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs shadow-md hover:from-purple-500 hover:to-indigo-500 transition-all duration-200"
           >
             <LogIn className="h-4 w-4" />

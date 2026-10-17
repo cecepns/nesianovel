@@ -63,13 +63,28 @@ async function run() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
-    // 5. Premium Orders
+    // 5. Users Coins Column
+    await ensureColumn('users', 'coins', 'INT NOT NULL DEFAULT 0 AFTER `points`');
+    await db.query(`UPDATE users SET coins = points WHERE coins = 0 AND points > 0`);
+
+    // 6. Premium Orders
     await ensureColumn('premium_orders', 'order_type', "ENUM('premium', 'coins') NOT NULL DEFAULT 'premium' AFTER `package_id`");
     await ensureColumn('premium_orders', 'coins_amount', 'INT NOT NULL DEFAULT 0 AFTER `package_price`');
     await ensureColumn('premium_orders', 'duration_months', 'INT NOT NULL DEFAULT 0 AFTER `coins_amount`');
     await ensureColumn('premium_orders', 'user_id', 'INT NULL AFTER `username`');
+    await ensureColumn('premium_orders', 'email', 'VARCHAR(255) NULL AFTER `username`');
+    try {
+      await db.query(`
+        UPDATE premium_orders po 
+        JOIN users u ON (po.user_id = u.id OR po.username COLLATE utf8mb4_unicode_ci = u.username COLLATE utf8mb4_unicode_ci) 
+        SET po.email = u.email 
+        WHERE po.email IS NULL AND u.email IS NOT NULL
+      `);
+    } catch (e) {
+      console.warn('Note: Order email backfill skipped or partial:', e.message);
+    }
 
-    // 6. Default announcement
+    // 7. Default announcement
     const [existingAnn] = await db.query('SELECT id FROM announcements WHERE slug = ?', ['panduan-pembayaran-saweria']);
     if (existingAnn.length === 0) {
       await db.query(`

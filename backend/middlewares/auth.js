@@ -24,6 +24,7 @@ const authenticateToken = async (req, res, next) => {
         bio,
         profile_image,
         points,
+        coins,
         is_membership,
         COALESCE(membership_type, 'web') AS membership_type,
         membership_expires_at,
@@ -45,6 +46,8 @@ const authenticateToken = async (req, res, next) => {
     const row = users[0];
     req.user = {
       ...row,
+      coins: Number(row.coins || 0),
+      points: Number(row.points || 0),
       role: resolveUserRole(row.role, decoded.role),
     };
     next();
@@ -72,6 +75,7 @@ const optionalAuthenticate = async (req, res, next) => {
         bio,
         profile_image,
         points,
+        coins,
         is_membership,
         COALESCE(membership_type, 'web') AS membership_type,
         membership_expires_at,
@@ -91,6 +95,8 @@ const optionalAuthenticate = async (req, res, next) => {
       const row = users[0];
       req.user = {
         ...row,
+        coins: Number(row.coins || 0),
+        points: Number(row.points || 0),
         role: resolveUserRole(row.role, decoded.role),
       };
     }

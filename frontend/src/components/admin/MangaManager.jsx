@@ -12,6 +12,7 @@ import {
   BookOpen,
   Upload,
   GripVertical,
+  Pin,
 } from "lucide-react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -61,7 +62,7 @@ const MangaManager = () => {
     category_id: "",
     category_ids: [],
     country_id: "",
-    content_type: "manga",
+    content_type: "novel",
     status: "ongoing",
     rating: "",
     color: false,
@@ -245,7 +246,7 @@ const MangaManager = () => {
       submitData.append("rating", formData.rating);
     }
     submitData.append("color", formData.color ? "true" : "false");
-    submitData.append("is_project", formData.is_project ? "true" : "false");
+    submitData.append("is_project", formData.is_pinned ? "true" : "false");
     submitData.append("is_pinned", formData.is_pinned ? "true" : "false");
 
     if (thumbnailFile) {
@@ -272,7 +273,7 @@ const MangaManager = () => {
         category_id: "",
         category_ids: [],
         country_id: "",
-        content_type: "manga",
+        content_type: "novel",
         status: "ongoing",
         rating: "",
         color: false,
@@ -308,12 +309,12 @@ const MangaManager = () => {
         item.category_id || (categoryIds.length > 0 ? categoryIds[0] : ""),
       category_ids: categoryIds,
       country_id: item.country_id || "",
-      content_type: item.content_type || "manga",
+      content_type: item.content_type || "novel",
       status: item.status || "ongoing",
       rating: item.rating || "",
       color: item.color || false,
-      is_project: !!item.is_project,
-      is_pinned: !!item.is_pinned,
+      is_project: !!(item.is_pinned !== undefined ? item.is_pinned : item.is_project),
+      is_pinned: !!(item.is_pinned !== undefined ? item.is_pinned : item.is_project),
     });
     setShowForm(true);
   };
@@ -849,10 +850,12 @@ const MangaManager = () => {
                       }
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     >
+                      <option value="novel">Novel</option>
+                      <option value="web_novel">Web Novel</option>
+                      <option value="light_novel">Light Novel</option>
                       <option value="manga">Manga</option>
                       <option value="manhwa">Manhwa</option>
                       <option value="manhua">Manhua</option>
-                      <option value="comic">Comic</option>
                     </select>
                   </div>
 
@@ -1739,8 +1742,38 @@ const MangaManager = () => {
                     className="w-full h-full object-cover"
                     wrapperClassName="w-full h-full"
                   />
+                  {Boolean(item.is_pinned || item.is_project) && (
+                    <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500 text-gray-950 font-black text-[10px] shadow-md">
+                      <Pin className="h-3 w-3 rotate-45" /> PINNED
+                    </span>
+                  )}
                   <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-opacity duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
                     <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            const res = await apiClient.toggleMangaPin(item.id);
+                            if (res && res.success) {
+                              setManga((prev) =>
+                                prev.map((m) =>
+                                  m.id === item.id ? { ...m, is_pinned: res.is_pinned, is_project: res.is_pinned } : m
+                                )
+                              );
+                            }
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                        className={`p-2 rounded-full transition-colors ${
+                          item.is_pinned || item.is_project
+                            ? "bg-amber-500 hover:bg-amber-600 text-gray-950"
+                            : "bg-white hover:bg-gray-100 text-gray-700"
+                        }`}
+                        title={item.is_pinned || item.is_project ? "Lepas Pin Series" : "Pin Series (Slider Beranda)"}
+                      >
+                        <Pin className="h-4 w-4 rotate-45" />
+                      </button>
                       {!!item.is_input_manual && (
                         <button
                           onClick={() => handleOpenChapters(item)}
@@ -1817,6 +1850,31 @@ const MangaManager = () => {
                       Kelola Chapter
                     </button>
                   )}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        const res = await apiClient.toggleMangaPin(item.id);
+                        if (res && res.success) {
+                          setManga((prev) =>
+                            prev.map((m) =>
+                              m.id === item.id ? { ...m, is_pinned: res.is_pinned, is_project: res.is_pinned } : m
+                            )
+                          );
+                        }
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    }}
+                    className={`mt-1.5 w-full px-2.5 py-1 text-[11px] font-bold rounded border flex items-center justify-center gap-1.5 transition-colors ${
+                      item.is_pinned || item.is_project
+                        ? "bg-amber-500/20 text-amber-600 dark:text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
+                        : "bg-gray-100 dark:bg-purple-950/40 text-gray-700 dark:text-purple-300 border-gray-300 dark:border-purple-800/40 hover:bg-gray-200 dark:hover:bg-purple-900/50"
+                    }`}
+                  >
+                    <Pin className="h-3 w-3 rotate-45" />
+                    <span>{item.is_pinned || item.is_project ? "Pinned (Klik Lepas)" : "Pin ke Beranda"}</span>
+                  </button>
                 </div>
               </div>
             ))}

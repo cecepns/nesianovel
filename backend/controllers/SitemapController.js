@@ -133,7 +133,7 @@ const sitemapMain = async (req, res) => {
         : now;
 
       xml += '  <url>\n';
-      xml += `    <loc>${siteUrl}/view/${encodeURIComponent(chapter.slug)}</loc>\n`;
+      xml += `    <loc>${siteUrl}/baca/${encodeURIComponent(chapter.slug)}</loc>\n`;
       xml += `    <lastmod>${lastmod}</lastmod>\n`;
       xml += '    <changefreq>monthly</changefreq>\n';
       xml += '    <priority>0.6</priority>\n';
@@ -274,7 +274,7 @@ const sitemapChapters = async (req, res) => {
         : now;
 
       xml += '  <url>\n';
-      xml += `    <loc>${siteUrl}/view/${encodeURIComponent(chapter.slug)}</loc>\n`;
+      xml += `    <loc>${siteUrl}/baca/${encodeURIComponent(chapter.slug)}</loc>\n`;
       xml += `    <lastmod>${lastmod}</lastmod>\n`;
       xml += '    <changefreq>monthly</changefreq>\n';
       xml += '    <priority>0.6</priority>\n';

@@ -97,6 +97,7 @@ const createOrder = async (req, res) => {
   try {
     const {
       username,
+      email,
       package_id,
       package_name,
       package_price,
@@ -106,6 +107,7 @@ const createOrder = async (req, res) => {
     } = req.body || {};
 
     const usernameTrim = String(username || '').trim();
+    let emailTrim = String(email || '').trim();
     const packageId = String(package_id || '').trim();
     const packageName = String(package_name || '').trim();
     const packagePrice = String(package_price || '').trim();
@@ -124,19 +126,23 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ status: false, error: 'Paket tidak valid' });
     }
 
-    // Try finding user_id
+    // Try finding user_id and email if email not provided
     let userId = null;
-    const [uRows] = await db.execute('SELECT id FROM users WHERE username = ?', [usernameTrim]);
+    const [uRows] = await db.execute('SELECT id, email FROM users WHERE username = ?', [usernameTrim]);
     if (uRows.length > 0) {
       userId = uRows[0].id;
+      if (!emailTrim && uRows[0].email) {
+        emailTrim = uRows[0].email;
+      }
     }
 
     const [result] = await db.execute(
       `INSERT INTO premium_orders
-        (username, user_id, package_id, order_type, package_name, package_price, coins_amount, duration_months, proof_image, payment_status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+        (username, email, user_id, package_id, order_type, package_name, package_price, coins_amount, duration_months, proof_image, payment_status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
       [
         usernameTrim.slice(0, 100),
+        emailTrim ? emailTrim.slice(0, 255) : null,
         userId,
         packageId.slice(0, 50),
         orderType,
@@ -174,16 +180,16 @@ const listOrders = async (req, res) => {
     const where = [];
     const params = [];
     if (search) {
-      where.push('(LOWER(username) LIKE ? OR LOWER(package_name) LIKE ?)');
+      where.push('(LOWER(po.username) LIKE ? OR LOWER(COALESCE(po.email, u.email, \'\')) LIKE ? OR LOWER(po.package_name) LIKE ?)');
       const keyword = `%${search}%`;
-      params.push(keyword, keyword);
+      params.push(keyword, keyword, keyword);
     }
     if (orderTypeFilter && ['premium', 'coins'].includes(orderTypeFilter)) {
-      where.push('order_type = ?');
+      where.push('po.order_type = ?');
       params.push(orderTypeFilter);
     }
     if (statusFilter && ['pending', 'sukses'].includes(statusFilter)) {
-      where.push('payment_status = ?');
+      where.push('po.payment_status = ?');
       params.push(statusFilter);
     }
 
@@ -191,16 +197,31 @@ const listOrders = async (req, res) => {
 
     const [[countRow]] = await db.execute(
       `SELECT COUNT(*) AS total
-       FROM premium_orders
+       FROM premium_orders po
+       LEFT JOIN users u ON (po.user_id = u.id OR po.username COLLATE utf8mb4_unicode_ci = u.username COLLATE utf8mb4_unicode_ci)
        ${whereSql}`,
       params
     );
 
     const [rows] = await db.query(
-      `SELECT id, username, user_id, package_id, order_type, package_name, package_price, coins_amount, duration_months, proof_image, payment_status, created_at
-       FROM premium_orders
+      `SELECT 
+         po.id, 
+         po.username, 
+         po.user_id, 
+         COALESCE(po.email, u.email) AS email,
+         po.package_id, 
+         po.order_type, 
+         po.package_name, 
+         po.package_price, 
+         po.coins_amount, 
+         po.duration_months, 
+         po.proof_image, 
+         po.payment_status, 
+         po.created_at
+       FROM premium_orders po
+       LEFT JOIN users u ON (po.user_id = u.id OR po.username COLLATE utf8mb4_unicode_ci = u.username COLLATE utf8mb4_unicode_ci)
        ${whereSql}
-       ORDER BY id DESC
+       ORDER BY po.id DESC
        LIMIT ? OFFSET ?`,
       [...params, limit, offset]
     );
@@ -244,14 +265,14 @@ const updateOrderStatus = async (req, res) => {
     // Apply fulfillment when changing to 'sukses'
     if (previousStatus !== 'sukses' && paymentStatus === 'sukses') {
       const [users] = await db.execute(
-        `SELECT id, points, is_membership, membership_expires_at FROM users WHERE username = ?`,
+        `SELECT id, points, coins, is_membership, membership_expires_at FROM users WHERE username = ?`,
         [order.username]
       );
 
       if (users.length > 0) {
         const u = users[0];
         if (order.order_type === 'coins' && order.coins_amount > 0) {
-          await db.execute('UPDATE users SET points = points + ? WHERE id = ?', [order.coins_amount, u.id]);
+          await db.execute('UPDATE users SET coins = coins + ? WHERE id = ?', [order.coins_amount, u.id]);
         } else if (order.order_type === 'premium') {
           const durationMonths = order.duration_months > 0 ? order.duration_months : 1;
           const isCurrentlyActive = u.is_membership === 1 && u.membership_expires_at && new Date(u.membership_expires_at) > new Date();

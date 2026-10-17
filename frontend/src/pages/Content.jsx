@@ -11,25 +11,12 @@ import LiveChatWidget from "../components/LiveChatWidget";
 import ChapterAccessLink from "../components/ChapterAccessLink";
 const statusOptions = ["All", "Ongoing", "Completed", "Hiatus"];
 const typeOptions = [
-  { label: "All", value: "All", country: null },
-  { label: "Comic", value: "Comic", country: null, apiType: "comic" },
-  { label: "Manga", value: "Manga", country: "JP", apiType: "manga" },
-  { label: "Manhua", value: "Manhua", country: "CN", apiType: "manhua" },
-  { label: "Manhwa", value: "Manhwa", country: "KR", apiType: "manhwa" },
+  { label: "Semua", value: "All", country: null },
+  { label: "Novel", value: "Novel", country: null },
+  { label: "Web Novel", value: "Web Novel", country: null },
+  { label: "Light Novel", value: "Light Novel", country: null },
 ];
 const orderOptions = ["Az", "Za", "Update", "Added", "Popular"];
-
-const projectFilterOptions = [
-  { label: "Semua", value: "all" },
-  { label: "Project", value: "true" },
-  { label: "Bukan project", value: "false" },
-];
-
-const sourceOptions = [
-  { label: "Semua Source", value: "all" },
-  { label: "Source 1", value: "kiryu" },
-  { label: "Source 2", value: "apkomik" },
-];
 
 const Content = () => {
   const navigate = useNavigate();
@@ -55,19 +42,9 @@ const Content = () => {
   )
     ? searchParams.get("type")
     : "All";
-  const selectedOrder = orderOptions.includes(searchParams.get("order") || "")
-    ? searchParams.get("order")
-    : "Update";
-
-  const projectParam = searchParams.get("project");
-  const selectedProject =
-    projectParam === "true" || projectParam === "false" ? projectParam : "all";
-
-  const selectedSource = sourceOptions.some(
-    (opt) => opt.value === (searchParams.get("source") || ""),
-  )
-    ? searchParams.get("source")
-    : "all";
+  const rawOrder = searchParams.get("order") || searchParams.get("orderBy") || "";
+  const matchedOrder = orderOptions.find((o) => o.toLowerCase() === rawOrder.toLowerCase());
+  const selectedOrder = matchedOrder || "Update";
 
   // Mobile filter & view mode states
   const [showMobileFilterModal, setShowMobileFilterModal] = useState(false);
@@ -119,13 +96,10 @@ const Content = () => {
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (selectedStatus !== "All") count++;
-    if (selectedType !== "All") count++;
-    if (selectedProject !== "all") count++;
-    if (selectedSource !== "all") count++;
     if (selectedOrder !== "Update") count++;
     if (selectedGenres.length > 0) count += selectedGenres.length;
     return count;
-  }, [selectedStatus, selectedType, selectedProject, selectedSource, selectedOrder, selectedGenres]);
+  }, [selectedStatus, selectedOrder, selectedGenres]);
 
   const updateSearchParams = useCallback(
     (updater) => {
@@ -183,27 +157,6 @@ const Content = () => {
     [updateSearchParams],
   );
 
-  const setProjectFilter = useCallback(
-    (project) => {
-      updateSearchParams((params) => {
-        if (project === "all") params.delete("project");
-        else params.set("project", project);
-        params.delete("page");
-      });
-    },
-    [updateSearchParams],
-  );
-
-  const setSourceFilter = useCallback(
-    (source) => {
-      updateSearchParams((params) => {
-        if (source === "all") params.delete("source");
-        else params.set("source", source);
-        params.delete("page");
-      });
-    },
-    [updateSearchParams],
-  );
 
   const fetchManga = useCallback(async () => {
     setLoading(true);
@@ -213,16 +166,6 @@ const Content = () => {
       // Add search query if exists
       if (searchQuery.trim()) {
         params.append("q", searchQuery.trim());
-      }
-      if (selectedProject === "true") {
-        params.append("project", "true");
-      } else if (selectedProject === "false") {
-        params.append("project", "false");
-      }
-
-      // Add source filter
-      if (selectedSource !== "all") {
-        params.append("source", selectedSource);
       }
 
       // Common parameters
@@ -239,10 +182,17 @@ const Content = () => {
         params.append("status", selectedStatus);
       }
 
-      // Add type filter (can be combined with search)
-      const typeOption = typeOptions.find((t) => t.value === selectedType);
-      if (typeOption && typeOption.value !== "All") {
-        params.append("type", typeOption.apiType || typeOption.value);
+      // Add type filter
+      if (selectedType && selectedType !== "All") {
+        params.append("type", selectedType);
+      }
+
+      // Add pinned / project filters if present in URL
+      if (searchParams.get("is_pinned")) {
+        params.append("is_pinned", searchParams.get("is_pinned"));
+      }
+      if (searchParams.get("project")) {
+        params.append("project", searchParams.get("project"));
       }
 
       // Add order filter (can be combined with search)
@@ -268,8 +218,7 @@ const Content = () => {
     selectedType,
     selectedOrder,
     searchQuery,
-    selectedProject,
-    selectedSource,
+    searchParams,
   ]);
 
   // Load manga based on filters
@@ -614,46 +563,6 @@ const Content = () => {
                   </div>
                 </div>
 
-                {/* PROJECT */}
-                <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2.5">PROJECT</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {projectFilterOptions.map((opt) => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => setProjectFilter(opt.value)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedProject === opt.value
-                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-900/40 border border-purple-400/40'
-                            : 'bg-purple-950/40 border border-purple-900/30 text-purple-200/80 hover:bg-purple-900/40 hover:text-white'
-                          }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* SOURCE */}
-                <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2.5">SOURCE</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {sourceOptions.map((opt) => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => setSourceFilter(opt.value)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedSource === opt.value
-                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-900/40 border border-purple-400/40'
-                            : 'bg-purple-950/40 border border-purple-900/30 text-purple-200/80 hover:bg-purple-900/40 hover:text-white'
-                          }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 {/* URUTKAN */}
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2.5">URUTKAN</h4>
@@ -754,28 +663,6 @@ const Content = () => {
                 </div>
               </div>
 
-              {/* Project filter */}
-              <div className="mb-5">
-                <h4 className="font-semibold text-xs uppercase tracking-wider text-purple-300/80 mb-2.5">
-                  Project
-                </h4>
-                <div className="flex flex-wrap gap-1.5">
-                  {projectFilterOptions.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setProjectFilter(opt.value)}
-                      className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all duration-200 ${selectedProject === opt.value
-                          ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-900/40 border border-purple-400/40"
-                          : "bg-purple-950/40 border border-purple-900/30 text-purple-200/80 hover:bg-purple-900/40 hover:text-white"
-                        }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Order Filter */}
               <div className="mb-5">
                 <h4 className="font-semibold text-xs uppercase tracking-wider text-purple-300/80 mb-2.5">
@@ -844,10 +731,7 @@ const Content = () => {
             {(searchQuery ||
               selectedGenres.length > 0 ||
               selectedStatus !== "All" ||
-              selectedType !== "All" ||
-              selectedOrder !== "Update" ||
-              selectedProject !== "all" ||
-              selectedSource !== "all") && (
+              selectedOrder !== "Update") && (
                 <div className="mb-6 rounded-2xl border border-purple-900/30 bg-[#130c24]/80 p-4 shadow-md backdrop-blur-md">
                   <div className="flex flex-wrap gap-2">
                     {searchQuery && (
@@ -887,20 +771,6 @@ const Content = () => {
                         <span>Status: {selectedStatus}</span>
                         <button
                           onClick={() => setStatusFilter("All")}
-                          className="hover:text-white"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      </span>
-                    )}
-                    {selectedProject !== "all" && (
-                      <span className="inline-flex items-center space-x-2 px-3 py-1 bg-purple-950/80 text-purple-200 rounded-full text-xs font-semibold border border-purple-700/50">
-                        <span>
-                          Project:{" "}
-                          {selectedProject === "true" ? "Ya" : "Bukan project"}
-                        </span>
-                        <button
-                          onClick={() => setProjectFilter("all")}
                           className="hover:text-white"
                         >
                           <X className="h-3.5 w-3.5" />

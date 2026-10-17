@@ -127,6 +127,11 @@ async function fetchLocalManga(filters) {
   if (type) {
     const normalizedType = String(type).trim().toLowerCase();
     const typeMap = {
+      novel: 'novel',
+      web_novel: 'web_novel',
+      'web novel': 'web_novel',
+      light_novel: 'light_novel',
+      'light novel': 'light_novel',
       manga: 'manga',
       manhua: 'manhua',
       manhwa: 'manhwa',

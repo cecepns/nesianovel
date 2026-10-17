@@ -9,7 +9,7 @@ export function useChapterAccess() {
 
   const openChapter = useCallback(
     (navigate, chapter, _isLatest, pathOverride) => {
-      const path = pathOverride || (chapter?.slug ? `/view/${chapter.slug}` : null);
+      const path = pathOverride || (chapter?.slug ? `/baca/${chapter.slug}` : null);
       if (!path) return false;
 
       if (requiresChapterLogin(chapter, isAuthenticated)) {

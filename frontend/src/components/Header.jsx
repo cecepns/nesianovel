@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import {
   Search,
@@ -7,23 +8,55 @@ import {
   Crown,
   Coins,
   Megaphone,
+  Menu,
+  Home,
+  ShoppingBag,
+  BookMarked,
+  Compass,
+  UserCircle,
+  Trophy,
+  CalendarDays,
+  LogIn,
+  ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 import Logo from "../assets/logo.png";
 import LazyImage from "./LazyImage";
 import { useAuth } from "../contexts/AuthContext";
 import { apiClient } from "../utils/api";
+import { resolveActiveNavId } from "../config/navigation";
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
+  const activeTab = resolveActiveNavId(location.pathname);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const searchDesktopRef = useRef(null);
   const searchMobileRef = useRef(null);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setMobileSearchOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -206,7 +239,7 @@ const Header = () => {
             >
               <Coins className="h-3.5 w-3.5 text-amber-300" />
               {isAuthenticated && user ? (
-                <span>{Number(user.points || 0).toLocaleString()} Koin</span>
+                <span>{Number(user.coins !== undefined ? user.coins : user.points || 0).toLocaleString()} Koin</span>
               ) : (
                 <span>Store</span>
               )}
@@ -222,11 +255,21 @@ const Header = () => {
               <Search className="h-5 w-5" />
             </button>
 
-            {/* Profile Avatar / Login */}
+            {/* Mobile Hamburger Menu (Garis 3) - Matches Windows Navigation */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden p-2 rounded-xl text-purple-200 hover:text-white bg-purple-950/40 border border-purple-800/40 hover:bg-purple-900/50 transition-colors"
+              aria-label="Menu Navigasi"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+
+            {/* Desktop Profile Avatar / Login */}
             {isAuthenticated && user ? (
               <Link
                 to="/akun"
-                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-white/5 transition-colors"
+                className="hidden md:flex items-center gap-2 p-1.5 rounded-xl hover:bg-white/5 transition-colors"
               >
                 <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0 overflow-hidden border border-purple-500/40">
                   {user.profile_image ? (
@@ -238,8 +281,8 @@ const Header = () => {
               </Link>
             ) : (
               <Link
-                to="/login"
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-bold text-white shadow transition-all"
+                to="/akun"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-bold text-white shadow transition-all"
               >
                 <User className="h-3.5 w-3.5" />
                 <span>Masuk</span>
@@ -317,8 +360,186 @@ const Header = () => {
           </div>
         )}
       </div>
+
+      {/* Mobile Slide-out Menu (Garis 3) - Rendered via createPortal to escape header stacking context */}
+      {mobileMenuOpen && typeof document !== "undefined" && createPortal(
+        <div className="md:hidden fixed inset-0 z-[9999] flex">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+
+          {/* Drawer Content */}
+          <div className="relative ml-auto w-72 max-w-[85vw] h-full bg-[#0d081e] border-l border-purple-900/40 p-4 flex flex-col justify-between shadow-2xl z-10 overflow-y-auto">
+            <div className="space-y-5">
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-purple-900/30">
+                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
+                  <img src={Logo} alt="NesiaNovel" className="h-8 w-auto object-contain" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-1.5 rounded-xl bg-purple-950/60 border border-purple-800/40 text-gray-300 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* User Balance & Status Widget (Mobile) */}
+              {isAuthenticated && user ? (
+                <div className="rounded-2xl border border-purple-900/30 bg-purple-950/30 p-3">
+                  <div className="flex items-center gap-2.5 mb-2.5">
+                    <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0 overflow-hidden border border-purple-500/40">
+                      {user.profile_image ? (
+                        <img src={user.profile_image} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        (user.username || 'U')[0].toUpperCase()
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-bold text-white truncate">{user.username}</div>
+                      <div className="text-[10px] text-purple-300/70">
+                        {user.membership_active ? (
+                          <span className="text-amber-400 font-semibold flex items-center gap-0.5">
+                            <Crown className="h-3 w-3" /> VIP Member
+                          </span>
+                        ) : (
+                          <span>Member Reguler</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between bg-black/40 rounded-xl px-2.5 py-1.5 border border-purple-900/40">
+                    <div className="flex items-center gap-1.5 text-xs text-amber-300 font-bold">
+                      <Coins className="h-3.5 w-3.5 text-amber-400" />
+                      <span>{Number(user.coins !== undefined ? user.coins : user.points || 0).toLocaleString()} Koin</span>
+                    </div>
+                    <Link
+                      to="/store"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[10px] font-bold text-purple-300 hover:text-white bg-purple-600/50 hover:bg-purple-600 px-2 py-0.5 rounded-lg transition-colors flex items-center gap-0.5"
+                    >
+                      Top-up <ChevronRight className="h-2.5 w-2.5" />
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  to="/akun"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs shadow-md"
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span>Masuk / Daftar Akun</span>
+                </Link>
+              )}
+
+              {/* Menu Utama (Same as Windows Sidebar) */}
+              <div>
+                <div className="px-2 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-purple-300/60">
+                  Menu Utama
+                </div>
+                <nav className="space-y-1">
+                  {[
+                    { id: 'home', label: 'Home', icon: Home, path: '/' },
+                    { id: 'store', label: 'Store', icon: ShoppingBag, path: '/store', badge: 'Koin & VIP' },
+                    { id: 'library', label: 'Library', icon: BookMarked, path: '/library' },
+                    { id: 'novels', label: 'All Novels', icon: Compass, path: '/novels' },
+                    { id: 'account', label: 'Akun', icon: UserCircle, path: '/akun' },
+                  ].map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <Link
+                        key={item.id}
+                        to={item.path}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                          isActive
+                            ? 'bg-gradient-to-r from-purple-600/30 to-purple-800/20 text-white border border-purple-500/40 shadow-sm'
+                            : 'text-gray-300 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Icon className={`h-4 w-4 ${isActive ? 'text-purple-400' : 'text-gray-400'}`} />
+                          <span>{item.label}</span>
+                        </div>
+                        {item.badge && (
+                          <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-amber-500 text-white">
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              {/* Jelajahi Section (Same as Windows Sidebar) */}
+              <div>
+                <div className="px-2 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-purple-300/60">
+                  Jelajahi
+                </div>
+                <nav className="space-y-1">
+                  {[
+                    { label: 'Pengumuman', icon: Megaphone, path: '/announcements' },
+                    { label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
+                    { label: 'Jadwal Rilis', icon: CalendarDays, path: '/jadwal' },
+                  ].map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                          isActive
+                            ? 'bg-purple-900/30 text-purple-200 font-semibold border border-purple-500/20'
+                            : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+                        }`}
+                      >
+                        <Icon className="h-4 w-4 text-gray-500" />
+                        <span>{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              {/* Admin Panel Link if Admin */}
+              {user?.role === 'admin' && (
+                <div>
+                  <div className="px-2 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-purple-300/60">
+                    Admin
+                  </div>
+                  <Link
+                    to="/admin/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold bg-purple-950/60 text-purple-300 border border-purple-800/40 hover:bg-purple-900/50 transition-colors"
+                  >
+                    <ShieldCheck className="h-4 w-4 text-purple-400" />
+                    <span>Admin Panel</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-4 border-t border-purple-900/30 text-center">
+              <p className="text-[10px] text-purple-300/50">
+                NesiaNovel &copy; 2026
+              </p>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </header>
   );
 };
 
 export default Header;
+

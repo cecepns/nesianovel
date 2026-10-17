@@ -27,8 +27,8 @@ const contentFilterInactive = `rounded-xl border ${contentBtnTrans} border-purpl
 const contentFilterActive = `rounded-xl border ${contentBtnTrans} border-purple-400/40 bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-900/40`;
 const contentCtaPrimary = `rounded-xl border border-purple-400/30 bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-purple-950/40 ${contentBtnTrans} hover:-translate-y-0.5 hover:from-purple-500 hover:to-indigo-500 active:translate-y-0.5 active:shadow-none`;
 const paginationBtnClass = `${contentFilterInactive} px-4 py-2.5 text-sm font-semibold disabled:pointer-events-none disabled:opacity-40`;
-const dangerIconBtnClass = `rounded-xl border border-rose-500/40 bg-rose-600/90 p-2 text-white shadow-md transition-all duration-200 hover:bg-rose-600 active:scale-95`;
-const dangerOutlineBtnClass = `inline-flex items-center gap-2 rounded-xl border border-rose-500/40 bg-rose-600/90 px-4 py-2.5 text-sm font-semibold text-white shadow-md ${contentBtnTrans} hover:bg-rose-600 active:scale-95`;
+const dangerIconBtnClass = `rounded-xl border border-purple-500/40 bg-purple-700/90 p-2 text-white shadow-md transition-all duration-200 hover:bg-purple-600 active:scale-95`;
+const dangerOutlineBtnClass = `inline-flex items-center gap-2 rounded-xl border border-purple-500/40 bg-purple-700/90 px-4 py-2.5 text-sm font-semibold text-white shadow-md ${contentBtnTrans} hover:bg-purple-600 active:scale-95`;
 const linkChipBtnClass = `max-w-fit rounded-lg border border-purple-900/30 bg-purple-950/40 px-3 py-1.5 text-left text-xs font-medium text-purple-200 shadow-sm transition-all duration-200 hover:-translate-y-px hover:border-purple-600/50 hover:text-white md:text-sm`;
 
 const VALID_TABS = ["bookmark", "readlist", "history"];
@@ -322,10 +322,10 @@ const Library = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-transparent text-gray-900 dark:text-gray-100">
       <Helmet>
-        <title>Library | KomikNesia</title>
+        <title>Library | NesiaNovel</title>
         <meta
           name="description"
-          content="Bookmark, readlist, dan riwayat baca komik di KomikNesia. Kelola koleksi favoritmu dengan mudah."
+          content="Bookmark, readlist, dan riwayat baca novel di NesiaNovel. Kelola koleksi favoritmu dengan mudah."
         />
       </Helmet>
       {/* Library Top Ads - 6 ads */}
@@ -403,7 +403,7 @@ const Library = () => {
                       Bookmark
                     </h2>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Komik yang kamu simpan (tersimpan per akun)
+                      Novel yang kamu simpan (tersimpan per akun)
                     </p>
                   </div>
                   {bookmarkLoading ? (
@@ -420,7 +420,7 @@ const Library = () => {
                         Belum ada bookmark
                       </p>
                       <p className="text-gray-400 dark:text-gray-500 text-sm">
-                        Buka detail komik dan simpan ke bookmark untuk melihat
+                        Buka detail novel dan simpan ke bookmark untuk melihat
                         di sini
                       </p>
                     </div>
@@ -434,7 +434,7 @@ const Library = () => {
                           >
                             <div
                               className="relative aspect-[3/4] overflow-hidden"
-                              onClick={() => navigate(`/komik/${item.slug}`)}
+                              onClick={() => navigate(`/novel/${item.slug}`)}
                             >
                               <LazyImage
                                 src={getImageUrl(item.cover)}
@@ -460,7 +460,7 @@ const Library = () => {
                             </div>
                             <div
                               className="p-3 min-h-[64px]"
-                              onClick={() => navigate(`/komik/${item.slug}`)}
+                              onClick={() => navigate(`/novel/${item.slug}`)}
                             >
                               <h3 className="font-bold text-sm line-clamp-2 text-gray-900 dark:text-gray-100">
                                 {item.title}
@@ -553,7 +553,7 @@ const Library = () => {
                             {readlistDetail.title}
                           </h2>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {(readlistDetail.items || []).length} komik di readlist ini
+                            {(readlistDetail.items || []).length} novel di readlist ini
                           </p>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -577,7 +577,7 @@ const Library = () => {
                             className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold ${contentCtaPrimary}`}
                           >
                             <Plus className="h-4 w-4 shrink-0" aria-hidden />
-                            Tambah manga
+                            Tambah novel
                           </button>
                           <button
                             type="button"
@@ -611,14 +611,14 @@ const Library = () => {
                             Readlist masih kosong
                           </p>
                           <p className="text-gray-400 dark:text-gray-500 text-sm mb-4">
-                            Tambahkan manga lewat pencarian (bisa pilih banyak sekaligus)
+                            Tambahkan novel lewat pencarian (bisa pilih banyak sekaligus)
                           </p>
                           <button
                             type="button"
                             onClick={() => setAddMangaOpen(true)}
                             className={contentCtaPrimary}
                           >
-                            Tambah manga
+                            Tambah novel
                           </button>
                         </div>
                       ) : (
@@ -630,7 +630,7 @@ const Library = () => {
                             >
                               <div
                                 className="relative aspect-[3/4] overflow-hidden"
-                                onClick={() => navigate(`/komik/${item.slug}`)}
+                                onClick={() => navigate(`/novel/${item.slug}`)}
                               >
                                 <LazyImage
                                   src={getImageUrl(item.cover)}
@@ -657,7 +657,7 @@ const Library = () => {
                               </div>
                               <div
                                 className="p-3 min-h-[64px]"
-                                onClick={() => navigate(`/komik/${item.slug}`)}
+                                onClick={() => navigate(`/novel/${item.slug}`)}
                               >
                                 <h3 className="font-bold text-sm line-clamp-2 text-gray-900 dark:text-gray-100">
                                   {item.title}
@@ -678,7 +678,7 @@ const Library = () => {
                         Readlist
                       </h2>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Buat daftar baca sendiri dan isi dengan manga favorit (multi-pilih)
+                        Buat daftar baca sendiri dan isi dengan novel favorit (multi-pilih)
                       </p>
                     </div>
                     <button
@@ -729,7 +729,7 @@ const Library = () => {
                             {rl.title}
                           </h3>
                           <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                            {Number(rl.manga_count) || 0} manga
+                            {Number(rl.manga_count) || 0} novel
                           </p>
                           <div className="flex flex-wrap gap-2">
                             <button
@@ -756,7 +756,7 @@ const Library = () => {
                                   apiClient.deleteReadlist(rl.id).then(() => loadReadlists());
                                 }
                               }}
-                              className={`rounded-lg px-3 py-1.5 text-xs font-semibold border border-rose-500/40 bg-rose-600/90 hover:bg-rose-600 text-white transition-colors`}
+                              className={`rounded-lg px-3 py-1.5 text-xs font-semibold border border-purple-500/40 bg-purple-700/90 hover:bg-purple-600 text-white transition-colors`}
                             >
                               Hapus
                             </button>
@@ -779,7 +779,7 @@ const Library = () => {
                     Riwayat Baca
                   </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Maksimal 100 manga, ditampilkan 10 per halaman
+                    Maksimal 100 novel, ditampilkan 10 per halaman
                   </p>
                 </div>
                 {historyList.length > 0 && (
@@ -806,21 +806,21 @@ const Library = () => {
                     Belum ada riwayat
                   </p>
                   <p className="text-gray-400 dark:text-gray-500 text-sm">
-                    Mulai baca komik untuk melihat riwayat di sini
+                    Mulai baca novel untuk melihat riwayat di sini
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {historyList
                     .slice((historyPage - 1) * 10, historyPage * 10)
                     .map((item, index) => (
                       <div
                         key={`${item.mangaSlug}-${index}`}
-                        className="bg-white dark:bg-white/[0.06] dark:border dark:border-white/10 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer flex relative"
+                        className="bg-white dark:bg-white/[0.06] dark:border dark:border-white/10 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer flex relative"
                       >
                         <div
-                          className="relative w-32 sm:w-40 flex-shrink-0 overflow-hidden flex-1 min-w-0"
-                          onClick={() => navigate(`/komik/${item.mangaSlug}`)}
+                          className="relative w-28 sm:w-32 flex-shrink-0 overflow-hidden min-w-0"
+                          onClick={() => navigate(`/novel/${item.mangaSlug}`)}
                         >
                           <LazyImage
                             src={getImageUrl(item.cover)}
@@ -831,10 +831,10 @@ const Library = () => {
                         </div>
 
                         <div
-                          className="flex-1 p-4 pr-12 flex flex-col justify-between min-w-0"
-                          onClick={() => navigate(`/komik/${item.mangaSlug}`)}
+                          className="flex-1 p-3.5 pr-10 flex flex-col justify-between min-w-0"
+                          onClick={() => navigate(`/novel/${item.mangaSlug}`)}
                         >
-                          <h3 className="font-bold text-base md:text-lg mb-1 text-gray-900 dark:text-gray-100 line-clamp-2">
+                          <h3 className="font-bold text-sm md:text-base mb-1 text-gray-900 dark:text-gray-100 line-clamp-2">
                             {item.mangaTitle}
                           </h3>
                           {item.chapterSlug ? (
@@ -843,7 +843,7 @@ const Library = () => {
                                 slug: item.chapterSlug,
                                 created_at: item.chapterCreatedAt,
                               }}
-                              to={`/view/${item.chapterSlug}`}
+                              to={`/baca/${item.chapterSlug}`}
                               onClick={(e) => e.stopPropagation()}
                               compact
                               className="mb-1"
@@ -902,7 +902,7 @@ const Library = () => {
                   Populer
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Top 50 komik populer per kategori
+                  Top 50 novel populer per kategori
                 </p>
               </div>
 
@@ -947,7 +947,7 @@ const Library = () => {
                     <div
                       key={item.id}
                       className="bg-white dark:bg-white/[0.06] dark:border dark:border-white/10 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer"
-                      onClick={() => navigate(`/komik/${item.slug}`)}
+                      onClick={() => navigate(`/novel/${item.slug}`)}
                     >
                       <div className="relative aspect-[3/4] overflow-hidden">
                         <LazyImage
@@ -1117,7 +1117,7 @@ const Library = () => {
                 id="readlist-add-manga-title"
                 className="text-lg font-bold text-gray-900 dark:text-gray-100"
               >
-                Tambah manga ke readlist
+                Tambah novel ke readlist
               </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 Ketik minimal 2 huruf untuk mencari; centang beberapa lalu tambahkan sekaligus.
@@ -1126,7 +1126,7 @@ const Library = () => {
                 type="search"
                 value={mangaPickerQuery}
                 onChange={(e) => setMangaPickerQuery(e.target.value)}
-                placeholder="Cari judul manga…"
+                placeholder="Cari judul novel…"
                 className="mt-3 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none ring-sky-500/30 focus:ring-2 dark:border-white/15 dark:bg-primary-900/40 dark:text-gray-100"
               />
             </div>
