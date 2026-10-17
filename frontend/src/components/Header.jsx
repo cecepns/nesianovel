@@ -146,16 +146,8 @@ const Header = () => {
     <header className="fixed top-0 right-0 left-0 md:left-64 z-30 bg-[#0d081f]/90 backdrop-blur-md border-b border-purple-900/30 transition-all duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 gap-4">
-          {/* Mobile Logo & Left Hamburger Toggle */}
-          <div className="flex items-center gap-2 md:hidden">
-            <button
-              type="button"
-              onClick={openMobileMenu}
-              className="p-2 -ml-1.5 rounded-xl text-purple-200 hover:text-white bg-purple-950/40 border border-purple-800/40 hover:bg-purple-900/50 active:scale-95 transition-all"
-              aria-label="Buka Menu Navigasi"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
+          {/* Mobile Logo */}
+          <div className="flex items-center md:hidden">
             <Link to="/" className="flex items-center gap-2">
               <img
                 src={Logo}
@@ -244,11 +236,11 @@ const Header = () => {
           </div>
 
           {/* Right Action Icons */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {/* Announcements Pill */}
             <Link
               to="/announcements"
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-950/60 hover:bg-purple-900/60 border border-purple-800/40 text-xs font-semibold text-purple-300 hover:text-white transition-colors"
+              className="hidden lg:inline-flex h-9 shrink-0 items-center gap-1.5 px-3 rounded-xl bg-purple-950/60 hover:bg-purple-900/60 border border-purple-800/40 text-xs font-semibold text-purple-300 hover:text-white transition-colors"
             >
               <Megaphone className="h-3.5 w-3.5 text-purple-400 animate-pulse" />
               <span>Pengumuman</span>
@@ -257,13 +249,16 @@ const Header = () => {
             {/* Store / Coin Quick Button */}
             <Link
               to="/store"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-700/60 to-indigo-700/60 hover:from-purple-600 hover:to-indigo-600 border border-purple-500/40 text-xs font-bold text-white shadow-sm transition-all"
+              className="h-9 shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-purple-700/60 to-indigo-700/60 hover:from-purple-600 hover:to-indigo-600 border border-purple-500/40 text-xs font-bold text-white shadow-sm transition-all active:scale-95"
             >
-              <Coins className="h-3.5 w-3.5 text-amber-300" />
+              <Coins className="h-3.5 w-3.5 text-amber-300 shrink-0" />
               {isAuthenticated && user ? (
-                <span>{Number(user.coins !== undefined ? user.coins : user.points || 0).toLocaleString()} Koin</span>
+                <span className="whitespace-nowrap leading-none inline-flex items-center gap-1">
+                  <span className="text-amber-300 font-extrabold">{Number(user.coins !== undefined ? user.coins : user.points || 0).toLocaleString()}</span>
+                  <span className="text-purple-200 text-[11px] sm:text-xs font-medium">Koin</span>
+                </span>
               ) : (
-                <span>Store</span>
+                <span className="whitespace-nowrap">Store</span>
               )}
             </Link>
 
@@ -271,7 +266,7 @@ const Header = () => {
             <button
               type="button"
               onClick={() => setMobileSearchOpen((prev) => !prev)}
-              className="md:hidden p-2 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+              className="md:hidden h-9 w-9 shrink-0 flex items-center justify-center rounded-xl text-gray-300 hover:text-white hover:bg-white/5 active:scale-95 transition-colors"
               aria-label="Cari Novel"
             >
               <Search className="h-5 w-5" />
@@ -281,7 +276,7 @@ const Header = () => {
             <button
               type="button"
               onClick={openMobileMenu}
-              className="md:hidden p-2 rounded-xl text-purple-200 hover:text-white bg-purple-950/40 border border-purple-800/40 hover:bg-purple-900/50 active:scale-95 transition-all"
+              className="md:hidden h-9 w-9 shrink-0 flex items-center justify-center rounded-xl text-purple-200 hover:text-white bg-purple-950/40 border border-purple-800/40 hover:bg-purple-900/50 active:scale-95 transition-all"
               aria-label="Menu Navigasi"
             >
               <Menu className="h-5 w-5" />

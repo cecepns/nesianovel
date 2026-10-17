@@ -1,19 +1,16 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Megaphone, ChevronRight, ChevronLeft, Pin, Calendar, ArrowRight } from 'lucide-react';
+import { Megaphone, ChevronRight, Pin, Calendar } from 'lucide-react';
 import { apiClient } from '../utils/api';
 
 const AnnouncementSection = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const touchStartXRef = useRef(0);
-  const touchEndXRef = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
-    apiClient.getAnnouncements(10)
+    // Limit to 2 announcements so height stays slim and compact on home
+    apiClient.getAnnouncements(2)
       .then((res) => {
         if (!cancelled && res?.status && Array.isArray(res.data)) {
           setAnnouncements(res.data);
@@ -26,129 +23,74 @@ const AnnouncementSection = () => {
     return () => { cancelled = true; };
   }, []);
 
-  const total = announcements.length;
-
-  const nextSlide = useCallback(() => {
-    if (total <= 1) return;
-    setCurrentIndex((prev) => (prev + 1) % total);
-  }, [total]);
-
-  const prevSlide = useCallback(() => {
-    if (total <= 1) return;
-    setCurrentIndex((prev) => (prev - 1 + total) % total);
-  }, [total]);
-
-  // Auto-play timer
-  useEffect(() => {
-    if (total <= 1 || isPaused) return;
-    const interval = setInterval(nextSlide, 5000);
-    return () => clearInterval(interval);
-  }, [total, isPaused, nextSlide]);
-
-  const handleTouchStart = (e) => {
-    touchStartXRef.current = e.touches[0].clientX;
-  };
-
-  const handleTouchMove = (e) => {
-    touchEndXRef.current = e.touches[0].clientX;
-  };
-
-  const handleTouchEnd = () => {
-    const diff = touchStartXRef.current - touchEndXRef.current;
-    if (Math.abs(diff) > 40) {
-      if (diff > 0) {
-        nextSlide();
-      } else {
-        prevSlide();
-      }
-    }
-  };
-
   if (loading || announcements.length === 0) return null;
 
-  const currentAnn = announcements[currentIndex];
-
   return (
-    <section className="my-3 sm:my-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        className="rounded-2xl border border-purple-800/40 bg-gradient-to-r from-[#170e33]/90 via-[#120a28]/95 to-[#170e33]/90 px-3.5 py-2.5 sm:px-4 sm:py-3 shadow-lg relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 backdrop-blur-md"
-      >
-        {/* Left: Badge + Current Announcement */}
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <Link
-            to="/announcements"
-            className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-200 hover:text-white font-extrabold text-[11px] uppercase tracking-wider shadow-sm transition-colors"
-          >
-            <Megaphone className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
-            <span>Pengumuman</span>
-          </Link>
-
-          {currentAnn.is_pinned && (
-            <span className="shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase bg-amber-500 text-gray-950 shadow-sm">
-              <Pin className="h-2.5 w-2.5 rotate-45" />
-              PINNED
-            </span>
-          )}
-
-          <Link
-            to={`/announcements/${currentAnn.slug}`}
-            className="min-w-0 flex-1 flex items-center gap-2 group"
-          >
-            <span className="font-bold text-xs sm:text-sm text-gray-100 group-hover:text-amber-300 transition-colors truncate">
-              {currentAnn.title}
-            </span>
-            {currentAnn.excerpt && (
-              <span className="hidden md:inline text-xs text-purple-300/60 truncate max-w-xs">
-                — {currentAnn.excerpt}
-              </span>
-            )}
-            <span className="shrink-0 inline-flex items-center text-[11px] font-bold text-amber-400 group-hover:translate-x-0.5 transition-transform">
-              <ArrowRight className="h-3 w-3" />
-            </span>
-          </Link>
+    <div className="rounded-2xl border border-purple-800/40 bg-gradient-to-r from-[#170e33]/90 via-[#120a28]/95 to-[#170e33]/90 p-3 sm:p-3.5 shadow-lg relative overflow-hidden backdrop-blur-md">
+      {/* Header on top */}
+      <div className="flex items-center justify-between gap-3 mb-2.5 pb-2 border-b border-purple-900/30">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 rounded-lg bg-purple-600/20 border border-purple-500/30 text-purple-300 shrink-0">
+            <Megaphone className="h-4 w-4 text-purple-400 animate-pulse" />
+          </div>
+          <div>
+            <h2 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5 leading-tight">
+              Pengumuman Resmi
+            </h2>
+            <p className="hidden sm:block text-[10px] text-purple-300/60 leading-tight">
+              Informasi penting, tutorial pembayaran, dan pembaruan NesiaNovel
+            </p>
+          </div>
         </div>
-
-        {/* Right: Controls & All link */}
-        <div className="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-purple-900/30">
-          {total > 1 && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-bold text-purple-300/60 mr-1 tabular-nums">
-                {currentIndex + 1}/{total}
-              </span>
-              <button
-                type="button"
-                onClick={prevSlide}
-                className="p-1 rounded-lg bg-purple-950/60 border border-purple-800/40 text-purple-300 hover:text-white hover:bg-purple-800/50 active:scale-95 transition-all"
-                aria-label="Sebelumnya"
-              >
-                <ChevronLeft className="h-3.5 w-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={nextSlide}
-                className="p-1 rounded-lg bg-purple-950/60 border border-purple-800/40 text-purple-300 hover:text-white hover:bg-purple-800/50 active:scale-95 transition-all"
-                aria-label="Berikutnya"
-              >
-                <ChevronRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          )}
-
-          <Link
-            to="/announcements"
-            className="flex items-center gap-1 text-[11px] font-semibold text-purple-300 hover:text-white px-2 py-0.5 rounded-lg bg-purple-950/40 hover:bg-purple-900/40 border border-purple-800/40 transition-colors"
-          >
-            <span>Semua</span>
-            <ChevronRight className="h-3 w-3" />
-          </Link>
-        </div>
+        <Link
+          to="/announcements"
+          className="flex items-center gap-1 text-[11px] font-bold text-purple-300 hover:text-white px-2.5 py-1 rounded-lg bg-purple-950/50 hover:bg-purple-900/50 border border-purple-800/40 transition-colors shrink-0"
+        >
+          <span>Semua</span>
+          <ChevronRight className="h-3 w-3" />
+        </Link>
       </div>
-    </section>
+
+      {/* Announcements Cards Below Header */}
+      <div className={`grid grid-cols-1 ${announcements.length > 1 ? 'md:grid-cols-2' : ''} gap-2 sm:gap-2.5`}>
+        {announcements.map((ann) => (
+          <Link
+            key={ann.id}
+            to={`/announcements/${ann.slug}`}
+            className="group flex items-start gap-2.5 p-2.5 rounded-xl bg-purple-950/30 hover:bg-purple-900/30 border border-purple-900/30 hover:border-purple-600/40 transition-all duration-200"
+          >
+            <div className="p-1.5 rounded-lg bg-[#1b103c] border border-purple-800/40 text-purple-400 group-hover:text-amber-300 group-hover:scale-105 transition-all shrink-0 mt-0.5">
+              {ann.is_pinned ? (
+                <Pin className="h-3.5 w-3.5 text-amber-400 rotate-45" />
+              ) : (
+                <Calendar className="h-3.5 w-3.5 text-purple-400" />
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-0.5">
+                {ann.is_pinned && (
+                  <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase bg-amber-500 text-gray-950 leading-none">
+                    PINNED
+                  </span>
+                )}
+                <span className="text-[10px] text-purple-300/60 leading-none">
+                  {ann.created_at ? new Date(ann.created_at).toLocaleDateString('id-ID', { dateStyle: 'medium' }) : ''}
+                </span>
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm line-clamp-1 group-hover:text-amber-300 transition-colors">
+                {ann.title}
+              </h3>
+              {ann.excerpt && (
+                <p className="text-[10px] sm:text-[11px] text-purple-200/60 line-clamp-1 mt-0.5">
+                  {ann.excerpt}
+                </p>
+              )}
+            </div>
+            <ChevronRight className="h-4 w-4 text-purple-500/40 group-hover:text-purple-300 group-hover:translate-x-0.5 transition-all self-center shrink-0" />
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 };
 

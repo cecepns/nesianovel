@@ -546,7 +546,7 @@ const Home = () => {
       </div>
 
       {/* Announcements Section directly above Popular */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6" data-aos="fade-up" data-aos-delay="150">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4 sm:mb-5" data-aos="fade-up" data-aos-delay="150">
         <AnnouncementSection />
       </div>
 
