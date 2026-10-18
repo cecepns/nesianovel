@@ -38,6 +38,7 @@ import creditBanner from '../assets/credit-banner.png';
 import LazyImage from '../components/LazyImage';
 import { saveToHistory } from '../utils/historyManager';
 import { apiClient, getImageUrl } from '../utils/api';
+import { resolveHtmlImages } from '../utils/quillImageHelper';
 import AdBanner from '../components/AdBanner';
 import { useAds } from '../hooks/useAds';
 import CommentSection from '../components/CommentSection';
@@ -119,11 +120,26 @@ const ChapterReader = () => {
   const [loginOpen, setLoginOpen] = useState(false);
   const isPremiumUser = !!user?.membership_active;
 
-  const discordInviteUrl = 'https://discord.gg/dgC22PSm9h';
-  const donateUrl = 'https://saweria.co/nesianovel';
+  const [discordInviteUrl, setDiscordInviteUrl] = useState('https://discord.gg/dgC22PSm9h');
+  const [donateUrl, setDonateUrl] = useState('https://saweria.co/nesianovel');
   const chapterOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://nesianovel.com';
   const chapterShareUrl = effectiveChapterSlug ? `${chapterOrigin}/baca/${effectiveChapterSlug}` : '';
   const [chapterSharePopupOpen, setChapterSharePopupOpen] = useState(false);
+
+  useEffect(() => {
+    apiClient.getSettings()
+      .then((s) => {
+        if (s && Array.isArray(s.quick_links)) {
+          const discordItem = s.quick_links.find(
+            (item) => item.id === 'discord' || item.icon === 'Discord' || String(item.title || '').toLowerCase().includes('discord')
+          );
+          if (discordItem?.href) {
+            setDiscordInviteUrl(discordItem.href);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const copyChapterShareLink = async () => {
     if (!chapterShareUrl) return;
@@ -788,7 +804,7 @@ const ChapterReader = () => {
                     fontSize: `${fontSize}px`,
                     lineHeight: lineHeight === 'loose' ? '2.1' : lineHeight === 'relaxed' ? '1.85' : '1.6',
                   }}
-                  dangerouslySetInnerHTML={{ __html: chapterData.novel_content }}
+                  dangerouslySetInnerHTML={{ __html: resolveHtmlImages(chapterData.novel_content) }}
                 />
               ) : chapterData?.images && chapterData.images.length > 0 ? (
                 /* Fallback for image-based chapters */
@@ -883,21 +899,16 @@ const ChapterReader = () => {
               <Heart className="h-4 w-4 text-amber-400 fill-amber-400" />
               <span>Donasi</span>
             </a>
-            <button
-              type="button"
-              onClick={() => {
-                const q = new URLSearchParams({
-                  topic: 'lapor-error-novel',
-                  chapter: effectiveChapterSlug || '',
-                });
-                if (novelSlug) q.set('novel', novelSlug);
-                navigate(`/contact?${q.toString()}`);
-              }}
+            {/* Lapor Error via Discord */}
+            <a
+              href={discordInviteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-purple-950/40 border border-purple-900/30 text-white font-bold text-xs hover:bg-purple-900/40 transition-colors"
             >
               <AlertTriangle className="h-4 w-4 text-red-400" />
               <span>Lapor Error</span>
-            </button>
+            </a>
           </div>
 
           {/* Reaksi Chapter */}

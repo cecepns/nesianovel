@@ -116,6 +116,74 @@ body {
   right: 20px;
 }
 
+/* React Quill Tooltip (Link, Video, Formula popups) */
+.ql-snow .ql-tooltip {
+  background-color: #1a1236 !important;
+  border: 1px solid #6b21a8 !important;
+  border-radius: 0.625rem !important;
+  color: #f3f4f6 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 0 15px rgba(168, 85, 247, 0.2) !important;
+  padding: 8px 14px !important;
+}
+
+.ql-snow .ql-tooltip::before {
+  color: #e2e8f0 !important;
+  font-weight: 500 !important;
+}
+
+.ql-snow .ql-tooltip input[type="text"] {
+  background-color: #0b0616 !important;
+  border: 1px solid #7c3aed !important;
+  border-radius: 0.375rem !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: 13px !important;
+  height: 30px !important;
+  padding: 4px 10px !important;
+  outline: none !important;
+}
+
+.ql-snow .ql-tooltip input[type="text"]:focus {
+  border-color: #a855f7 !important;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.35) !important;
+}
+
+.ql-snow .ql-tooltip a {
+  color: #38bdf8 !important;
+  font-weight: 600 !important;
+  transition: color 0.15s ease !important;
+}
+
+.ql-snow .ql-tooltip a:hover {
+  color: #7dd3fc !important;
+  text-decoration: underline !important;
+}
+
+.ql-snow .ql-tooltip a.ql-action::after {
+  color: #38bdf8 !important;
+  font-weight: 600 !important;
+}
+
+.ql-snow .ql-tooltip a.ql-preview {
+  color: #60a5fa !important;
+}
+
+.ql-snow .ql-tooltip a.ql-remove::before {
+  color: #f87171 !important;
+}
+
+/* Links inside editor */
+.ql-snow .ql-editor a,
+.ql-editor a {
+  color: #60a5fa !important;
+  text-decoration: underline !important;
+}
+
+.ql-snow .ql-editor a:hover,
+.ql-editor a:hover {
+  color: #93c5fd !important;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 7px;

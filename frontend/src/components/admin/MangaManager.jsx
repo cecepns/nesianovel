@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   Plus,
   Trash2,
@@ -20,6 +20,12 @@ import { apiClient, getImageUrl } from "../../utils/api";
 import { compressImage } from "../../utils/imageCompression";
 import LazyImage from "../LazyImage";
 import { toast } from "react-toastify";
+import {
+  resolveHtmlImages,
+  sanitizeAndUploadBase64InHtml,
+  createQuillImageHandler,
+  setupQuillImagePasteAndDrop,
+} from "../../utils/quillImageHelper";
 
 const quillModules = {
   toolbar: [
@@ -101,6 +107,33 @@ const MangaManager = () => {
   const [draggedImage, setDraggedImage] = useState(null); // Track dragged image {chapterId, imageId}
   const [draggedOverImage, setDraggedOverImage] = useState(null); // Track image being dragged over {chapterId, imageId}
   const [isReordering, setIsReordering] = useState({}); // Track reordering state per chapter
+
+  const chapterQuillRef = useRef(null);
+  const chapterQuillModules = useMemo(() => ({
+    toolbar: {
+      container: [
+        [{ header: [1, 2, 3, 4, 5, 6, false] }],
+        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        [{ align: [] }],
+        ['link', 'image'],
+        ['clean'],
+      ],
+      handlers: {
+        image: createQuillImageHandler(chapterQuillRef),
+      },
+    },
+  }), []);
+
+  useEffect(() => {
+    if (showChapterForm && chapterQuillRef.current) {
+      const quill = chapterQuillRef.current.getEditor ? chapterQuillRef.current.getEditor() : null;
+      if (quill) {
+        const cleanup = setupQuillImagePasteAndDrop(quill);
+        return cleanup;
+      }
+    }
+  }, [showChapterForm]);
 
   const fetchManga = useCallback(async () => {
     try {
@@ -455,6 +488,8 @@ const MangaManager = () => {
     e.preventDefault();
     if (!selectedMangaForChapters) return;
 
+    const cleanContent = await sanitizeAndUploadBase64InHtml(chapterFormData.content || "");
+
     const submitData = new FormData();
     submitData.append("title", chapterFormData.title);
     submitData.append("chapter_number", chapterFormData.chapter_number);
@@ -462,7 +497,7 @@ const MangaManager = () => {
     if (chapterFormData.release_mode === "scheduled" && chapterFormData.scheduled_release_at) {
       submitData.append("scheduled_release_at", chapterFormData.scheduled_release_at);
     }
-    submitData.append("content", chapterFormData.content || "");
+    submitData.append("content", cleanContent);
     submitData.append("coin_price", chapterFormData.coin_price || 25);
     submitData.append("is_locked", chapterFormData.is_locked ? "1" : "0");
     if (chapterCoverFile) {
@@ -517,6 +552,8 @@ const MangaManager = () => {
     } catch (err) {
       console.warn("Could not fetch full chapter details:", err);
     }
+
+    content = resolveHtmlImages(content);
 
     setChapterFormData({
       title: chapter.title,
@@ -1450,12 +1487,13 @@ const MangaManager = () => {
                   </div>
                   <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100">
                     <ReactQuill
+                      ref={chapterQuillRef}
                       theme="snow"
                       value={chapterFormData.content}
                       onChange={(val) =>
                         setChapterFormData((prev) => ({ ...prev, content: val }))
                       }
-                      modules={quillModules}
+                      modules={chapterQuillModules}
                       formats={quillFormats}
                       placeholder="Tulis atau tempel cerita novel di sini (format rich text, link, gambar didukung)..."
                       className="novel-admin-quill"

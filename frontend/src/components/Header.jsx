@@ -23,7 +23,7 @@ import {
 import Logo from "../assets/logo.png";
 import LazyImage from "./LazyImage";
 import { useAuth } from "../contexts/AuthContext";
-import { apiClient } from "../utils/api";
+import { apiClient, getImageUrl } from "../utils/api";
 import { resolveActiveNavId } from "../config/navigation";
 
 const Header = () => {
@@ -38,8 +38,13 @@ const Header = () => {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMenuAnimating, setIsMenuAnimating] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const searchDesktopRef = useRef(null);
   const searchMobileRef = useRef(null);
+
+  useEffect(() => {
+    setAvatarError(false);
+  }, [user?.profile_image]);
 
   const openMobileMenu = () => {
     setMobileMenuOpen(true);
@@ -289,8 +294,13 @@ const Header = () => {
                 className="hidden md:flex items-center gap-2 p-1.5 rounded-xl hover:bg-white/5 transition-colors"
               >
                 <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0 overflow-hidden border border-purple-500/40">
-                  {user.profile_image ? (
-                    <img src={user.profile_image} alt="" className="h-full w-full object-cover" />
+                  {user.profile_image && !avatarError ? (
+                    <img
+                      src={getImageUrl(user.profile_image)}
+                      alt={user.username || "Profile"}
+                      className="h-full w-full object-cover"
+                      onError={() => setAvatarError(true)}
+                    />
                   ) : (
                     (user.username || 'U')[0].toUpperCase()
                   )}
@@ -416,8 +426,13 @@ const Header = () => {
                 <div className="rounded-2xl border border-purple-900/30 bg-purple-950/30 p-3">
                   <div className="flex items-center gap-2.5 mb-2.5">
                     <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0 overflow-hidden border border-purple-500/40">
-                      {user.profile_image ? (
-                        <img src={user.profile_image} alt="" className="h-full w-full object-cover" />
+                      {user.profile_image && !avatarError ? (
+                        <img
+                          src={getImageUrl(user.profile_image)}
+                          alt={user.username || "Profile"}
+                          className="h-full w-full object-cover"
+                          onError={() => setAvatarError(true)}
+                        />
                       ) : (
                         (user.username || 'U')[0].toUpperCase()
                       )}

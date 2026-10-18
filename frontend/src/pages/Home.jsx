@@ -570,6 +570,7 @@ const Home = () => {
             iconType="pin"
             targetUrl="/content?is_pinned=true"
             fetchParams={{ page: 1, per_page: 15, orderBy: "Update", is_pinned: "true" }}
+            coverOnly={true}
           />
         </div>
 

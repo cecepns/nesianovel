@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { Helmet } from 'react-helmet-async';
 import {
   Coins,
@@ -451,142 +452,151 @@ const Store = () => {
       </section>
 
       {/* ORDER CONFIRMATION MODAL */}
-      {orderModalOpen && selectedPackage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
-          <div className="w-full max-w-lg max-h-[90vh] my-auto overflow-y-auto rounded-3xl bg-[#140c2e] border border-purple-800/60 p-5 sm:p-7 text-white shadow-2xl relative space-y-5 overscroll-contain">
-            <button
-              type="button"
-              onClick={() => setOrderModalOpen(false)}
-              className="absolute top-5 right-5 p-1 rounded-lg text-gray-400 hover:text-white"
-            >
-              <X className="h-5 w-5" />
-            </button>
-
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 font-bold text-xs uppercase mb-2">
-                Konfirmasi Pesanan
-              </div>
-              <h3 className="text-xl font-black text-white">
-                {selectedPackage.name || `${selectedPackage.coins} Koin`} - {selectedPackage.price}
-              </h3>
-            </div>
-
-            {/* Saweria Direct Link Box */}
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200/90 space-y-3">
-              <div className="flex items-start gap-3">
-                <Info className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-bold text-white mb-1">
-                    Sudah mentransfer via Saweria?
-                  </p>
-                  <p>
-                    Jika belum, silakan klik tombol di bawah untuk membuka{' '}
-                    <span className="font-bold text-amber-300">Saweria</span> sebesar{' '}
-                    <strong>{selectedPackage.price}</strong> dan cantumkan username akun kamu.
-                  </p>
+      {orderModalOpen && selectedPackage && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-lg max-h-[92dvh] sm:max-h-[88vh] my-auto flex flex-col rounded-3xl bg-[#140c2e] border border-purple-800/60 text-white shadow-2xl relative overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-4 sm:p-6 pb-3 flex items-start justify-between border-b border-purple-900/40 shrink-0">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 font-bold text-xs uppercase mb-1.5">
+                  Konfirmasi Pesanan
                 </div>
+                <h3 className="text-lg sm:text-xl font-black text-white">
+                  {selectedPackage.name || `${selectedPackage.coins} Koin`} - {selectedPackage.price}
+                </h3>
               </div>
-
-              {/* Prominent Saweria Payment Button */}
-              <a
-                href={packagesData.saweria_url || 'https://saweria.co/nesianovel'}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:brightness-110 text-gray-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all text-center"
+              <button
+                type="button"
+                onClick={() => setOrderModalOpen(false)}
+                className="p-1.5 rounded-xl bg-purple-950/60 border border-purple-800/40 text-gray-400 hover:text-white active:scale-95 transition-all"
+                aria-label="Tutup"
               >
-                <ExternalLink className="h-4 w-4 shrink-0" />
-                <span>Bayar Sekarang via Saweria ({selectedPackage.price})</span>
-              </a>
+                <X className="h-5 w-5" />
+              </button>
             </div>
 
-            <form onSubmit={handleSubmitOrder} className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-purple-200 block mb-1.5">
-                  Email Akun NesiaNovel
-                </label>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="emailkamu@gmail.com"
-                  className="w-full px-4 py-3 rounded-xl bg-[#1b103b] border border-purple-800/50 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-purple-200 block mb-1.5">
-                  Username Akun NesiaNovel
-                </label>
-                <input
-                  type="text"
-                  value={form.username}
-                  onChange={(e) => setForm({ ...form, username: e.target.value })}
-                  placeholder="Username akun kamu"
-                  className="w-full px-4 py-3 rounded-xl bg-[#1b103b] border border-purple-800/50 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-purple-200 block mb-1.5">
-                  Bukti Pembayaran Saweria (Screenshot)
-                </label>
-                <div className="relative border-2 border-dashed border-purple-800/60 rounded-2xl p-4 text-center hover:border-purple-500 transition-colors bg-[#170e34]">
-                  {form.preview ? (
-                    <div className="space-y-2">
-                      <img
-                        src={form.preview}
-                        alt="Preview"
-                        className="max-h-48 mx-auto rounded-xl object-contain"
-                      />
-                      <label
-                        htmlFor="proof-upload"
-                        className="inline-block text-xs text-purple-300 font-bold underline cursor-pointer hover:text-white"
-                      >
-                        Ganti Foto Bukti
-                      </label>
+            {/* Form wrapping scrollable content and sticky footer */}
+            <form onSubmit={handleSubmitOrder} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              {/* Scrollable Body Content */}
+              <div className="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1 overscroll-contain">
+                {/* Saweria Direct Link Box */}
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200/90 space-y-2.5">
+                  <div className="flex items-start gap-2.5">
+                    <Info className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-white mb-0.5">
+                        Sudah mentransfer via Saweria?
+                      </p>
+                      <p className="text-[11px] sm:text-xs">
+                        Jika belum, silakan klik tombol di bawah untuk membuka{' '}
+                        <span className="font-bold text-amber-300">Saweria</span> sebesar{' '}
+                        <strong>{selectedPackage.price}</strong> dan cantumkan username akun kamu.
+                      </p>
                     </div>
-                  ) : (
-                    <label htmlFor="proof-upload" className="cursor-pointer block py-6 space-y-2">
-                      <Upload className="h-8 w-8 text-purple-400 mx-auto" />
-                      <div className="text-xs font-bold text-white">
-                        Klik untuk upload screenshot bukti transfer
-                      </div>
-                      <div className="text-[10px] text-purple-300/60">
-                        PNG, JPG, WEBP (Maks 5MB)
-                      </div>
-                    </label>
-                  )}
+                  </div>
+
+                  {/* Prominent Saweria Payment Button */}
+                  <a
+                    href={packagesData.saweria_url || 'https://saweria.co/nesianovel'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:brightness-110 text-gray-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/20 active:scale-98 transition-all text-center"
+                  >
+                    <ExternalLink className="h-4 w-4 shrink-0" />
+                    <span>Bayar Sekarang via Saweria ({selectedPackage.price})</span>
+                  </a>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-purple-200 block mb-1.5">
+                    Email Akun NesiaNovel
+                  </label>
                   <input
-                    id="proof-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden"
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="emailkamu@gmail.com"
+                    className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-[#1b103b] border border-purple-800/50 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    required
                   />
                 </div>
+
+                <div>
+                  <label className="text-xs font-bold text-purple-200 block mb-1.5">
+                    Username Akun NesiaNovel
+                  </label>
+                  <input
+                    type="text"
+                    value={form.username}
+                    onChange={(e) => setForm({ ...form, username: e.target.value })}
+                    placeholder="Username akun kamu"
+                    className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-[#1b103b] border border-purple-800/50 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-purple-200 block mb-1.5">
+                    Bukti Pembayaran Saweria (Screenshot)
+                  </label>
+                  <div className="relative border-2 border-dashed border-purple-800/60 rounded-2xl p-4 text-center hover:border-purple-500 transition-colors bg-[#170e34]">
+                    {form.preview ? (
+                      <div className="space-y-2">
+                        <img
+                          src={form.preview}
+                          alt="Preview"
+                          className="max-h-40 sm:max-h-48 mx-auto rounded-xl object-contain"
+                        />
+                        <label
+                          htmlFor="proof-upload"
+                          className="inline-block text-xs text-purple-300 font-bold underline cursor-pointer hover:text-white"
+                        >
+                          Ganti Foto Bukti
+                        </label>
+                      </div>
+                    ) : (
+                      <label htmlFor="proof-upload" className="cursor-pointer block py-5 sm:py-6 space-y-1.5 sm:space-y-2">
+                        <Upload className="h-7 w-7 text-purple-400 mx-auto" />
+                        <div className="text-xs font-bold text-white">
+                          Klik untuk upload screenshot bukti transfer
+                        </div>
+                        <div className="text-[10px] text-purple-300/60">
+                          PNG, JPG, WEBP (Maks 5MB)
+                        </div>
+                      </label>
+                    )}
+                    <input
+                      id="proof-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="pt-2 flex gap-3">
+              {/* Bottom Sticky Action Buttons */}
+              <div className="p-3 sm:p-4 bg-[#110927] border-t border-purple-900/40 flex gap-3 shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
                 <button
                   type="button"
                   onClick={() => setOrderModalOpen(false)}
-                  className="flex-1 py-3 px-4 rounded-xl bg-purple-950 border border-purple-900/40 text-purple-300 hover:text-white font-bold text-xs"
+                  className="flex-1 py-3 px-4 rounded-xl bg-purple-950/80 border border-purple-900/40 text-purple-300 hover:text-white font-bold text-xs active:scale-95 transition-all"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-2 py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:brightness-110 text-white font-black text-xs shadow-lg transition-all"
+                  className="flex-[2] py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:brightness-110 text-white font-black text-xs shadow-lg active:scale-95 transition-all"
                 >
                   {submitting ? 'Mengirim...' : 'Kirim Bukti Pembayaran'}
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {loginModalOpen && <LoginModal isOpen={loginModalOpen} onClose={() => setLoginModalOpen(false)} />}

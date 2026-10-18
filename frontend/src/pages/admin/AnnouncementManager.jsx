@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Megaphone, 
   Plus, 
@@ -20,16 +20,12 @@ import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { apiClient, getImageUrl, formatToLocaleString } from '../../utils/api';
-
-const quillModules = {
-  toolbar: [
-    [{ header: [1, 2, 3, false] }],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{ list: 'ordered' }, { list: 'bullet' }],
-    ['link', 'image'],
-    ['clean'],
-  ],
-};
+import {
+  resolveHtmlImages,
+  sanitizeAndUploadBase64InHtml,
+  createQuillImageHandler,
+  setupQuillImagePasteAndDrop,
+} from '../../utils/quillImageHelper';
 
 const quillFormats = [
   'header',
@@ -53,6 +49,33 @@ export default function AnnouncementManager() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const quillRef = useRef(null);
+
+  const quillModules = useMemo(() => ({
+    toolbar: {
+      container: [
+        [{ header: [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link', 'image'],
+        ['clean'],
+      ],
+      handlers: {
+        image: createQuillImageHandler(quillRef),
+      },
+    },
+  }), []);
+
+  useEffect(() => {
+    if (modalOpen && quillRef.current) {
+      const quill = quillRef.current.getEditor ? quillRef.current.getEditor() : null;
+      if (quill) {
+        const cleanup = setupQuillImagePasteAndDrop(quill);
+        return cleanup;
+      }
+    }
+  }, [modalOpen]);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -106,7 +129,7 @@ export default function AnnouncementManager() {
       title: item.title || '',
       slug: item.slug || '',
       excerpt: item.excerpt || '',
-      content: item.content || '',
+      content: resolveHtmlImages(item.content || ''),
       bannerImage: null,
       bannerPreview: item.banner_image ? getImageUrl(item.banner_image) : '',
       is_pinned: !!item.is_pinned,
@@ -149,11 +172,12 @@ export default function AnnouncementManager() {
 
     try {
       setSubmitting(true);
+      const cleanContent = await sanitizeAndUploadBase64InHtml(formData.content);
       const data = new FormData();
       data.append('title', formData.title.trim());
       if (formData.slug.trim()) data.append('slug', formData.slug.trim());
       if (formData.excerpt.trim()) data.append('excerpt', formData.excerpt.trim());
-      data.append('content', formData.content);
+      data.append('content', cleanContent);
       data.append('is_pinned', formData.is_pinned ? '1' : '0');
       data.append('is_published', formData.is_published ? '1' : '0');
 
@@ -484,6 +508,7 @@ export default function AnnouncementManager() {
                 </label>
                 <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-300 dark:border-gray-600">
                   <ReactQuill
+                    ref={quillRef}
                     theme="snow"
                     value={formData.content}
                     onChange={(val) => setFormData((prev) => ({ ...prev, content: val }))}

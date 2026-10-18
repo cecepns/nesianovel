@@ -21,6 +21,7 @@ const NovelCoverSlider = ({
   iconType = "sparkles", // "pin", "sparkles", "heart", "flame"
   targetUrl = "/novels",
   fetchParams = { page: 1, per_page: 15, orderBy: "Update" },
+  coverOnly = false,
 }) => {
   const navigate = useNavigate();
   const [novels, setNovels] = useState([]);
@@ -118,11 +119,19 @@ const NovelCoverSlider = ({
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="w-[140px] sm:w-[170px] md:w-[190px] shrink-0 rounded-xl bg-purple-950/20 border border-purple-900/20 p-2 animate-pulse"
+              className={
+                coverOnly
+                  ? "w-[130px] sm:w-[155px] md:w-[175px] lg:w-[185px] shrink-0 rounded-xl bg-purple-950/20 border border-purple-900/20 overflow-hidden animate-pulse aspect-[2/3]"
+                  : "w-[140px] sm:w-[170px] md:w-[190px] shrink-0 rounded-xl bg-purple-950/20 border border-purple-900/20 p-2 animate-pulse"
+              }
             >
               <div className="aspect-[2/3] w-full rounded-lg bg-purple-900/30" />
-              <div className="mt-2.5 h-4 w-3/4 bg-purple-900/40 rounded" />
-              <div className="mt-1.5 h-3 w-1/2 bg-purple-900/20 rounded" />
+              {!coverOnly && (
+                <>
+                  <div className="mt-2.5 h-4 w-3/4 bg-purple-900/40 rounded" />
+                  <div className="mt-1.5 h-3 w-1/2 bg-purple-900/20 rounded" />
+                </>
+              )}
             </div>
           ))}
         </div>
@@ -192,6 +201,36 @@ const NovelCoverSlider = ({
           className="flex gap-3 sm:gap-4 overflow-x-auto pb-3 pt-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden cursor-grab active:cursor-grabbing select-none"
         >
           {novels.map((novel) => {
+            if (coverOnly) {
+              return (
+                <div
+                  key={novel.id}
+                  onClick={() => {
+                    if (dragDistanceRef.current > 10) return;
+                    navigate(`/novel/${novel.slug}`);
+                  }}
+                  title={novel.title}
+                  className="group relative w-[130px] sm:w-[155px] md:w-[175px] lg:w-[185px] shrink-0 cursor-pointer overflow-hidden rounded-xl bg-[#130c24]/80 border border-purple-900/30 transition-all duration-300 hover:-translate-y-1.5 hover:border-purple-500/70 hover:shadow-[0_12px_28px_-5px_rgba(168,85,247,0.4)] aspect-[2/3]"
+                >
+                  <LazyImage
+                    src={getImageUrl(novel.cover)}
+                    alt={novel.title}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    wrapperClassName="h-full w-full"
+                  />
+                  {/* Subtle hover gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                  {/* Rating badge */}
+                  {novel.rating > 0 && (
+                    <div className="absolute top-2 right-2 pointer-events-none">
+                      <RatingBadge rating={novel.rating} />
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             const latestCh = novel?.lastChapters?.[0];
             const chNumber = latestCh?.number || latestCh?.title?.match(/\d+/)?.[0] || null;
 

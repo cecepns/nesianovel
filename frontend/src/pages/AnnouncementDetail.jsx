@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Megaphone, Calendar, ArrowLeft, Pin, Share2 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { apiClient } from '../utils/api';
+import { apiClient, getImageUrl } from '../utils/api';
+import { resolveHtmlImages } from '../utils/quillImageHelper';
 
 const AnnouncementDetail = () => {
   const { slug } = useParams();
@@ -86,7 +87,7 @@ const AnnouncementDetail = () => {
           {announcement.banner_image && (
             <div className="rounded-2xl overflow-hidden max-h-96 border border-purple-800/30">
               <img
-                src={announcement.banner_image}
+                src={getImageUrl(announcement.banner_image)}
                 alt={announcement.title}
                 className="w-full h-full object-cover"
               />
@@ -96,7 +97,7 @@ const AnnouncementDetail = () => {
           {/* HTML Announcement Content */}
           <div
             className="novel-content text-purple-100 text-sm sm:text-base leading-relaxed space-y-4"
-            dangerouslySetInnerHTML={{ __html: announcement.content }}
+            dangerouslySetInnerHTML={{ __html: resolveHtmlImages(announcement.content) }}
           />
 
           <div className="border-t border-purple-900/40 pt-6 flex items-center justify-between">

@@ -41,6 +41,7 @@ import {
 } from 'react-share';
 import LazyImage from '../components/LazyImage';
 import { API_BASE_URL, apiClient, getImageUrl } from '../utils/api';
+import { resolveHtmlImages } from '../utils/quillImageHelper';
 import AdBanner from '../components/AdBanner';
 import { useAds } from '../hooks/useAds';
 import { useAuth } from '../contexts/AuthContext';
@@ -758,7 +759,7 @@ const MangaDetail = () => {
                     className={`prose prose-sm max-w-none text-gray-300 leading-relaxed transition-all duration-300 ${
                       synopsisExpanded ? '' : 'line-clamp-3'
                     }`}
-                    dangerouslySetInnerHTML={{ __html: manga.sinopsis || 'Tidak ada sinopsis tersedia.' }}
+                    dangerouslySetInnerHTML={{ __html: resolveHtmlImages(manga.sinopsis || 'Tidak ada sinopsis tersedia.') }}
                   />
                   {manga.sinopsis && manga.sinopsis.length > 150 && (
                     <button

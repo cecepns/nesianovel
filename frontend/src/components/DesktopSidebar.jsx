@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home,
@@ -17,11 +18,17 @@ import {
 import Logo from '../assets/logo.png';
 import { useAuth } from '../contexts/AuthContext';
 import { resolveActiveNavId } from '../config/navigation';
+import { getImageUrl } from '../utils/api';
 
 const DesktopSidebar = () => {
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
   const activeTab = resolveActiveNavId(location.pathname);
+  const [avatarError, setAvatarError] = useState(false);
+
+  useEffect(() => {
+    setAvatarError(false);
+  }, [user?.profile_image]);
 
   const mainNav = [
     { id: 'home', label: 'Home', icon: Home, path: '/' },
@@ -154,8 +161,13 @@ const DesktopSidebar = () => {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0 overflow-hidden">
-                  {user.profile_image ? (
-                    <img src={user.profile_image} alt="" className="h-full w-full object-cover" />
+                  {user.profile_image && !avatarError ? (
+                    <img
+                      src={getImageUrl(user.profile_image)}
+                      alt={user.username || "Profile"}
+                      className="h-full w-full object-cover"
+                      onError={() => setAvatarError(true)}
+                    />
                   ) : (
                     (user.username || 'U')[0].toUpperCase()
                   )}

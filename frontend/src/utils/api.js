@@ -55,7 +55,8 @@ export function toProxiedImageUrlIfNeeded(imagePath) {
   return imagePath;
 }
 
-let currentCdnDomain = 'https://data.cdnesia.my.id';
+const SAVED_CDN = typeof localStorage !== 'undefined' ? localStorage.getItem('cdn_domain') : null;
+let currentCdnDomain = SAVED_CDN || 'https://data.cdnesia.my.id';
 
 export const setCdnDomain = (domain) => {
   if (!domain) return;
@@ -64,7 +65,14 @@ export const setCdnDomain = (domain) => {
     d = `https://${d}`;
   }
   currentCdnDomain = d;
+  if (typeof localStorage !== 'undefined') {
+    try {
+      localStorage.setItem('cdn_domain', d);
+    } catch {}
+  }
 };
+
+export const getCdnDomain = () => currentCdnDomain;
 
 /**
  * Get full image URL with endpoint prefix if the path is relative
@@ -888,14 +896,41 @@ class APIClient {
     });
   }
 
-  getSettings() {
-    return this.request('/settings');
+  async getSettings() {
+    const res = await this.request('/settings');
+    if (res && res.cdn_domain) {
+      setCdnDomain(res.cdn_domain);
+    }
+    return res;
   }
 
-  updateSettings(body) {
-    return this.request('/settings', {
+  async updateSettings(body) {
+    const res = await this.request('/settings', {
       method: 'PUT',
       body,
+    });
+    if (body && body.cdn_domain) {
+      setCdnDomain(body.cdn_domain);
+    }
+    return res;
+  }
+
+  uploadEditorImage(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.request('/settings/upload-editor-image', {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
+  uploadEditorBase64(imageBase64) {
+    return this.request('/settings/upload-editor-image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ image_base64: imageBase64 }),
     });
   }
 

@@ -28,7 +28,7 @@ const defaultCtaItems = [
     id: "read_manga",
     title: "Baca Manga",
     subtitle: "Ribuan judul manga, manhwa & manhua gratis",
-    href: "https://v1.komiknesiaku.com/",
+    href: "https://nesianovel.com/",
     icon: "BookOpen",
     badge: "Hot",
   },
@@ -36,7 +36,7 @@ const defaultCtaItems = [
     id: "premium",
     title: "Upgrade ke Premium",
     subtitle: "Baca tanpa iklan & fitur eksklusif",
-    href: "https://v1.komiknesiaku.com/premium",
+    href: "https://nesianovel.com/premium",
     icon: "Crown",
     badge: "Pro",
   },
@@ -50,21 +50,21 @@ const defaultCtaItems = [
   {
     id: "facebook",
     title: "Facebook",
-    subtitle: "Halaman resmi KomikNesia di Facebook",
+    subtitle: "Halaman resmi NesiaNovel di Facebook",
     href: "https://facebook.com",
     icon: "Facebook",
   },
   {
     id: "tiktok",
     title: "TikTok",
-    subtitle: "Follow TikTok KomikNesia",
+    subtitle: "Follow TikTok NesiaNovel",
     href: "https://tiktok.com",
     icon: "TikTok",
   },
   {
     id: "instagram",
     title: "Instagram",
-    subtitle: "Follow Instagram KomikNesia",
+    subtitle: "Follow Instagram NesiaNovel",
     href: "https://instagram.com",
     icon: "Instagram",
   },
@@ -72,7 +72,7 @@ const defaultCtaItems = [
     id: "download_app",
     title: "Download App",
     subtitle: "Baca manga lebih nyaman di aplikasi",
-    href: "https://02.komiknesia.asia/",
+    href: "https://nesianovel.com/",
     icon: "Download",
     badge: "App",
   }
@@ -149,7 +149,7 @@ const faqItems = [
   },
   {
     question: "Apa domain resmi Nesianovel?",
-    answer: "Domain utama Nesianovel untuk baca manga adalah 02.komiknesia.asia. Hati-hati dengan domain lain yang mengatasnamakan Nesianovel dan pastikan kamu selalu mengakses domain resmi.",
+    answer: "Domain utama Nesianovel untuk baca manga adalah nesianovel.com. Hati-hati dengan domain lain yang mengatasnamakan Nesianovel dan pastikan kamu selalu mengakses domain resmi.",
   },
   {
     question: "Genre apa saja yang tersedia?",
@@ -306,7 +306,7 @@ const Landing = () => {
         <div className="flex flex-col items-center text-center">
           <div className="relative group">
             <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-red-600 to-rose-600 opacity-40 blur-lg transition duration-300 group-hover:opacity-75" />
-            <img src={logo} alt="KomikNesia" className="relative w-44 sm:w-56 object-contain" />
+            <img src={logo} alt="NesiaNovel" className="relative w-44 sm:w-56 object-contain" />
           </div>
 
           <div
@@ -558,13 +558,13 @@ const Landing = () => {
               }`}
           >
             <h2 className="text-lg font-extrabold text-red-500 mb-2">
-              KomikNesia Indonesia
+              NesiaNovel Indonesia
             </h2>
             <p className={`text-xs sm:text-sm leading-relaxed max-w-lg mx-auto ${isLightMode ? "text-slate-600" : "text-gray-400"}`}>
               Platform utama baca komik manga, manhwa, dan manhua bahasa Indonesia tercepat, terlengkap, dan gratis.
             </p>
             <p className="mt-4 text-xs font-semibold text-gray-500">
-              © {new Date().getFullYear()} KomikNesia. All rights reserved.
+              © {new Date().getFullYear()} NesiaNovel. All rights reserved.
             </p>
           </section>
         </div>
