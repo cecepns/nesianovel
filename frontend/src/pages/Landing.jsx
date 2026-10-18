@@ -25,9 +25,9 @@ import { decryptResponseAddress } from "../utils/decryptor";
 
 const defaultCtaItems = [
   {
-    id: "read_manga",
-    title: "Baca Manga",
-    subtitle: "Ribuan judul manga, manhwa & manhua gratis",
+    id: "read_novel",
+    title: "Baca Novel",
+    subtitle: "Ribuan judul web novel & light novel gratis",
     href: "https://nesianovel.com/",
     icon: "BookOpen",
     badge: "Hot",
@@ -71,7 +71,7 @@ const defaultCtaItems = [
   {
     id: "download_app",
     title: "Download App",
-    subtitle: "Baca manga lebih nyaman di aplikasi",
+    subtitle: "Baca novel lebih nyaman di aplikasi",
     href: "https://nesianovel.com/",
     icon: "Download",
     badge: "App",
@@ -116,48 +116,48 @@ const renderIcon = (iconName) => {
 };
 
 const getItemGradient = (id, iconName) => {
-  if (id === 'read_manga' || iconName === 'BookOpen') return 'from-red-600 to-rose-600 text-white shadow-red-500/25';
+  if (id === 'read_novel' || id === 'read_manga' || iconName === 'BookOpen') return 'from-purple-600 to-indigo-600 text-white shadow-purple-500/25';
   if (id === 'premium' || iconName === 'Crown') return 'from-amber-500 via-yellow-500 to-amber-600 text-slate-950 shadow-amber-500/25';
   if (id === 'discord' || iconName === 'Discord') return 'from-[#5865F2] to-indigo-600 text-white shadow-indigo-500/25';
   if (id === 'facebook' || iconName === 'Facebook') return 'from-[#1877F2] to-blue-600 text-white shadow-blue-500/25';
   if (id === 'tiktok' || iconName === 'TikTok') return 'from-slate-900 to-black text-white ring-1 ring-white/20 shadow-slate-950/40';
   if (id === 'instagram' || iconName === 'Instagram') return 'from-amber-500 via-rose-500 to-purple-600 text-white shadow-rose-500/25';
   if (id === 'download_app' || iconName === 'Download') return 'from-emerald-600 to-teal-600 text-white shadow-emerald-500/25';
-  return 'from-red-600 to-rose-600 text-white shadow-red-500/20';
+  return 'from-purple-600 to-indigo-600 text-white shadow-purple-500/20';
 };
 
 const stats = [
-  { value: "5000+", label: "Judul Komik", icon: BookOpen },
-  { value: "100K+", label: "Chapter", icon: Zap },
+  { value: "5000+", label: "Judul Novel", icon: BookOpen },
+  { value: "100K+", label: "Chapter Novel", icon: Zap },
   { value: "24/7", label: "Update Harian", icon: Flame },
 ];
 
 const genreItems = [
-  "Action", "Romance", "Fantasy", "Comedy", "Adventure",
-  "Martial Arts", "Shounen", "Seinen", "Isekai", "Slice of Life",
-  "Horror", "School Life", "Drama", "Harem", "Supernatural", "Ecchi"
+  "Fantasy", "Isekai", "Romance", "Action", "Martial Arts", "Xianxia", "Wuxia",
+  "Adventure", "Comedy", "Mystery", "Sci-Fi", "Slice of Life", "Supernatural",
+  "Reincarnation", "Drama", "School Life"
 ];
 
 const faqItems = [
   {
     question: "Apa itu Nesianovel?",
-    answer: "Nesianovel adalah platform baca komik online yang menyediakan manga (Jepang), manhwa (Korea), dan manhua (China) dalam bahasa Indonesia secara gratis. Nesianovel telah dipercaya oleh ratusan ribu pembaca di seluruh Indonesia.",
+    answer: "Nesianovel adalah platform baca novel online terdepan yang menyediakan web novel, light novel, dan novel terjemahan bahasa Indonesia terlengkap dan gratis. Nesianovel telah dipercaya oleh ratusan ribu pembaca novel di seluruh Indonesia.",
   },
   {
     question: "Apakah Nesianovel gratis?",
-    answer: "Ya! Kamu bisa membaca semua manga, manhwa, dan manhua di Nesianovel secara gratis. Tersedia juga opsi Premium untuk pengalaman tanpa iklan dan fitur eksklusif lainnya.",
+    answer: "Ya! Kamu bisa membaca ribuan judul novel dan chapter di Nesianovel secara gratis. Tersedia juga opsi Premium untuk pengalaman membaca tanpa iklan dan akses fitur eksklusif lainnya.",
   },
   {
     question: "Apa domain resmi Nesianovel?",
-    answer: "Domain utama Nesianovel untuk baca manga adalah nesianovel.com. Hati-hati dengan domain lain yang mengatasnamakan Nesianovel dan pastikan kamu selalu mengakses domain resmi.",
+    answer: "Domain resmi Nesianovel adalah nesianovel.com. Pastikan kamu selalu mengakses domain resmi untuk mendapatkan update chapter novel terbaru dan terpercaya.",
   },
   {
-    question: "Genre apa saja yang tersedia?",
-    answer: "Nesianovel menyediakan banyak genre termasuk Action, Romance, Fantasy, Comedy, Slice of Life, Martial Arts, Isekai, Horror, Seinen, Shounen, dan masih banyak lagi.",
+    question: "Genre novel apa saja yang tersedia?",
+    answer: "Nesianovel menyediakan beragam genre novel populer termasuk Fantasy, Isekai, Romance, Action, Martial Arts (Wuxia & Xianxia), Reincarnation, Sci-Fi, Mystery, Slice of Life, dan masih banyak lagi.",
   },
   {
-    question: "Bagaimana cara baca manga di Nesianovel?",
-    answer: 'Sangat mudah! Klik tombol "Baca Manga" di atas, cari judul manga yang kamu inginkan, pilih chapter, dan mulai membaca. Kamu juga bisa memakai aplikasi Android untuk pengalaman membaca yang lebih nyaman.',
+    question: "Bagaimana cara baca novel di Nesianovel?",
+    answer: 'Sangat mudah! Klik tombol "Baca Novel" di atas, cari judul novel yang ingin kamu nikmati, pilih chapter, dan langsung mulai membaca. Tampilan reader kami dirancang khusus agar nyaman untuk membaca teks panjang di HP maupun PC.',
   },
 ];
 
@@ -256,12 +256,12 @@ const Landing = () => {
       <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
         <div
           className={`absolute top-[-10%] left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full blur-[120px] opacity-40 transition-opacity ${isLightMode
-              ? "bg-gradient-to-tr from-red-200 via-rose-300 to-amber-200"
-              : "bg-gradient-to-tr from-red-900/60 via-rose-800/40 to-amber-900/30"
+              ? "bg-gradient-to-tr from-purple-200 via-indigo-200 to-purple-100"
+              : "bg-gradient-to-tr from-purple-950/70 via-purple-900/50 to-indigo-950/40"
             }`}
         />
         <div
-          className={`absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-[120px] opacity-30 transition-opacity ${isLightMode ? "bg-red-300/30" : "bg-red-900/30"
+          className={`absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-[120px] opacity-30 transition-opacity ${isLightMode ? "bg-purple-200/30" : "bg-purple-900/30"
             }`}
         />
       </div>
@@ -304,19 +304,18 @@ const Landing = () => {
 
         {/* Brand Logo & Headline */}
         <div className="flex flex-col items-center text-center">
-          <div className="relative group">
-            <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-red-600 to-rose-600 opacity-40 blur-lg transition duration-300 group-hover:opacity-75" />
-            <img src={logo} alt="NesiaNovel" className="relative w-44 sm:w-56 object-contain" />
+          <div className="relative">
+            <img src={logo} alt="NesiaNovel" className="w-44 sm:w-56 object-contain" />
           </div>
 
           <div
             className={`mt-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-extrabold shadow-sm transition-all ${isLightMode
-                ? "bg-red-50 text-red-700 border border-red-200/80"
-                : "bg-red-950/60 text-red-400 border border-red-900/60 backdrop-blur-md"
+                ? "bg-purple-50 text-purple-700 border border-purple-200/80"
+                : "bg-purple-950/60 text-purple-300 border border-purple-800/60 backdrop-blur-md"
               }`}
           >
-            <Flame className="h-4 w-4 text-red-500 animate-bounce" />
-            Baca Manga, Manhwa & Manhua Bahasa Indonesia
+            <Flame className="h-4 w-4 text-purple-400 animate-bounce" />
+            Platform Baca Web Novel & Light Novel Bahasa Indonesia
           </div>
         </div>
 
@@ -331,8 +330,8 @@ const Landing = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`group relative flex w-full items-center justify-between rounded-2xl border p-4 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${isLightMode
-                    ? "border-slate-200/90 bg-white hover:border-red-400/60 hover:shadow-red-500/10"
-                    : "border-gray-800/80 bg-gray-900/80 backdrop-blur-xl hover:border-red-600/60 hover:shadow-red-900/20"
+                    ? "border-slate-200/90 bg-white hover:border-purple-400/60 hover:shadow-purple-500/10"
+                    : "border-gray-800/80 bg-gray-900/80 backdrop-blur-xl hover:border-purple-500/60 hover:shadow-purple-900/20"
                   }`}
               >
                 <div className="flex items-center gap-4">
@@ -345,7 +344,7 @@ const Landing = () => {
                   <div className="text-left">
                     <div className="flex items-center gap-2">
                       <p
-                        className={`text-base font-extrabold sm:text-lg transition-colors group-hover:text-red-500 ${isLightMode ? "text-slate-900" : "text-gray-100"
+                        className={`text-base font-extrabold sm:text-lg transition-colors group-hover:text-purple-400 ${isLightMode ? "text-slate-900" : "text-gray-100"
                           }`}
                       >
                         {item.title}
@@ -354,7 +353,7 @@ const Landing = () => {
                         <span
                           className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${item.badge.toLowerCase() === 'pro' || item.badge.toLowerCase() === 'hot'
                               ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 shadow-sm'
-                              : 'bg-red-600 text-white shadow-sm'
+                              : 'bg-purple-600 text-white shadow-sm'
                             }`}
                         >
                           {item.badge}
@@ -374,8 +373,8 @@ const Landing = () => {
 
                 <div
                   className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all duration-300 group-hover:scale-110 ${isLightMode
-                      ? "bg-slate-100 text-slate-600 group-hover:bg-red-600 group-hover:text-white"
-                      : "bg-gray-800 text-gray-400 group-hover:bg-red-600 group-hover:text-white"
+                      ? "bg-slate-100 text-slate-600 group-hover:bg-purple-600 group-hover:text-white"
+                      : "bg-gray-800 text-gray-400 group-hover:bg-purple-600 group-hover:text-white"
                     }`}
                 >
                   <ExternalLink className="h-4 w-4" />
@@ -389,7 +388,7 @@ const Landing = () => {
         <div
           className={`mt-8 grid w-full grid-cols-3 gap-3 rounded-2xl border p-4 shadow-lg ${isLightMode
               ? "border-slate-200 bg-white"
-              : "border-gray-800 bg-gray-900/70 backdrop-blur-md"
+              : "border-purple-900/30 bg-gray-900/70 backdrop-blur-md"
             }`}
         >
           {stats.map((stat) => {
@@ -400,8 +399,8 @@ const Landing = () => {
                 className={`flex flex-col items-center justify-center rounded-xl p-3 text-center transition-transform hover:scale-105 ${isLightMode ? "bg-slate-50" : "bg-gray-800/60"
                   }`}
               >
-                <IconComponent className="h-5 w-5 text-red-500 mb-1.5" />
-                <p className="text-base font-extrabold text-red-500 sm:text-xl font-mono">
+                <IconComponent className="h-5 w-5 text-purple-400 mb-1.5" />
+                <p className="text-base font-extrabold text-purple-400 sm:text-xl font-mono">
                   {stat.value}
                 </p>
                 <p className={`text-[11px] font-semibold mt-0.5 ${isLightMode ? "text-slate-600" : "text-gray-400"}`}>
@@ -416,42 +415,42 @@ const Landing = () => {
         <div className="mt-8 w-full space-y-4">
           {/* About Section */}
           <section
-            className={`rounded-2xl border p-6 shadow-md transition-colors ${isLightMode ? "border-slate-200 bg-white" : "border-gray-800 bg-gray-900/70 backdrop-blur-md"
+            className={`rounded-2xl border p-6 shadow-md transition-colors ${isLightMode ? "border-slate-200 bg-white" : "border-purple-900/30 bg-gray-900/70 backdrop-blur-md"
               }`}
           >
-            <h2 className="flex items-center gap-2.5 text-xl font-extrabold text-red-500">
+            <h2 className="flex items-center gap-2.5 text-xl font-extrabold text-purple-400">
               <BookOpen className="h-5 w-5" /> Apa itu Nesianovel?
             </h2>
             <p className={`mt-3 text-sm leading-relaxed ${isLightMode ? "text-slate-600" : "text-gray-300"}`}>
-              Nesianovel adalah platform baca manga, manhwa, dan manhua online berbahasa Indonesia yang paling
-              lengkap dan terupdate. Dengan ribuan judul dari berbagai genre, Nesianovel menjadi pilihan utama para
-              pecinta komik Jepang, Korea, dan China di Indonesia.
+              Nesianovel adalah platform baca web novel, light novel, dan novel terjemahan online berbahasa Indonesia yang paling
+              lengkap dan terupdate. Dengan ribuan judul dari berbagai genre populer seperti Fantasy, Isekai, Xianxia, Romance,
+              hingga Sci-Fi, Nesianovel menjadi pilihan utama para penikmat cerita novel di Indonesia.
             </p>
             <p className={`mt-3 text-sm leading-relaxed ${isLightMode ? "text-slate-600" : "text-gray-300"}`}>
-              Nikmati pengalaman membaca yang nyaman dengan update chapter terbaru setiap hari, tampilan modern yang
-              responsif di semua perangkat, dan fitur bookmark untuk menyimpan manga favoritmu. Semua bisa kamu akses
+              Nikmati pengalaman membaca novel yang nyaman dan imersif dengan update chapter terbaru setiap hari, tampilan modern yang
+              responsif di semua perangkat, kustomisasi reader yang fleksibel, dan fitur bookmark untuk menyimpan novel favoritmu. Semua bisa kamu akses
               secara gratis!
             </p>
           </section>
 
           {/* Genre Section */}
           <section
-            className={`rounded-2xl border p-6 shadow-md transition-colors ${isLightMode ? "border-slate-200 bg-white" : "border-gray-800 bg-gray-900/70 backdrop-blur-md"
+            className={`rounded-2xl border p-6 shadow-md transition-colors ${isLightMode ? "border-slate-200 bg-white" : "border-purple-900/30 bg-gray-900/70 backdrop-blur-md"
               }`}
           >
-            <h2 className="flex items-center gap-2.5 text-xl font-extrabold text-red-500">
-              <Sparkles className="h-5 w-5" /> Jelajahi Genre Komik
+            <h2 className="flex items-center gap-2.5 text-xl font-extrabold text-purple-400">
+              <Sparkles className="h-5 w-5" /> Jelajahi Genre Novel
             </h2>
             <p className={`mt-2 text-xs sm:text-sm ${isLightMode ? "text-slate-500" : "text-gray-400"}`}>
-              Temukan ribuan manga, manhwa, dan manhua sesuai genre favoritmu:
+              Temukan ribuan web novel dan light novel sesuai genre favoritmu:
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {genreItems.map((genre) => (
                 <span
                   key={genre}
                   className={`rounded-xl px-3 py-1.5 text-xs font-bold border transition-all duration-200 hover:scale-105 cursor-pointer ${isLightMode
-                      ? "border-slate-200 bg-slate-100 text-slate-700 hover:border-red-500 hover:bg-red-600 hover:text-white"
-                      : "border-gray-800 bg-gray-800/80 text-gray-300 hover:border-red-500 hover:bg-red-600 hover:text-white"
+                      ? "border-slate-200 bg-slate-100 text-slate-700 hover:border-purple-500 hover:bg-purple-600 hover:text-white"
+                      : "border-gray-800 bg-gray-800/80 text-gray-300 hover:border-purple-500 hover:bg-purple-600 hover:text-white"
                     }`}
                 >
                   {genre}
@@ -462,23 +461,23 @@ const Landing = () => {
 
           {/* Features Section */}
           <section
-            className={`rounded-2xl border p-6 shadow-md transition-colors ${isLightMode ? "border-slate-200 bg-white" : "border-gray-800 bg-gray-900/70 backdrop-blur-md"
+            className={`rounded-2xl border p-6 shadow-md transition-colors ${isLightMode ? "border-slate-200 bg-white" : "border-purple-900/30 bg-gray-900/70 backdrop-blur-md"
               }`}
           >
-            <h2 className="flex items-center gap-2.5 text-xl font-extrabold text-red-500">
+            <h2 className="flex items-center gap-2.5 text-xl font-extrabold text-purple-400">
               <Zap className="h-5 w-5" /> Keunggulan Nesianovel
             </h2>
             <ul className="mt-4 space-y-3 text-xs sm:text-sm">
               {[
-                { title: "Koleksi Terlengkap", desc: "Ribuan judul manga, manhwa, dan manhua dalam bahasa Indonesia." },
+                { title: "Koleksi Terlengkap", desc: "Ribuan judul web novel, light novel, dan novel terjemahan dalam bahasa Indonesia." },
                 { title: "Update Tercepat", desc: "Chapter terbaru rilis setiap hari tanpa terlambat." },
                 { title: "Akses Perangkat", desc: "Tampilan responsif di HP, tablet, dan aplikasi Android." },
-                { title: "Bookmark & Riwayat", desc: "Simpan judul favorit dan lanjutkan dari halaman terakhir." },
-                { title: "Mode Gelap & Terang", desc: "Tampilan visual nyaman untuk mata kapan pun dibaca." },
+                { title: "Bookmark & Riwayat", desc: "Simpan judul favorit dan lanjutkan dari chapter terakhir." },
+                { title: "Mode Gelap & Terang", desc: "Tampilan visual nyaman untuk membaca teks kapan pun." },
                 { title: "Fitur Premium", desc: "Pengalaman baca bebas dari gangguan iklan." },
               ].map((feat) => (
                 <li key={feat.title} className="flex items-start gap-2.5">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-red-500 mt-0.5" />
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-purple-400 mt-0.5" />
                   <div>
                     <span className={`font-bold ${isLightMode ? "text-slate-900" : "text-gray-100"}`}>
                       {feat.title}
@@ -495,11 +494,11 @@ const Landing = () => {
 
           {/* FAQ Accordion */}
           <section
-            className={`rounded-2xl border p-6 shadow-md transition-colors ${isLightMode ? "border-slate-200 bg-white" : "border-gray-800 bg-gray-900/70 backdrop-blur-md"
+            className={`rounded-2xl border p-6 shadow-md transition-colors ${isLightMode ? "border-slate-200 bg-white" : "border-purple-900/30 bg-gray-900/70 backdrop-blur-md"
               }`}
           >
             <div className="flex items-center justify-between gap-3 mb-4">
-              <h2 className="flex items-center gap-2.5 text-xl font-extrabold text-red-500">
+              <h2 className="flex items-center gap-2.5 text-xl font-extrabold text-purple-400">
                 <Globe className="h-5 w-5" /> Pertanyaan Umum (FAQ)
               </h2>
               <button
@@ -521,8 +520,8 @@ const Landing = () => {
                   <div
                     key={item.question}
                     className={`rounded-xl border transition-colors overflow-hidden ${isLightMode
-                        ? isOpen ? "border-red-300 bg-red-50/50" : "border-slate-200 bg-slate-50"
-                        : isOpen ? "border-red-900/80 bg-red-950/20" : "border-gray-800/80 bg-gray-800/40"
+                        ? isOpen ? "border-purple-300 bg-purple-50/50" : "border-slate-200 bg-slate-50"
+                        : isOpen ? "border-purple-500/60 bg-purple-950/30" : "border-gray-800/80 bg-gray-800/40"
                       }`}
                   >
                     <button
@@ -535,12 +534,12 @@ const Landing = () => {
                         {item.question}
                       </span>
                       <ChevronDown
-                        className={`h-4 w-4 shrink-0 transition-transform duration-200 text-red-500 ${isOpen ? "rotate-180" : "rotate-0"
+                        className={`h-4 w-4 shrink-0 transition-transform duration-200 text-purple-400 ${isOpen ? "rotate-180" : "rotate-0"
                           }`}
                       />
                     </button>
                     {isOpen && (
-                      <div className="px-4 pb-4 pt-0 text-xs sm:text-sm leading-relaxed border-t border-red-500/10 mt-1">
+                      <div className="px-4 pb-4 pt-0 text-xs sm:text-sm leading-relaxed border-t border-purple-500/20 mt-1">
                         <p className={isLightMode ? "text-slate-600" : "text-gray-300"}>
                           {item.answer}
                         </p>
@@ -554,14 +553,14 @@ const Landing = () => {
 
           {/* Footer Info */}
           <section
-            className={`rounded-2xl border p-6 shadow-md transition-colors text-center ${isLightMode ? "border-slate-200 bg-white" : "border-gray-800 bg-gray-900/70 backdrop-blur-md"
+            className={`rounded-2xl border p-6 shadow-md transition-colors text-center ${isLightMode ? "border-slate-200 bg-white" : "border-purple-900/30 bg-gray-900/70 backdrop-blur-md"
               }`}
           >
-            <h2 className="text-lg font-extrabold text-red-500 mb-2">
+            <h2 className="text-lg font-extrabold text-purple-400 mb-2">
               NesiaNovel Indonesia
             </h2>
             <p className={`text-xs sm:text-sm leading-relaxed max-w-lg mx-auto ${isLightMode ? "text-slate-600" : "text-gray-400"}`}>
-              Platform utama baca komik manga, manhwa, dan manhua bahasa Indonesia tercepat, terlengkap, dan gratis.
+              Platform utama baca web novel, light novel, dan novel terjemahan bahasa Indonesia tercepat, terlengkap, dan gratis.
             </p>
             <p className="mt-4 text-xs font-semibold text-gray-500">
               © {new Date().getFullYear()} NesiaNovel. All rights reserved.

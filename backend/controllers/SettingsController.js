@@ -25,7 +25,7 @@ const DEFAULT_QUICK_LINKS = [
     id: "read_manga",
     title: "Baca Manga",
     subtitle: "Ribuan judul manga, manhwa & manhua gratis",
-    href: "https://v1.komiknesiaku.com/",
+    href: "https://nesianovel.com/",
     icon: "BookOpen",
     badge: "Hot",
     is_active: true,
@@ -35,7 +35,7 @@ const DEFAULT_QUICK_LINKS = [
     id: "premium",
     title: "Upgrade ke Premium",
     subtitle: "Baca tanpa iklan & fitur eksklusif",
-    href: "https://v1.komiknesiaku.com/premium",
+    href: "https://nesianovel.com/premium",
     icon: "Crown",
     is_active: true,
     is_internal: false
@@ -52,7 +52,7 @@ const DEFAULT_QUICK_LINKS = [
   {
     id: "facebook",
     title: "Facebook",
-    subtitle: "Halaman resmi KomikNesia di Facebook",
+    subtitle: "Halaman resmi NesiaNovel di Facebook",
     href: "https://facebook.com",
     icon: "Facebook",
     is_active: true,
@@ -61,7 +61,7 @@ const DEFAULT_QUICK_LINKS = [
   {
     id: "tiktok",
     title: "TikTok",
-    subtitle: "Follow TikTok KomikNesia",
+    subtitle: "Follow TikTok NesiaNovel",
     href: "https://tiktok.com",
     icon: "TikTok",
     is_active: true,
@@ -70,7 +70,7 @@ const DEFAULT_QUICK_LINKS = [
   {
     id: "instagram",
     title: "Instagram",
-    subtitle: "Follow Instagram KomikNesia",
+    subtitle: "Follow Instagram NesiaNovel",
     href: "https://instagram.com",
     icon: "Instagram",
     is_active: true,
@@ -80,7 +80,7 @@ const DEFAULT_QUICK_LINKS = [
     id: "download_app",
     title: "Download App",
     subtitle: "Baca manga lebih nyaman di aplikasi",
-    href: "https://02.komiknesia.asia/",
+    href: "https://nesianovel.com/",
     icon: "Download",
     is_active: true,
     is_internal: false
@@ -323,8 +323,95 @@ const uploadBanner = async (req, res) => {
   }
 };
 
+const uploadEditorImage = async (req, res) => {
+  try {
+    const { uploadFileToS3, uploadBufferToS3, s3Client, getDynamicCdnDomainSync } = require('../utils/s3Upload');
+    const path = require('path');
+    const fs = require('fs');
+
+    let savedPath = '';
+
+    // Handle multipart file upload
+    if (req.file) {
+      const ext = path.extname(req.file.originalname || req.file.filename || '').toLowerCase() || '.webp';
+      const filename = `editor_${Date.now()}_${Math.round(Math.random() * 1e6)}${ext}`;
+      const s3Key = `komiknesia/editor/${filename}`;
+
+      if (s3Client) {
+        try {
+          await uploadFileToS3(s3Key, req.file.path, req.file.mimetype);
+          savedPath = s3Key;
+          if (fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+          }
+        } catch (s3Err) {
+          console.error('Error uploading editor image to S3/R2:', s3Err);
+        }
+      }
+
+      if (!savedPath) {
+        const editorDir = path.join(__dirname, '..', 'uploads-komiknesia', 'editor');
+        if (!fs.existsSync(editorDir)) {
+          fs.mkdirSync(editorDir, { recursive: true });
+        }
+        const targetPath = path.join(editorDir, filename);
+        fs.renameSync(req.file.path, targetPath);
+        savedPath = `/uploads/editor/${filename}`;
+      }
+    } 
+    // Handle base64 payload if sent as JSON { image_base64: 'data:image/...' }
+    else if (req.body && req.body.image_base64) {
+      const matches = String(req.body.image_base64).match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      if (!matches) {
+        return res.status(400).json({ status: false, error: 'Format base64 image tidak valid' });
+      }
+      const mimeType = matches[1];
+      const buffer = Buffer.from(matches[2], 'base64');
+      const ext = mimeType.includes('png') ? '.png' : (mimeType.includes('jpeg') || mimeType.includes('jpg')) ? '.jpg' : mimeType.includes('gif') ? '.gif' : '.webp';
+      const filename = `editor_${Date.now()}_${Math.round(Math.random() * 1e6)}${ext}`;
+      const s3Key = `komiknesia/editor/${filename}`;
+
+      if (s3Client) {
+        try {
+          await uploadBufferToS3(s3Key, buffer, mimeType);
+          savedPath = s3Key;
+        } catch (s3Err) {
+          console.error('Error uploading base64 editor image to S3/R2:', s3Err);
+        }
+      }
+
+      if (!savedPath) {
+        const editorDir = path.join(__dirname, '..', 'uploads-komiknesia', 'editor');
+        if (!fs.existsSync(editorDir)) {
+          fs.mkdirSync(editorDir, { recursive: true });
+        }
+        const targetPath = path.join(editorDir, filename);
+        fs.writeFileSync(targetPath, buffer);
+        savedPath = `/uploads/editor/${filename}`;
+      }
+    } else {
+      return res.status(400).json({ status: false, error: 'Tidak ada file gambar atau data base64 yang diunggah' });
+    }
+
+    const cdnDomain = (getDynamicCdnDomainSync() || 'https://cdn.komiknesia.net').replace(/\/+$/, '');
+    const fullUrl = savedPath.startsWith('/uploads/')
+      ? `${req.protocol}://${req.get('host')}${savedPath}`
+      : `${cdnDomain}/${savedPath}`;
+
+    return res.json({
+      status: true,
+      path: savedPath,
+      url: fullUrl,
+    });
+  } catch (error) {
+    console.error('Error in uploadEditorImage:', error);
+    return res.status(500).json({ status: false, error: 'Internal server error' });
+  }
+};
+
 module.exports = {
   show,
   update,
   uploadBanner,
+  uploadEditorImage,
 };

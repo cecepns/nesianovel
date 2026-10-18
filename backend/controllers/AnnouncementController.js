@@ -1,4 +1,5 @@
 const db = require('../db');
+const { sanitizeHtmlForStorage } = require('../utils/s3Upload');
 
 function slugify(text) {
   return String(text || '')
@@ -79,15 +80,16 @@ const create = async (req, res) => {
       finalSlug = `${finalSlug}-${Date.now().toString().slice(-4)}`;
     }
 
+    const cleanContent = await sanitizeHtmlForStorage(content);
     const bannerImage = req.file ? `/uploads/${req.file.filename}` : (req.body.banner_image || null);
-    const excerptText = excerpt || (content.replace(/<[^>]*>?/gm, '').slice(0, 160) + '...');
+    const excerptText = excerpt || (cleanContent.replace(/<[^>]*>?/gm, '').slice(0, 160) + '...');
     const isPinned = is_pinned === true || is_pinned === '1' || is_pinned === 1 ? 1 : 0;
     const isPublished = is_published === false || is_published === '0' || is_published === 0 ? 0 : 1;
 
     const [result] = await db.execute(
       `INSERT INTO announcements (title, slug, content, excerpt, banner_image, is_pinned, is_published)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [title, finalSlug, content, excerptText, bannerImage, isPinned, isPublished]
+      [title, finalSlug, cleanContent, excerptText, bannerImage, isPinned, isPublished]
     );
 
     res.status(201).json({
@@ -112,8 +114,9 @@ const update = async (req, res) => {
     }
 
     let finalSlug = slug ? slugify(slug) : undefined;
+    const cleanContent = content !== undefined ? await sanitizeHtmlForStorage(content) : undefined;
     const bannerImage = req.file ? `/uploads/${req.file.filename}` : (req.body.banner_image !== undefined ? req.body.banner_image : rows[0].banner_image);
-    const excerptText = excerpt !== undefined ? excerpt : (content ? content.replace(/<[^>]*>?/gm, '').slice(0, 160) + '...' : undefined);
+    const excerptText = excerpt !== undefined ? excerpt : (cleanContent ? cleanContent.replace(/<[^>]*>?/gm, '').slice(0, 160) + '...' : undefined);
     const isPinned = is_pinned !== undefined ? (is_pinned === true || is_pinned === '1' || is_pinned === 1 ? 1 : 0) : undefined;
     const isPublished = is_published !== undefined ? (is_published === false || is_published === '0' || is_published === 0 ? 0 : 1) : undefined;
 
@@ -127,7 +130,7 @@ const update = async (req, res) => {
         is_pinned = COALESCE(?, is_pinned),
         is_published = COALESCE(?, is_published)
        WHERE id = ?`,
-      [title, finalSlug, content, excerptText, bannerImage, isPinned, isPublished, id]
+      [title, finalSlug, cleanContent, excerptText, bannerImage, isPinned, isPublished, id]
     );
 
     res.json({ status: true, message: 'Pengumuman berhasil diperbarui' });

@@ -9,6 +9,7 @@ const SettingsController = require('../controllers/SettingsController');
 router.get('/', encryptResponseMiddleware, SettingsController.show);
 router.put('/', authenticateToken, requireAdmin, SettingsController.update);
 router.post('/upload-banner', authenticateToken, requireAdmin, upload.single('image'), SettingsController.uploadBanner);
+router.post('/upload-editor-image', authenticateToken, requireAdmin, upload.single('image'), SettingsController.uploadEditorImage);
 
 module.exports = router;
 

@@ -217,43 +217,7 @@ io.on('connection', (socket) => {
 });
 
 // Middleware to dynamically rewrite S3/R2 image keys to use the current dynamic CDN domain
-const { tryParseS3KeyFromUrl, getDynamicCdnDomainSync } = require('./utils/s3Upload');
-
-function transformUrls(obj, cdnUrl) {
-  if (obj === null || obj === undefined) return obj;
-
-  if (obj instanceof Date) {
-    return obj;
-  }
-
-  if (typeof obj === 'string') {
-    if (obj.startsWith('/uploads/')) {
-      return obj;
-    }
-    const key = tryParseS3KeyFromUrl(obj);
-    if (key) {
-      const cleanCdn = cdnUrl.replace(/\/$/, '');
-      return `${cleanCdn}/${key}`;
-    }
-    return obj;
-  }
-
-  if (Array.isArray(obj)) {
-    return obj.map(item => transformUrls(item, cdnUrl));
-  }
-
-  if (typeof obj === 'object') {
-    const newObj = {};
-    for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        newObj[key] = transformUrls(obj[key], cdnUrl);
-      }
-    }
-    return newObj;
-  }
-
-  return obj;
-}
+const { tryParseS3KeyFromUrl, getDynamicCdnDomainSync, transformUrls } = require('./utils/s3Upload');
 
 app.use((req, res, next) => {
   const originalJson = res.json;

@@ -2,8 +2,7 @@ const db = require('../db');
 const { recordMangaViewEvent } = require('../utils/recordMangaViewEvent');
 const { upload } = require('../middlewares/upload'); // used in routes, not here
 const { deleteFile, resolveLocalUploadPath } = require('../utils/files');
-const { uploadFileToS3 } = require('../utils/s3Upload');
-const { deleteUrlFromS3 } = require('../utils/s3Upload');
+const { uploadFileToS3, deleteUrlFromS3, sanitizeHtmlForStorage } = require('../utils/s3Upload');
 const {
   isIkiruCdnUrl,
   isYuuCdnUrl,
@@ -614,9 +613,11 @@ const create = async (req, res) => {
     const coinPrice = parseInt(coin_price, 10) || 25;
     const isLocked = is_locked === '1' || is_locked === 1 || is_locked === true ? 1 : 0;
 
+    const cleanContent = content ? await sanitizeHtmlForStorage(content) : null;
+
     const [result] = await db.execute(
       'INSERT INTO chapters (manga_id, title, chapter_number, slug, cover, content, coin_price, is_locked) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [mangaId, title, chapter_number, chapterSlug, cover, content || null, coinPrice, isLocked]
+      [mangaId, title, chapter_number, chapterSlug, cover, cleanContent, coinPrice, isLocked]
     );
 
     await refreshMangaChapterActivity(db, mangaId);
@@ -653,8 +654,9 @@ const update = async (req, res) => {
     const params = [title, chapter_number, chapterSlug];
 
     if (content !== undefined) {
+      const cleanContent = content ? await sanitizeHtmlForStorage(content) : '';
       query += ', content = ?';
-      params.push(content);
+      params.push(cleanContent);
     }
     if (coin_price !== undefined) {
       query += ', coin_price = ?';

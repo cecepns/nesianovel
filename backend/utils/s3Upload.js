@@ -212,7 +212,12 @@ function tryParseS3KeyFromUrl(url) {
   // Raw key already stored (not a URL), e.g. "komiknesia/manga/..."
   if (!/^https?:\/\//i.test(raw)) {
     const normalized = raw.replace(/^\/+/, '');
-    if (normalized.startsWith(`${S3_BUCKET}/`)) {
+    if (
+      normalized.startsWith(`${S3_BUCKET}/`) ||
+      normalized.startsWith('komiknesia/') ||
+      normalized.startsWith('editor/') ||
+      normalized.startsWith('banners/')
+    ) {
       return normalized;
     }
     return null;
@@ -234,7 +239,7 @@ function tryParseS3KeyFromUrl(url) {
   }
 
   // If it starts with "komiknesia/", that's our key!
-  if (pathname.startsWith(`${S3_BUCKET}/`)) {
+  if (pathname.startsWith(`${S3_BUCKET}/`) || pathname.startsWith('komiknesia/')) {
     return pathname;
   }
 
@@ -250,7 +255,7 @@ function tryParseS3KeyFromUrl(url) {
   }
 
   // Last resort: if path already looks like our object key, use it.
-  if (pathname.startsWith('komiknesia/')) {
+  if (pathname.startsWith('komiknesia/') || pathname.startsWith('editor/') || pathname.startsWith('banners/')) {
     return pathname;
   }
 
@@ -317,6 +322,16 @@ function transformUrls(obj, cdnUrl) {
       const cleanCdn = (cdnUrl || GLOBAL_CDN_DOMAIN || S3_PUBLIC_URL).replace(/\/$/, '');
       return `${cleanCdn}/${key}`;
     }
+    if (obj.includes('<img')) {
+      const cleanCdn = (cdnUrl || GLOBAL_CDN_DOMAIN || S3_PUBLIC_URL).replace(/\/$/, '');
+      return obj.replace(/(<img\b[^>]*?\bsrc=["'])([^"']+)(["'][^>]*?>)/gi, (match, prefix, src, suffix) => {
+        const k = tryParseS3KeyFromUrl(src);
+        if (k) {
+          return `${prefix}${cleanCdn}/${k}${suffix}`;
+        }
+        return match;
+      });
+    }
     return obj;
   }
 
@@ -337,6 +352,83 @@ function transformUrls(obj, cdnUrl) {
   return obj;
 }
 
+/**
+ * Sanitizes HTML rich-text before saving to database:
+ * 1. Uploads any embedded base64 images directly to S3/R2 and replaces with relative S3 key.
+ * 2. Strips absolute CDN domain prefix from any S3 keys, ensuring only the relative path/key is stored.
+ * 3. Normalizes leading slashes for S3 keys.
+ */
+async function sanitizeHtmlForStorage(htmlContent) {
+  if (!htmlContent || typeof htmlContent !== 'string') return htmlContent;
+
+  let sanitized = htmlContent;
+
+  // 1. Process and upload any base64 images
+  const base64Regex = /<img\b([^>]*?)\bsrc=["'](data:image\/([a-zA-Z0-9+.-]+);base64,[^"']+)["']([^>]*?>)/gi;
+  const base64Matches = [];
+  let match;
+  while ((match = base64Regex.exec(sanitized)) !== null) {
+    base64Matches.push({
+      fullMatch: match[0],
+      beforeSrc: match[1],
+      dataUrl: match[2],
+      subtype: match[3],
+      afterSrc: match[4],
+    });
+  }
+
+  for (const item of base64Matches) {
+    try {
+      const parts = item.dataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      if (parts) {
+        const mimeType = parts[1];
+        const buffer = Buffer.from(parts[2], 'base64');
+        const ext = mimeType.includes('png') ? '.png' : (mimeType.includes('jpeg') || mimeType.includes('jpg')) ? '.jpg' : mimeType.includes('gif') ? '.gif' : '.webp';
+        const filename = `editor_${Date.now()}_${Math.round(Math.random() * 1e6)}${ext}`;
+        const s3Key = `komiknesia/editor/${filename}`;
+
+        let savedKey = '';
+        if (s3Client) {
+          try {
+            await uploadBufferToS3(s3Key, buffer, mimeType);
+            savedKey = s3Key;
+          } catch (e) {
+            console.error('Failed to upload base64 to S3/R2 in sanitizeHtmlForStorage:', e);
+          }
+        }
+
+        if (!savedKey) {
+          const editorDir = path.join(__dirname, '..', 'uploads-komiknesia', 'editor');
+          if (!fs.existsSync(editorDir)) {
+            fs.mkdirSync(editorDir, { recursive: true });
+          }
+          const targetPath = path.join(editorDir, filename);
+          fs.writeFileSync(targetPath, buffer);
+          savedKey = `/uploads/editor/${filename}`;
+        }
+
+        sanitized = sanitized.replace(item.fullMatch, `<img${item.beforeSrc}src="${savedKey}"${item.afterSrc}`);
+      }
+    } catch (err) {
+      console.error('Error processing base64 image in HTML:', err);
+    }
+  }
+
+  // 2. Strip any full CDN / external domain from our S3/R2 keys so only the relative path is stored
+  sanitized = sanitized.replace(/(<img\b[^>]*?\bsrc=["'])([^"']+)(["'][^>]*?>)/gi, (m, prefix, src, suffix) => {
+    const parsedKey = tryParseS3KeyFromUrl(src);
+    if (parsedKey) {
+      return `${prefix}${parsedKey}${suffix}`;
+    }
+    if (/^\/+komiknesia\//.test(src)) {
+      return `${prefix}${src.replace(/^\/+/, '')}${suffix}`;
+    }
+    return m;
+  });
+
+  return sanitized;
+}
+
 module.exports = {
   s3Client,
   uploadBufferToS3,
@@ -348,5 +440,6 @@ module.exports = {
   refreshCdnDomain,
   getDynamicCdnDomainSync,
   transformUrls,
+  sanitizeHtmlForStorage,
 };
 
